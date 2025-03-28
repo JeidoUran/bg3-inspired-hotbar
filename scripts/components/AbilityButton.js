@@ -3,34 +3,40 @@ import { CONFIG } from '../utils/config.js';
 class AbilityCard {
     // Static configuration for DnD5e system skill mappings
     static SKILL_MAP = {
-        "Athletics": "ath",
-        "Acrobatics": "acr",
-        "Sleight of Hand": "slt",
-        "Stealth": "ste",
-        "Arcana": "arc",
-        "History": "his",
+        "Athlétisme": "ath",
+        "Acrobaties": "acr",
+        "Escamotage": "slt",
+        "Discrétion": "ste",
+        "Arcanes": "arc",
+        "Histoire": "his",
         "Investigation": "inv",
         "Nature": "nat",
         "Religion": "rel",
-        "Animal Handling": "ani",
-        "Insight": "ins",
-        "Medicine": "med",
+        "Dressage": "ani",
+        "Intuition": "ins",
+        "Médecine": "med",
         "Perception": "prc",
-        "Survival": "sur",
-        "Deception": "dec",
+        "Survie": "sur",
+        "Tromperie": "dec",
         "Intimidation": "itm",
         "Performance": "prf",
-        "Persuasion": "per"
+        "Persuasion": "per",
+        "Armurerie": "arm",
+        "Coupe": "chp",
+        "Extraction": "tak",
+        "Forge": "frg",
+        "Minage": "min",
+        "Préparation": "prp"
     };
 
     // Static configuration for ability scores
     static ABILITY_CONFIG = {
-        str: { label: "Strength", skills: ["Athletics"] },
-        dex: { label: "Dexterity", skills: ["Acrobatics", "Sleight of Hand", "Stealth"] },
+        str: { label: "Force", skills: ["Athlétisme", "Forge", "Minage"] },
+        dex: { label: "Dextérité", skills: ["Acrobaties", "Escamotage", "Discrétion", "Armurerie", "Extraction"] },
         con: { label: "Constitution", skills: [] },
-        int: { label: "Intelligence", skills: ["Arcana", "History", "Investigation", "Nature", "Religion"] },
-        wis: { label: "Wisdom", skills: ["Animal Handling", "Insight", "Medicine", "Perception", "Survival"] },
-        cha: { label: "Charisma", skills: ["Deception", "Intimidation", "Performance", "Persuasion"] }
+        int: { label: "Intelligence", skills: ["Arcanes", "Histoire", "Investigation", "Nature", "Religion", "Préparation"] },
+        wis: { label: "Sagesse", skills: ["Dressage", "Intuition", "Médecine", "Perception", "Survie", "Coupe"] },
+        cha: { label: "Charisma", skills: ["Tromperie", "Intimidation", "Performance", "Persuasion"] }
     };
 
     constructor(portraitContainer) {
