@@ -36,7 +36,7 @@ class AbilityCard {
         con: { label: "Constitution", skills: [] },
         int: { label: "Intelligence", skills: ["Arcanes", "Histoire", "Investigation", "Nature", "Religion", "Préparation"] },
         wis: { label: "Sagesse", skills: ["Dressage", "Intuition", "Médecine", "Perception", "Survie", "Coupe"] },
-        cha: { label: "Charisma", skills: ["Tromperie", "Intimidation", "Performance", "Persuasion"] }
+        cha: { label: "Charisme", skills: ["Tromperie", "Intimidation", "Performance", "Persuasion"] }
     };
 
     constructor(portraitContainer) {
