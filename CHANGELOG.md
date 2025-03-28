@@ -1,3 +1,41 @@
+## [2.0.1] - 2025-03-28
+
+### Fixed:
+Related Issues: [#85] [#86]
+- Fix Auto-Scale setting
+- Allow Common Action Container to be unlocked
+- Setting to Enable/Disable Common Action Container auto-populating
+- Reorganize settings + categories
+
+Related Issue: [#28]
+- Extend "Collapse Foundry Macrobar" setting to Always/Never/When Hotbar visible
+
+Related Issues: [29]
+- Hide Spell Slots when https://foundryvtt.com/packages/dnd5e-spellpoints active and Spell Points item is found
+
+Related Issue: [#80] [#15]
+- Exclude Macros from cleanupInvalidItems
+
+Related Issue: [#87]
+- Fade out UI will now fade in when dragging over it
+
+Related Issue: [#14]
+- Add setting to show/hide hotbar controls menu on hover
+
+Related Issue: [#92]
+- Move getSceneControlButtons hook outside of init
+
+Related Issue: [#61]
+- When action type button is marked as "used" in filter container, associated skills will now be greyed out
+
+Related Issue: [#97]
+- Weapons will be auto-equipped only when switching sets, allowing to equip other weapons manually
+
+### Improvements:
+
+- Added settings to customize UI position and padding
+- Added option to fully hide the macrobar
+
 ## [2.0.0] - 2025-03-25
 **Thanks @Dapoulp for the PR's. Lots of great work while I was on holiday!**
 

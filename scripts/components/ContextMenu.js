@@ -4,6 +4,7 @@ import { CONFIG } from '../utils/config.js';
 import { fromUuid } from '../utils/foundryUtils.js';
 import { AutoPopulateDialog } from '../features/AutoPopulateContainer.js';
 import { AutoSort } from '../features/AutoSort.js';
+import { AutoPopulateCreateToken } from '../features/AutoPopulateCreateToken.js';
 
 export class ContextMenu {
     constructor(ui) {
@@ -29,6 +30,7 @@ export class ContextMenu {
     async show(e, container, slot) {
         e.preventDefault();
         e.stopPropagation();
+        if(container.data.locked) return;
         
         this.hide();
         this.currentContainer = container;
@@ -161,7 +163,7 @@ export class ContextMenu {
                 const autoPopulateOption = this._createMenuItem(
                     '<i class="fas fa-magic"></i>',
                     "Auto-Populate This Container",
-                    () => {
+                    async () => {
                         const targetContainer = this.currentContainer;
                         // Ensure container and UI references exist
                         if (!this.ui) {
@@ -170,8 +172,14 @@ export class ContextMenu {
                         }
                         targetContainer.ui = this.ui;
                         this.hide();
-                        const dialog = new AutoPopulateDialog(token.actor, targetContainer);
-                        dialog.render(true);
+                        if(targetContainer.data?.id == "combat-container") {
+                            await AutoPopulateCreateToken._populateCommonActions(token.actor, targetContainer.ui.manager);
+                            await targetContainer.ui.manager.persist();
+                            targetContainer.render();
+                        } else {
+                            const dialog = new AutoPopulateDialog(token.actor, targetContainer);
+                            dialog.render(true);
+                        }
                     }
                 );
                 menuItems.push(autoPopulateOption);

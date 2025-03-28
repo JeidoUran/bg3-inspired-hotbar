@@ -6,6 +6,7 @@ import { HotbarManager } from '../managers/HotbarManager.js';
 import { HotbarUI } from '../components/HotbarUI.js';
 import { AutoPopulateContainer } from './AutoPopulateContainer.js';
 import { AutoSort } from './AutoSort.js';
+import { BG3Hotbar } from '../bg3-hotbar.js';
 
 export class AutoPopulateDefaults extends FormApplication {
     static get defaultOptions() {
@@ -85,7 +86,7 @@ export class AutoPopulateDefaults extends FormApplication {
 
 export class AutoPopulateCreateToken {
     static async populateUnlinkedToken(token) {
-        if (!token?.actor || token.actor.type === 'character') return;
+        if (!token?.actor) return;
 
         try {
             // Check if user has permission to modify this token
@@ -94,67 +95,72 @@ export class AutoPopulateCreateToken {
                 return;
             }
 
-            // Get settings for each container
-            const container1Setting = game.settings.get(CONFIG.MODULE_NAME, 'container1AutoPopulate');
-            const container2Setting = game.settings.get(CONFIG.MODULE_NAME, 'container2AutoPopulate');
-            const container3Setting = game.settings.get(CONFIG.MODULE_NAME, 'container3AutoPopulate');
-
             // Create a temporary hotbar manager for this token
             const tempManager = new HotbarManager();
             tempManager.currentTokenId = token.id;
             await tempManager._loadTokenData();
 
-            // Initialize weapons containers with correct structure
-            tempManager.weaponsContainers = [];
-            for (let i = 0; i < 3; i++) {
-                tempManager.weaponsContainers[i] = {
-                    index: i,
-                    cols: 2,
-                    rows: 1,
-                    items: {},
-                    type: 'label',
-                    for: 'weapon-set',
-                    size: 1.5,
-                    delOnly: true,
-                    allowDuplicate: true,
-                    data: {
+            if(!tempManager.combatContainer[0]?.items || Object.values(tempManager.combatContainer[0].items).length > 0) return;
+            
+            // Auto-populate combat container if setting on true
+            if(game.settings.get(CONFIG.MODULE_NAME, 'autoPopulateCombatContainer') && token.actor.type !== 'vehicle') await this._populateCommonActions(token.actor, tempManager);
+
+            if(token.actor.type !== 'character' && ((!token.actorLink && game.settings.get(CONFIG.MODULE_NAME, 'autoPopulateUnlinkedTokens')) || (token.actorLink && game.settings.get(CONFIG.MODULE_NAME, 'autoPopulateLinkedTokens')))) {
+                // Get settings for each container
+                const container1Setting = game.settings.get(CONFIG.MODULE_NAME, 'container1AutoPopulate');
+                const container2Setting = game.settings.get(CONFIG.MODULE_NAME, 'container2AutoPopulate');
+                const container3Setting = game.settings.get(CONFIG.MODULE_NAME, 'container3AutoPopulate');
+    
+                // Initialize weapons containers with correct structure
+                tempManager.weaponsContainers = [];
+                for (let i = 0; i < 3; i++) {
+                    tempManager.weaponsContainers[i] = {
+                        id: 'weapon-container',
                         index: i,
-                        cols: 5,
-                        rows: 3,
+                        cols: 2,
+                        rows: 1,
                         items: {},
                         type: 'label',
                         for: 'weapon-set',
                         size: 1.5,
                         delOnly: true,
-                        allowDuplicate: true
-                    }
-                };
-            }
-  
-            // Process each container
-            if (token.actor) {
+                        allowDuplicate: true,
+                        data: {
+                            id: 'weapon-container',
+                            index: i,
+                            cols: 2,
+                            rows: 1,
+                            items: {},
+                            type: 'label',
+                            for: 'weapon-set',
+                            size: 1.5,
+                            delOnly: true,
+                            allowDuplicate: true
+                        }
+                    };
+                }
+      
+                // Process each weapon & combat containers
                 await this._populateWeaponsToken(token.actor, tempManager);
-            }
-
-            // Initialize containers with correct structure
-            tempManager.containers = [];
-            for (let i = 0; i < 3; i++) {
-                tempManager.containers[i] = {
-                    index: i,
-                    cols: 5,
-                    rows: 3,
-                    items: {},
-                    data: {
+    
+                // Initialize containers with correct structure
+                tempManager.containers = [];
+                for (let i = 0; i < 3; i++) {
+                    tempManager.containers[i] = {
                         index: i,
                         cols: 5,
                         rows: 3,
-                        items: {}
-                    }
-                };
-            }
-
-            // Process each container
-            if (token.actor) {
+                        items: {},
+                        data: {
+                            index: i,
+                            cols: 5,
+                            rows: 3,
+                            items: {}
+                        }
+                    };
+                }
+    
+                // Process each container
                 await this._populateContainerWithSettings(token.actor, tempManager, 0, container1Setting);
                 await this._populateContainerWithSettings(token.actor, tempManager, 1, container2Setting);
                 await this._populateContainerWithSettings(token.actor, tempManager, 2, container3Setting);
@@ -295,5 +301,30 @@ export class AutoPopulateCreateToken {
       } catch (error) {
           console.error("BG3 Inspired Hotbar | Error auto-populating weapons token hotbar:", error);
       }
+    }
+
+    static async _populateCommonActions(actor, manager) {
+        if(actor.type == 'vehicule') return;
+        try {
+            const tmpArray = [],
+                actionsClone = foundry.utils.deepClone(CONFIG.COMBATACTIONDATA)
+            Object.entries(actionsClone).forEach(([key, value]) => {
+              const hasItem = actor.items.find(item => item.type == 'feat' && item.name == value.name)
+              if(hasItem) value.uuid = hasItem.uuid;
+              else {
+                let tmpItem = BG3Hotbar.combatActionsArray.find(it => it.name == value.name);
+                if(tmpItem) tmpArray.push(tmpItem);
+              }
+            })
+            if(tmpArray.length) {
+              let tmpDoc = await actor.createEmbeddedDocuments('Item', tmpArray);
+              tmpDoc.forEach(doc => Object.values(actionsClone).find(value => value.name == doc.name).uuid = doc.uuid)
+            }
+            manager.combatContainer[0].items = actionsClone;
+            if(!manager.combatContainer[0].data) manager.combatContainer[0].data = {};
+            manager.combatContainer[0].data.items = actionsClone;
+        } catch (error) {
+            console.error("BG3 Inspired Hotbar | Error auto-populating common actions token hotbar:", error);
+        }
     }
 }

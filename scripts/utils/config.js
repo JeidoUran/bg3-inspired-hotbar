@@ -55,7 +55,7 @@ export const CONFIG = {
         BACKGROUND_LIGHT: "#2e2e2e",
         BACKGROUND_HIGHLIGHT: "#3e3e3e",
         BACKGROUND_ACTIVE: "#4e4e4e",
-        BORDER: "#444444",
+        // BORDER: "#444444",
         TEXT: {
             PRIMARY: "#dddddd",
             SECONDARY: "#999999"

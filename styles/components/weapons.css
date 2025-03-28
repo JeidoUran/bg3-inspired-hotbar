@@ -10,6 +10,7 @@
     display: flex;
     height: 100%;
     padding-top: var(--cell-size);
+    min-height: calc(var(--cell-size) * 1.6);
 }
 
 .bg3-hotbar-weaponcontainer {

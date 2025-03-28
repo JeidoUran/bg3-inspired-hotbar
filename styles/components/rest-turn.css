@@ -108,7 +108,7 @@
 }
 
 #toggle-input:checked ~ #bg3-hotbar-container {
-    transform: translateY(calc(100% + 15px));
+    transform: translateY(calc(100% + 5px));
 }
 
 #toggle-input:checked ~ #bg3-hotbar-container .filter-container, #toggle-input:checked ~ #bg3-hotbar-container .passives-container, #toggle-input:checked ~ #bg3-hotbar-container .effects-container, #toggle-input:checked ~ #bg3-hotbar-container .bg3-hotbar-weaponcontainer, #toggle-input:checked ~ #bg3-hotbar-container .portrait-card {

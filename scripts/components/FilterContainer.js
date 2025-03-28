@@ -128,8 +128,8 @@ export class FilterContainer {
             if (this.selectedActionType === type) {
                 this.selectedActionType = null;
                 button.style.borderColor = "transparent";
-                this._updateActionTypeHighlights();
             }
+            this._updateActionTypeHighlights(true);
         } else {
             // Mark action as used
             this.usedActions.add(type);
@@ -139,8 +139,8 @@ export class FilterContainer {
             if (this.selectedActionType === type) {
                 this.selectedActionType = null;
                 button.style.borderColor = "transparent";
-                this._updateActionTypeHighlights();
             }
+            this._updateActionTypeHighlights(true);
         }
     }
 
@@ -274,16 +274,9 @@ export class FilterContainer {
         return romanNumerals[num - 1] || num.toString();
     }
 
-    async _updateActionTypeHighlights() {
-        const highlightStyle = game.settings.get('bg3-inspired-hotbar', 'highlightStyle');
-        
+    async _updateActionTypeHighlights(onActionUsed) {        
         this.hotbarUI.gridContainers.forEach((container) => {
             container.element.querySelectorAll(".hotbar-cell").forEach(async (cell) => {
-                cell.style.boxShadow = 'none';
-                cell.style.borderColor = CONFIG.COLORS.BORDER;
-                cell.style.borderWidth = '2px';
-                cell.style.borderBottom = `2px solid ${CONFIG.COLORS.BORDER}`;
-                cell.style.opacity = '1';
                 
                 const slotKey = cell.dataset.slot;
                 const item = container.data.items[slotKey];
@@ -294,28 +287,18 @@ export class FilterContainer {
                         if (!itemData) return;
 
                         const activation = itemData.system?.activation?.type?.toLowerCase();
+                        if(onActionUsed === true) {
+                            cell.classList.toggle('action-used', this.usedActions.has(activation));
+                            return;
+                        }
+                        cell.classList.remove('action-excluded');
+                        cell.removeAttribute('data-highlight-type');
                         
                         if (this.selectedActionType) {
-                            let color = null;
-                            
-                            if (this.selectedActionType === "action" && activation === "action") {
-                                color = CONFIG.COLORS.ACTION;
-                            } else if (this.selectedActionType === "bonus" && activation === "bonus") {
-                                color = CONFIG.COLORS.BONUS;
-                            } else if (this.selectedActionType === "reaction" && activation === "reaction") {
-                                color = CONFIG.COLORS.REACTION;
-                            } else cell.style.opacity = '.25';
-
-                            if (color) {
-                                switch (highlightStyle) {
-                                    case 'bottom':
-                                        cell.style.borderBottom = `2px solid ${color}`;
-                                        break;
-                                    case 'border':
-                                        cell.style.borderColor = color;
-                                        break;
-                                }
-                            }
+                            /* if(this.selectedActionType === activation) cell.classList.add('action-highlighted');
+                            else cell.classList.add('action-excluded'); */
+                            if(this.selectedActionType === activation) cell.dataset.highlightType = 'action';
+                            else cell.classList.add('action-excluded');
                         }
                     } catch (error) {
                         console.error("Error updating action highlights:", error);
@@ -325,16 +308,11 @@ export class FilterContainer {
         });
     }
 
-    async _updateSpellLevelHighlights() {
-        const highlightStyle = game.settings.get('bg3-inspired-hotbar', 'highlightStyle');
-        
+    async _updateSpellLevelHighlights() {        
         this.hotbarUI.gridContainers.forEach((container) => {
             container.element.querySelectorAll(".hotbar-cell").forEach(async (cell) => {
-                cell.style.boxShadow = 'none';
-                cell.style.borderColor = CONFIG.COLORS.BORDER;
-                cell.style.borderWidth = '2px';
-                cell.style.borderBottom = `2px solid ${CONFIG.COLORS.BORDER}`;
-                cell.style.opacity = '1';
+                cell.classList.remove('action-excluded');
+                cell.removeAttribute('data-highlight-type');
                 
                 const slotKey = cell.dataset.slot;
                 const item = container.data.items[slotKey];
@@ -342,25 +320,17 @@ export class FilterContainer {
                 if (item && this.selectedSpellLevel.level !== null) {
                     try {
                         const itemData = await fromUuid(item.uuid);
-                        if (!itemData || itemData.type !== "spell") {
-                            cell.style.opacity = '.25';
+                        if (!itemData) return;
+                        if (itemData.type !== "spell") {
+                            cell.classList.add('action-excluded');
                             return
                         };
 
                         const spellLevel = itemData.system.level;
                         const isPactSpell = itemData.system.preparation?.mode === "pact";
                         
-                        if (spellLevel === this.selectedSpellLevel.level && this.selectedSpellLevel.isPact === isPactSpell) {
-                            const color = this.selectedSpellLevel.isPact ? CONFIG.COLORS.PACT_MAGIC : CONFIG.COLORS.SPELL_SLOT;
-                            switch (highlightStyle) {
-                                case 'bottom':
-                                    cell.style.borderBottom = `2px solid ${color}`;
-                                    break;
-                                case 'border':
-                                    cell.style.borderColor = color;
-                                    break;
-                            }
-                        } else cell.style.opacity = '.25';
+                        if (spellLevel === this.selectedSpellLevel.level && this.selectedSpellLevel.isPact === isPactSpell) cell.dataset.highlightType = 'spell';
+                        else cell.classList.add('action-excluded');
                     } catch (error) {
                         console.error("Error updating spell level highlights:", error);
                     }
@@ -369,16 +339,11 @@ export class FilterContainer {
         });
     }
 
-    async _updateFeatureHighlights() {
-        const highlightStyle = game.settings.get('bg3-inspired-hotbar', 'highlightStyle');
-        
+    async _updateFeatureHighlights() {        
         this.hotbarUI.gridContainers.forEach((container) => {
             container.element.querySelectorAll(".hotbar-cell").forEach(async (cell) => {
-                cell.style.boxShadow = 'none';
-                cell.style.borderColor = CONFIG.COLORS.BORDER;
-                cell.style.borderWidth = '2px';
-                cell.style.borderBottom = `2px solid ${CONFIG.COLORS.BORDER}`;
-                cell.style.opacity = '1';
+                cell.classList.remove('action-excluded');
+                cell.removeAttribute('data-highlight-type');
                 
                 const slotKey = cell.dataset.slot;
                 const item = container.data.items[slotKey];
@@ -386,22 +351,9 @@ export class FilterContainer {
                 if (item && this.featuresEnabled) {
                     try {
                         const itemData = await fromUuid(item.uuid);
-                        if (!itemData || itemData.type !== "feat") {
-                            cell.style.opacity = '.25';
-                            return
-                        };
-
-                        const featureType = itemData.system.type?.value || 'default';
-                        const color = CONFIG.COLORS.FEATURES[featureType] || CONFIG.COLORS.FEATURES.default;
-
-                        switch (highlightStyle) {
-                            case 'bottom':
-                                cell.style.borderBottom = `2px solid ${color}`;
-                                break;
-                            case 'border':
-                                cell.style.borderColor = color;
-                                break;
-                        }
+                        if (!itemData) return;
+                        if (itemData.type !== "feat") cell.classList.add('action-excluded');
+                        else cell.dataset.highlightType = 'feat';
                     } catch (error) {
                         console.error("Error updating feature highlights:", error);
                     }
@@ -474,6 +426,7 @@ export class FilterContainer {
 
         const spellContainer = document.createElement("div");
         spellContainer.classList.add("spell-container");
+        if(this.hotbarUI.manager.checkSpellPoint()) spellContainer.classList.add("filter-spell-point");
 
         let actor = null;
 

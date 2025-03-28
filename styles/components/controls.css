@@ -10,6 +10,7 @@
   flex-direction: column;
   gap: 8px;
   z-index: 100;
+  transition: opacity 0.3s ease-in-out 0s;
 }
 
 /* ==========================================================================
@@ -28,7 +29,16 @@
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  position: relative;  /* Add this to make it the positioning context for menus */
+  position: relative;  /* Add this to make it the positioning context for menus */ 
+  transition: opacity 0.3s ease-in-out 0s;
+}
+
+.bg3-hud .hotbar-control-column.fade {
+  opacity: 0;
+}
+
+.bg3-hud .hotbar-control-column.fade:hover {
+  opacity: 1;
 }
 
 .bg3-hud .hotbar-control-button:hover {

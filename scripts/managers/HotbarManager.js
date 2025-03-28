@@ -11,13 +11,13 @@ export class HotbarManager {
         this.currentTokenId = null;
         this.containers = [];
         this.weaponsContainers = [];
+        this.combatContainer = [];
         this.tokenConfigs = new Map(); // Store configurations per token
         this.portraitVisible = true;
         this.itemManager = new ItemUpdateManager(this);
         this.activeSet = 0;
         this.combatActionsArray = [];
         this._initializeContainers();
-        this.loadCombatActions();
     }
 
     _initializeContainers() {
@@ -32,9 +32,11 @@ export class HotbarManager {
             });
         }
         
+        this.weaponsContainers = [];
         // Create 3 weapons containers
         for(let i = 0; i < 3; i++) {
             this.weaponsContainers.push({
+                id: 'weapon-container',
                 index: i,
                 cols: 2,
                 rows: 1,
@@ -46,6 +48,18 @@ export class HotbarManager {
                 allowDuplicate: true
             });
         }
+
+        // Create 1 combat container
+        this.combatContainer = [{
+            id: 'combat-container',
+            index: 0,
+            cols: 2,
+            rows: 3,
+            items: {},
+            size: 1.5,
+            locked: !!game.settings.get(CONFIG.MODULE_NAME, 'lockCombatContainer')
+        }];
+
     }
 
     async updateHotbarForControlledToken(forceUpdate = false) {
@@ -84,6 +98,7 @@ export class HotbarManager {
             }));
 
             const weaponsContainersToCache = this.weaponsContainers.map(container => ({
+                id: container.id,
                 index: container.index,
                 cols: container.cols,
                 rows: container.rows,
@@ -94,10 +109,20 @@ export class HotbarManager {
                 delOnly: container.delOnly,
                 allowDuplicate: container.allowDuplicate
             }));
+
+            const combatContainersToCache = [{
+                id: this.combatContainer[0].id,
+                index: this.combatContainer[0].index,
+                cols: this.combatContainer[0].cols,
+                rows: this.combatContainer[0].rows,
+                items: foundry.utils.deepClone(this.combatContainer[0].items),
+                size: this.combatContainer[0].size
+            }];
             
             this.tokenConfigs.set(this.currentTokenId, {
                 containers: containersToCache,
                 weaponsContainers: weaponsContainersToCache,
+                combatContainer: combatContainersToCache,
                 portraitVisible: this.portraitVisible,
                 activeSet: this.activeSet
             });
@@ -121,6 +146,7 @@ export class HotbarManager {
                 items: foundry.utils.deepClone(container.items)
             }));
             this.weaponsContainers = config.weaponsContainers.map(container => ({
+                id: container.id,
                 index: container.index,
                 cols: container.cols,
                 rows: container.rows,
@@ -131,6 +157,15 @@ export class HotbarManager {
                 delOnly: container.delOnly,
                 allowDuplicate: container.allowDuplicate
             }));
+            this.combatContainer = [{
+                id: config.combatContainer[0].id,
+                index: config.combatContainer[0].index,
+                cols: config.combatContainer[0].cols,
+                rows: config.combatContainer[0].rows,
+                items: foundry.utils.deepClone(config.combatContainer[0].items),
+                size: config.combatContainer[0].size,
+                locked: !!game.settings.get(CONFIG.MODULE_NAME, 'lockCombatContainer')
+            }];
             this.portraitVisible = config.portraitVisible;
             this.activeSet = config.activeSet;
         } else {
@@ -151,7 +186,7 @@ export class HotbarManager {
 
         if (savedData) {
             // Handle both old and new data formats
-            let containersData, weaponsContainersData;
+            let containersData, weaponsContainersData, combatContainerData;
             if (Array.isArray(savedData)) {
                 // Old format: direct array of containers
                 containersData = foundry.utils.deepClone(savedData);
@@ -161,10 +196,12 @@ export class HotbarManager {
                 // New format: object with containers and portraitVisible
                 containersData = foundry.utils.deepClone(savedData.containers);
                 weaponsContainersData = foundry.utils.deepClone(savedData.weaponsContainers);
+                combatContainerData = foundry.utils.deepClone(savedData.combatContainer);
                 if(!weaponsContainersData) {
                   weaponsContainersData = []
                   for(let i=0;i<3;i++) {
                     weaponsContainersData.push({
+                        id: 'weapon-container',
                         index: this.weaponsContainers.length,
                         cols: 2,
                         rows: 1,
@@ -176,6 +213,17 @@ export class HotbarManager {
                         allowDuplicate: true
                     });
                   }
+                }
+                if(!combatContainerData) {
+                    combatContainerData = [{
+                        id: 'combat-container',
+                        index: 0,
+                        cols: 2,
+                        rows: 3,
+                        items: {},
+                        size: 1.5,
+                        locked: !!game.settings.get(CONFIG.MODULE_NAME, 'lockCombatContainer')
+                    }];
                 }
                 this.activeSet = savedData.activeSet ?? 0;
                 this.portraitVisible = savedData.portraitVisible ?? true;
@@ -193,6 +241,7 @@ export class HotbarManager {
             }));
               
             this.weaponsContainers = weaponsContainersData.map((container, index) => ({
+                id: container.id,
                 index: index,
                 cols: container.cols,
                 rows: container.rows,
@@ -203,6 +252,16 @@ export class HotbarManager {
                 delOnly: container.delOnly,
                 allowDuplicate: container.allowDuplicate
             }));
+
+            this.combatContainer = [{
+                id: combatContainerData[0].id,
+                index: combatContainerData[0].index,
+                cols: combatContainerData[0].cols,
+                rows: combatContainerData[0].rows,
+                items: foundry.utils.deepClone(combatContainerData[0].items || {}),
+                size: combatContainerData[0].size,
+                locked: !!game.settings.get(CONFIG.MODULE_NAME, 'lockCombatContainer')
+            }];
 
             // Final state after loading
 
@@ -217,6 +276,7 @@ export class HotbarManager {
             }
             while (this.weaponsContainers.length < 3) {
                 this.weaponsContainers.push({
+                    id: 'weapon-container',
                     index: this.weaponsContainers.length,
                     cols: 2,
                     rows: 1,
@@ -244,6 +304,7 @@ export class HotbarManager {
                 items: foundry.utils.deepClone(container.items)
             })),
             weaponsContainers: this.weaponsContainers.map(container => ({
+              id: container.id,
               index: container.index,
               cols: container.cols,
               rows: container.rows,
@@ -254,6 +315,14 @@ export class HotbarManager {
               delOnly: container.delOnly,
               allowDuplicate: container.allowDuplicate
             })),
+            combatContainer: [{
+                id: this.combatContainer[0].id,
+                index: this.combatContainer[0].index,
+                cols: this.combatContainer[0].cols,
+                rows: this.combatContainer[0].rows,
+                items: foundry.utils.deepClone(this.combatContainer[0].items),
+                size: this.combatContainer[0].size
+            }],
             activeSet: this.activeSet,
             portraitVisible: this.portraitVisible
         };
@@ -276,9 +345,10 @@ export class HotbarManager {
             rows: container.rows,
             items: foundry.utils.deepClone(container.items)  // Use Foundry's deep clone utility
         }));
-  
+        
         // Create deep copies of the weapons containers for saving
         const weaponsToSave = this.weaponsContainers.map(container => ({
+            id: 'weapon-container',
             index: container.index,
             cols: container.cols,
             rows: container.rows,
@@ -290,10 +360,20 @@ export class HotbarManager {
             allowDuplicate: true
         }));
 
+        const combatToSave = [{
+            id: this.combatContainer[0].id,
+            index: this.combatContainer[0].index,
+            cols: this.combatContainer[0].cols,
+            rows: this.combatContainer[0].rows,
+            items: foundry.utils.deepClone(this.combatContainer[0].items),
+            size: this.combatContainer[0].size
+        }];
+
         // Create the data object including portrait visibility
         const dataToSave = {
             containers: containersToSave,
             weaponsContainers: weaponsToSave,
+            combatContainer: combatToSave,
             activeSet: this.activeSet,
             portraitVisible: this.portraitVisible
         };
@@ -308,6 +388,7 @@ export class HotbarManager {
 
         // Save to actor flags
         await targetActor.setFlag(CONFIG.MODULE_NAME, CONFIG.FLAG_NAME, dataToSave);
+        console.log(targetActor.getFlag(CONFIG.MODULE_NAME, CONFIG.FLAG_NAME).combatContainer[0].items)
     }
 
     async cleanupInvalidItems(actor) {
@@ -328,23 +409,6 @@ export class HotbarManager {
         }
     }
 
-    async loadCombatActions() {
-        if (!game.modules.get("chris-premades")?.active) return;
-        let pack = game.packs.get("chris-premades.CPRActions"),
-            promises = [];
-        Object.entries(CONFIG.COMBATACTIONDATA).forEach(([key, value]) => {
-            let macroID = pack.index.find(t =>  t.type == 'feat' && t.name === value.name)._id;
-            if(macroID) {
-                promises.push(new Promise(async (resolve, reject) => {
-                    let item = await pack.getDocument(macroID);
-                    if(item) this.combatActionsArray.push(item)
-                    resolve();
-                }))
-            }
-        })
-        await Promise.all(promises).then((values) => {})
-    }
-
     // Clean up all data
     async cleanupAllData() {
         this.tokenConfigs.clear();
@@ -363,6 +427,14 @@ export class HotbarManager {
         }
     }
 
+    checkSpellPoint() {
+        if (game.modules.get("dnd5e-spellpoints")?.active) {
+            const token = canvas.tokens.get(this.currentTokenId);
+            if(token && token.actor.items.find(i => i.system.identifier == "spell-points")) return true;
+        }
+        return false;
+    }
+    
     async socketUpdateData(actor, changes) {
         // Check if we have saved data for this token
         if(this.currentTokenId && this.tokenConfigs.has(this.currentTokenId)) {

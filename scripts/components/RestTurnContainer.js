@@ -53,7 +53,7 @@ export class RestTurnContainer {
                 'click': this.actor.shortRest.bind(this.actor)
             }
         }
-        this._buttons.push(new RestTurnButton(dataShort));
+        if(this.actor?.type != 'vehicle') this._buttons.push(new RestTurnButton(dataShort));
 
         const dataLong = {
             type: 'div',
@@ -65,7 +65,7 @@ export class RestTurnContainer {
                 'click': this.actor.longRest.bind(this.actor)
             }
         }
-        this._buttons.push(new RestTurnButton(dataLong));
+        if(this.actor?.type != 'vehicle') this._buttons.push(new RestTurnButton(dataLong));
 
         // Add buttons to container
         for(let i = 0; i < this._buttons.length; i++) {
