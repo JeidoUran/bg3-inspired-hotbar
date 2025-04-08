@@ -169,10 +169,10 @@ export class BaseTooltip {
     const detailsEl = document.createElement("div");
     detailsEl.classList.add("tooltip-details-list");
     const detailsHTML = [];
-    if (details.castingTime) detailsHTML.push(`<div><strong>Action:</strong> ${details.castingTime}</div>`);
-    if (details.range) detailsHTML.push(`<div><strong>Range:</strong> ${details.range}</div>`);
-    if (details.target) detailsHTML.push(`<div><strong>Target:</strong> ${details.target}</div>`);
-    if (details.duration) detailsHTML.push(`<div><strong>Duration:</strong> ${details.duration}</div>`);
+    if (details.castingTime) detailsHTML.push(`<div><strong>${game.i18n.localize("BG3.Hotbar.Tooltips.Action")}:</strong> ${details.castingTime}</div>`);
+    if (details.range) detailsHTML.push(`<div><strong>${game.i18n.localize("BG3.Hotbar.Tooltips.Range")}:</strong> ${details.range}</div>`);
+    if (details.target) detailsHTML.push(`<div><strong>${game.i18n.localize("BG3.Hotbar.Tooltips.Target")}:</strong> ${details.target}</div>`);
+    if (details.duration) detailsHTML.push(`<div><strong>${game.i18n.localize("BG3.Hotbar.Tooltips.Duration")}:</strong> ${details.duration}</div>`);
     if (detailsHTML.length > 0) {
       detailsEl.innerHTML = detailsHTML.join("");
       content.appendChild(detailsEl);
@@ -182,7 +182,7 @@ export class BaseTooltip {
     if (this.item.system?.description?.value) {
       const descHeader = document.createElement("div");
       descHeader.classList.add("tooltip-description-header");
-      descHeader.textContent = "Description";
+      descHeader.textContent = game.i18n.localize("BG3.Hotbar.Tooltips.Description");
       content.appendChild(descHeader);
 
       const descContainer = document.createElement("div");
@@ -190,7 +190,7 @@ export class BaseTooltip {
 
       const descEl = document.createElement("div");
       descEl.classList.add("tooltip-description");
-      descEl.textContent = "Loading description...";
+      descEl.textContent = game.i18n.localize("BG3.Hotbar.Tooltips.LoadingDescription");
       
       // Get roll data from the item
       const rollData = this.item.getRollData ? this.item.getRollData() : {};
@@ -198,21 +198,21 @@ export class BaseTooltip {
       // Use enrichHTMLClean for consistent enrichment across all tooltips
       try {
         const enrichedHTML = await enrichHTMLClean(this.item.system.description.value, rollData, this.item);
-        descEl.innerHTML = enrichedHTML || "No description available.";
+        descEl.innerHTML = enrichedHTML || game.i18n.localize("BG3.Hotbar.Tooltips.NoDescription");
       } catch (err) {
-        console.warn("BG3 Hotbar - Failed to enrich item description:", err);
-        descEl.textContent = "No description available.";
+        console.warn("BG3 Hotbar - Failed to enrich description:", err);
+        descEl.textContent = game.i18n.localize("BG3.Hotbar.Tooltips.NoDescription");
       }
-      
+
       descContainer.appendChild(descEl);
       content.appendChild(descContainer);
     } else {
       const noDesc = document.createElement("div");
       noDesc.classList.add("tooltip-description");
-      noDesc.textContent = "No description available.";
+      noDesc.textContent = game.i18n.localize("BG3.Hotbar.Tooltips.NoDescription");
       content.appendChild(noDesc);
     }
-
+    
     this.element.appendChild(content);
   }
 

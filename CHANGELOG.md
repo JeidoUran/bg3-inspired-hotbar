@@ -1,3 +1,27 @@
+## [2.0.3] - 2025-04-08
+
+### Added
+- Added initial localization files for French (`fr.json`), Dutch (`nl.json`), and Russian (`ru.json`).
+- Added manifest support for French, Dutch, and Russian languages.
+
+### Improved
+- Updated Polish localization (`pl.json`) to include keys for tooltips (Issue [#37]).
+
+## [2.0.2] - 2025-04-08
+
+### Fixed
+Related Issue: [#62]
+- Improved context handling for enriching Active Effect descriptions in tooltips to better resolve embedded entities.
+
+### Improved
+Related Issue: [#37]
+- Added localization support for tooltip labels (Action, Range, Target, Duration, Description, Status).
+- Added localization support for tooltip status/duration text (Permanent, Active, Disabled, Rounds/Turns/Seconds Remaining).
+
+### Added
+Related PR: [#102] Thanks @Lioheart for the PR!
+- Added manifest support for Polish language translation.
+
 ## [2.0.1] - 2025-03-28
 
 ### Fixed:

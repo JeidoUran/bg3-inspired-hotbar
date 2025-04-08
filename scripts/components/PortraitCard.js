@@ -8,10 +8,12 @@ export class PortraitCard {
         this.gridContainer = gridContainer;
         this.element = null;
         this.abilityButton = null;
+        this.extraInfosContainer = null;
         this.stabilizationTimer = null;  // Add timer reference
         this.isStabilizing = false;      // Add stabilization state
         this.lastHpValue = null;  // Track HP changes
         this.useTokenImage = true;  // Default to token image
+        // this.overrideBendMode = false;
         this._createCard();
         this._registerHooks();
         this.loadImagePreference();  // Load saved preference
@@ -33,6 +35,7 @@ export class PortraitCard {
                 if (oldHp <= 0 && newHp < oldHp) {
                     this._handleDamageAtZeroHp(actor, options?.critical ?? false);
                 }
+                this.update(actor);
             }
         });
     }
@@ -59,7 +62,21 @@ export class PortraitCard {
     _createCard() {
         this.element = document.createElement("div");
         this.element.classList.add("portrait-card", "visible");
+        if(!game.settings.get(CONFIG.MODULE_NAME, 'hidePortraitImage')) this.element.classList.add('portrait-hidden');
         this.element.setAttribute("data-container-index", this.gridContainer.index);
+        this.element.setAttribute("data-shape", game.settings.get(CONFIG.MODULE_NAME, 'shapePortraitPreferences'));
+        this.element.setAttribute("data-border", game.settings.get(CONFIG.MODULE_NAME, 'borderPortraitPreferences'));
+        
+        if(game.settings.get(CONFIG.MODULE_NAME, 'backgroundPortraitPreferences')) this.element.style.setProperty('--img-background-color', game.settings.get(CONFIG.MODULE_NAME, 'backgroundPortraitPreferences'));
+        
+        // Create the ability button
+        this.abilityButton = new AbilityButton(this);
+
+        // Create extra infos
+        this.extraInfosContainer = document.createElement("div");
+        this.extraInfosContainer.classList.add("extra-infos-container");
+        this.element.appendChild(this.extraInfosContainer);
+        if(game.settings.get(CONFIG.MODULE_NAME, 'showExtraInfo')) this._createExtraInfo(this.extraInfosContainer);
 
         // Create death saves container first (it will be positioned absolutely)
         const deathSavesContainer = this._createDeathSavesContainer();
@@ -67,9 +84,6 @@ export class PortraitCard {
 
         const imageContainer = this._createImageContainer();
         this.element.appendChild(imageContainer);
-        
-        // Create the ability button
-        this.abilityButton = new AbilityButton(this);
     }
 
     _createDeathSavesContainer() {
@@ -334,21 +348,25 @@ export class PortraitCard {
     _createImageContainer() {
         const container = document.createElement("div");
         container.classList.add("portrait-image-container");
-
+        
         const token = canvas.tokens.get(this.gridContainer.ui.manager.currentTokenId);
         if (!token?.actor) return container;
 
         // Add token image
+        const imageContainer = document.createElement("div");
+        imageContainer.classList.add("portrait-image-subcontainer");
+        imageContainer.setAttribute('data-bend-mode', game.settings.get(CONFIG.MODULE_NAME, 'overlayModePortrait'));
         const image = document.createElement("img");
         image.classList.add("portrait-image");
         image.src = token.document.texture.src;
         image.alt = token.actor.name;
-        container.appendChild(image);
+        imageContainer.style.setProperty('--bend-img', `url(${image.src})`);
+        
+        imageContainer.appendChild(image);
 
         // Add health overlay
-        this._createHealthOverlay(container, token.actor);
+        this._createHealthOverlay(imageContainer, token.actor);
         this._createHPText(container, token.actor);
-        if(game.settings.get(CONFIG.MODULE_NAME, 'showExtraInfo')) this._createExtraInfo(container, token.actor);
 
         // Add double-click event listener to open character sheet
         image.addEventListener('dblclick', (event) => {
@@ -370,6 +388,7 @@ export class PortraitCard {
             }
         });
 
+        container.appendChild(imageContainer);
         // Add context menu for image selection
         container.addEventListener('contextmenu', this._handleImageContextMenu.bind(this));
 
@@ -398,10 +417,11 @@ export class PortraitCard {
             '<i class="fas fa-chess-pawn"></i>',
             "Use Token Image",
             async () => {
-                const portraitImg = this.element.querySelector('.portrait-image');
+                this._updatePortraitImage(token.document.texture.src);
+                /* const portraitImg = this.element.querySelector('.portrait-image');
                 if (portraitImg) {
                     portraitImg.src = token.document.texture.src;
-                }
+                } */
                 this.useTokenImage = true;
                 await this.saveImagePreference();
                 menu.remove();
@@ -413,10 +433,11 @@ export class PortraitCard {
             '<i class="fas fa-user"></i>',
             "Use Character Portrait",
             async () => {
-                const portraitImg = this.element.querySelector('.portrait-image');
+                this._updatePortraitImage(token.actor.img);
+                /* const portraitImg = this.element.querySelector('.portrait-image');
                 if (portraitImg) {
                     portraitImg.src = token.actor.img;
-                }
+                } */
                 this.useTokenImage = false;
                 await this.saveImagePreference();
                 menu.remove();
@@ -424,8 +445,21 @@ export class PortraitCard {
             !this.useTokenImage
         );
 
+        /* const bendOption = this._createImageMenuItem(
+            '<i class="fas fa-droplet"></i>',
+            "Override Health Overlay as Mask",
+            async () => {
+                this.overrideBendMode = !this.overrideBendMode;
+                this._updatePortraitImage(token.actor.img);
+                await this.saveImagePreference();
+                menu.remove();
+            },
+            this.overrideBendMode
+        ); */
+
         menu.appendChild(tokenOption);
         menu.appendChild(portraitOption);
+        // menu.appendChild(bendOption);
 
         // Position menu relative to the mouse cursor
         const containerRect = this.element.getBoundingClientRect();
@@ -482,6 +516,7 @@ export class PortraitCard {
     _createHealthOverlay(container, actor) {
         const healthOverlay = document.createElement("div");
         healthOverlay.classList.add("health-overlay");
+        if(!game.settings.get(CONFIG.MODULE_NAME, 'showHealthOverlay')) healthOverlay.classList.add("hidden");
         
         // Create the base red damage overlay
         const damageOverlay = document.createElement("div");
@@ -523,6 +558,7 @@ export class PortraitCard {
 
         const hpText = document.createElement("div");
         hpText.classList.add("hp-text");
+        if(!game.settings.get(CONFIG.MODULE_NAME, 'showHPText')) hpText.classList.add("hidden");
         
         // Add temp HP if it exists
         const tempHp = actor.system.attributes?.hp?.temp || 0;
@@ -543,7 +579,10 @@ export class PortraitCard {
         container.appendChild(hpText);
     }
 
-    _createExtraInfo = function(container, actor) {
+    _createExtraInfo = function(container) {
+        const token = canvas.tokens.get(this.gridContainer.ui.manager.currentTokenId);
+        if (!token?.actor) return;
+        
         // Remove previous infos
         const extraInfos = this.element.getElementsByClassName('extra-info');
         while(extraInfos.length > 0) {
@@ -553,7 +592,7 @@ export class PortraitCard {
         const savedData = game.settings.get(CONFIG.MODULE_NAME, "dataExtraInfo");
         for(let i = 0; i < savedData.length; i++) {
             if(!savedData[i].attr || savedData[i].attr == '') continue;
-            const attr = foundry.utils.getProperty(actor.system, savedData[i].attr) ?? foundry.utils.getProperty(actor.system, savedData[i].attr + ".value") ?? this._getInfoFromSettings(savedData[i].attr);
+            const attr = foundry.utils.getProperty(token.actor.system, savedData[i].attr) ?? foundry.utils.getProperty(token.actor.system, savedData[i].attr + ".value") ?? this._getInfoFromSettings(savedData[i].attr);
             if(!attr) continue;
             const extra = document.createElement("div");
             extra.classList.add("extra-info", `extra-info-${i}`, ...savedData[i].icon.split(' '));
@@ -563,6 +602,8 @@ export class PortraitCard {
             extra.appendChild(extraText);
             container.appendChild(extra);
         }
+
+        return container;
     }
 
     _getInfoFromSettings(stringInfo) {
@@ -571,6 +612,18 @@ export class PortraitCard {
             return game.settings.get(module, data);            
         } catch (error) {
             return null;
+        }
+    }
+
+    async _updatePortraitImage(img) {
+        const portraitImg = this.element.querySelector('.portrait-image'),
+            imageContainer = this.element.querySelector('.portrait-image-subcontainer');
+        if (portraitImg) {
+            portraitImg.src = img;
+            if (imageContainer) {
+                imageContainer.style.setProperty('--bend-img', `url(${portraitImg.src})`);
+                // imageContainer.setAttribute('data-bend-mode', (game.settings.get(CONFIG.MODULE_NAME, 'overlayModePortrait') && !this.overrideBendMode) || (!game.settings.get(CONFIG.MODULE_NAME, 'overlayModePortrait') && this.overrideBendMode));
+            }
         }
     }
 
@@ -616,9 +669,8 @@ export class PortraitCard {
         if (portraitImg) {
             const token = canvas.tokens.get(this.gridContainer.ui.manager.currentTokenId);
             if (token?.actor) {
-                portraitImg.src = this.useTokenImage ? 
-                    token.document.texture.src : 
-                    token.actor.img;
+                this._updatePortraitImage(this.useTokenImage ? token.document.texture.src : token.actor.img);
+                // portraitImg.src = this.useTokenImage ? token.document.texture.src : token.actor.img;
             }
         }
 
@@ -633,7 +685,7 @@ export class PortraitCard {
 
         // Update Extra Infos
         if(game.settings.get(CONFIG.MODULE_NAME, 'showExtraInfo')) {
-          this._createExtraInfo(container, token.actor);
+          this._createExtraInfo(this.extraInfosContainer);
         } else if(document.getElementsByClassName('extra-info').length) {
           const extraInfo = document.getElementsByClassName('extra-info');
           while(extraInfo.length > 0) {
@@ -688,20 +740,25 @@ export class PortraitCard {
 
         // First check for actor-specific saved preference
         const saved = await token.actor.getFlag(CONFIG.MODULE_NAME, "useTokenImage");
+            // savedBend = await token.actor.getFlag(CONFIG.MODULE_NAME, "overrideBendMode");
         
         if (saved !== undefined) {
             this.useTokenImage = saved;
+            // this.overrideBendMode = savedBend;
         } else {
             // If no actor-specific preference, use the default setting
             const defaultPref = game.settings.get(CONFIG.MODULE_NAME, 'defaultPortraitPreferences');
             this.useTokenImage = defaultPref === 'token';
+            // const defaultPrefBend = game.settings.get(CONFIG.MODULE_NAME, 'overlayModePortrait');
+            // this.useTokenImage = defaultPrefBend;
         }
-
+        
         // Update the image immediately if we have one
-        const portraitImg = this.element.querySelector('.portrait-image');
+        this._updatePortraitImage(this.useTokenImage ? token.document.texture.src : token.actor.img);
+        /* const portraitImg = this.element.querySelector('.portrait-image');
         if (portraitImg) {
             portraitImg.src = this.useTokenImage ? token.document.texture.src : token.actor.img;
-        }
+        } */
     }
 
     // Add method to save preference
@@ -709,5 +766,6 @@ export class PortraitCard {
         const token = canvas.tokens.get(this.gridContainer.ui.manager.currentTokenId);
         if (!token?.actor) return;
         await token.actor.setFlag(CONFIG.MODULE_NAME, "useTokenImage", this.useTokenImage);
+        // await token.actor.setFlag(CONFIG.MODULE_NAME, "overrideBendMode", this.overrideBendMode);
     }
 } 

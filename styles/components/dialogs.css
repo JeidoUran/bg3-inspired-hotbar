@@ -4,11 +4,16 @@
 
 .auto-populate-dialog .container-section,
 #bg3-hotbar-auto-populate-defaults .container-section,
-#bg3-inspired-hotbar-extradatas-settings .container-section {
+#bg3-inspired-hotbar-extradatas-settings .container-section,
+#bg3-inspired-hotbar-portrait-settings .container-section {
   margin-bottom: 1.5em;
   padding: 1em;
   background: rgba(0, 0, 0, 0.05);
   border-radius: 8px;
+}
+
+#bg3-inspired-hotbar-portrait-settings .dialog-container {
+  max-width: 600px;
 }
 
 #bg3-inspired-hotbar-extradatas-settings .dialog-container {

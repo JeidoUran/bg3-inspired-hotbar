@@ -25,6 +25,7 @@ class HotbarUI {
     this.controlsContainer = null;
     this.passivesContainer = null;
     this.activeEffectsContainer = null;
+    this.restTurnContainer = null;
     this.combat = [];
     this.weaponContainer = [];
     this.combatContainer = [];
@@ -60,10 +61,10 @@ class HotbarUI {
       return;
     }
 
-    // Remove existing UI if it exists
+    /* // Remove existing UI if it exists
     if (this.element) {
       this.destroy();
-    }
+    } */
 
     // Create main container with transition
     this.element = document.createElement("div");
@@ -72,10 +73,20 @@ class HotbarUI {
     if(game.settings.get('bg3-inspired-hotbar', 'highlightStyle') === 'bottom') this.element.classList.add("cell-bottom-highlight");
     this.element.style.transition = "transform 0.3s ease-in-out, opacity 0.3s ease-in-out";
     this.element.style.opacity = game.settings.get(CONFIG.MODULE_NAME, 'normalOpacity');
-    this.element.setAttribute('theme-option', game.settings.get(CONFIG.MODULE_NAME, 'themeOption'));
     this.element.dataset.position = game.settings.get(CONFIG.MODULE_NAME, 'uiPosition');
     this.element.style.setProperty('--position-padding', `${game.settings.get(CONFIG.MODULE_NAME, 'posPadding')}px`);
     this.element.style.setProperty('--position-bottom', `${game.settings.get(CONFIG.MODULE_NAME, 'posPaddingBottom')}px`);
+    
+    if(this.manager?.ui?.element) this.manager.ui.element.replaceWith(this.element);
+    else {
+      // Append to document
+      document.body.appendChild(this.element);
+    }
+
+    // Append to document
+    // document.body.appendChild(this.element);
+
+
     this.updateUIScale();
         
     // Create weapons containers
@@ -107,7 +118,6 @@ class HotbarUI {
     this.combatContainer.push(new GridContainer(this, this.manager.combatContainer[0], 0));
     this.combatContainer[0].element.id = "bg3-combat-container";
     this.combatContainer[0].element.classList.toggle('hidden', !game.settings.get(CONFIG.MODULE_NAME, 'showCombatContainer'));
-    console.log(this.manager.combatContainer[0], this.combatContainer[0])
 
     weaponContainer.appendChild(this.combatContainer[0].element);
 
@@ -159,19 +169,20 @@ class HotbarUI {
     this.controlsContainer = new ControlsContainer(this);
 
     // Create rest turn container
-    const restTurnContainer = new RestTurnContainer(this);
-    this.element.appendChild(restTurnContainer.element);
+    this.restTurnContainer = new RestTurnContainer(this);
+    this.element.appendChild(this.restTurnContainer.element);
 
-    this.combat.push(restTurnContainer);
+    this.combat.push(this.restTurnContainer);
 
     // Add keyboard event listener
     document.addEventListener('keydown', this._handleKeyDown);
 
-    // Append to document
-    document.body.appendChild(this.element);
-
     // Initial render
     this.render();
+
+    // Equip weapons if needed
+    // console.log('loading switchset');
+    this.switchSet(this.manager.activeSet);
   }
 
   /**
@@ -546,24 +557,52 @@ class HotbarUI {
   }
 
   async switchSet(index) {
+    // Check if needed
+    if(!this.weaponContainer[index]?.data) return;
+    if(this.manager?.activeSet === index && this.weaponContainer[index].data?.oldWeapons == this.weaponContainer[index].data?.items) return;
+    
+    this.weaponContainer[index].data.oldWeapons = foundry.utils.deepClone(this.weaponContainer[index].data.items);
     const token = canvas.tokens.get(BG3Hotbar.manager.currentTokenId),
       weaponsList = token?.actor?.items.filter(w => w.type == 'weapon'),
-      toUpdate = [],
-      weapons = this.weaponContainer.find(wc => wc.index === index);
+      weapons = this.weaponContainer.find(wc => wc.index === index),
+      toUpdate = [];
+
     if(weapons) {
       if(this.manager.activeSet !== index) {
+        // Add previous set to unequip
+        Object.values(this.weaponContainer[this.manager.activeSet].data.items).forEach(w => {
+          toUpdate.push({_id: w.uuid.split('.').pop(), "system.equipped": 0});
+        });
+  
+        // Save new active set
         this.manager.activeSet = index;
         await this.manager.persist();
       }
       if(Object.values(weapons.data.items).length) {
         Object.values(weapons.data.items).forEach(w => {
-          toUpdate.push({_id: w.uuid.split('.').pop(), "system.equipped": 1})
+          const itemId =  w.uuid.split('.').pop(),
+            commonItem = toUpdate.findIndex(wu => wu._id == itemId);
+          if(commonItem > -1) toUpdate[commonItem]["system.equipped"] = 1;
+          else toUpdate.push({_id: itemId, "system.equipped": 1})
         })
       }
       weaponsList.forEach(w => {
         if(w.system.equipped && !toUpdate.find(wu => wu._id == w.id)) toUpdate.push({_id: w.id, "system.equipped": 0})
       })
-      await token.actor.updateEmbeddedDocuments("Item", toUpdate);
+    }
+    if(toUpdate.length) await token.actor.updateEmbeddedDocuments("Item", toUpdate);
+  }
+
+  toggleUI() {
+    const toggleInput = document.getElementById('toggle-input');
+    if(toggleInput) {
+      const autoHideSetting = game.settings.get(CONFIG.MODULE_NAME, 'autoHideCombat');
+      let state = false;
+      if (autoHideSetting !== 'false') {
+        const actor = canvas.tokens.get(BG3Hotbar.manager.currentTokenId)?.actor;
+        state = (autoHideSetting == 'true' && !game.combat?.started) || (autoHideSetting == 'init' && (!game.combat?.started || !(game.combat?.started && game.combat?.combatant?.actor === actor)));
+      }
+      toggleInput.checked = state;
     }
   }
 }

@@ -273,6 +273,8 @@ class GridContainer {
       // For a macro drop from Foundry or an item drop from an actor sheet
       if (dragData.type === "Macro" || dragData.uuid?.startsWith("Macro.") || dragData.uuid) {
         await this.ui.dragDropManager.handleDrop(dragData, this, slotKey);
+        // If source or target container is a weapon container
+        if(sourceContainer?.data?.id == 'weapon-container' || this?.data?.id == 'weapon-container') this.ui.switchSet(this.index);
         return;
       }
 
@@ -298,6 +300,9 @@ class GridContainer {
         await sourceContainer?.render();
       }
       await this.ui.manager.persist();
+
+      // If source or target container is a weapon container
+      if(sourceContainer?.data?.id == 'weapon-container' || this?.data?.id == 'weapon-container') this.ui.switchSet(this.index);
     });
 
     // Basic visual feedback on dragenter/dragleave

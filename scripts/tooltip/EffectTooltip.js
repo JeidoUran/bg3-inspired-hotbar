@@ -35,26 +35,27 @@ export class EffectTooltip extends BaseTooltip {
     detailsEl.classList.add("tooltip-details-list");
 
     // Duration and Status
-    let durationText = "Permanent";
+    let durationText = game.i18n.localize("BG3.Hotbar.Tooltips.Permanent");
     const duration = this.item.duration || this.item.system?.duration;
     if (duration) {
       if (duration.type === "rounds" || duration.type === "turns") {
         const remaining = Math.max(0, duration.remaining || 0);
-        durationText = `${remaining} ${duration.type === "rounds" ? "Round(s)" : "Turn(s)"} Remaining`;
+        const key = duration.type === "rounds" ? "BG3.Hotbar.Tooltips.RoundsRemaining" : "BG3.Hotbar.Tooltips.TurnsRemaining";
+        durationText = game.i18n.format(key, { count: remaining });
       } else if (duration.seconds) {
         const totalSeconds = duration.seconds;
         const startTime = duration.startTime;
         const currentTime = game.time.worldTime;
         const elapsedSeconds = Math.max(0, currentTime - startTime);
         const remainingSeconds = Math.max(0, totalSeconds - elapsedSeconds);
-        durationText = `${remainingSeconds} Seconds Remaining`;
+        durationText = game.i18n.format("BG3.Hotbar.Tooltips.SecondsRemaining", { count: remainingSeconds });
       }
     }
 
     const isDisabled = this.item.disabled ?? this.item.system?.disabled ?? false;
     detailsEl.innerHTML = `
-      <div><strong>Duration:</strong> ${durationText}</div>
-      <div><strong>Status:</strong> ${isDisabled ? "Disabled" : "Active"}</div>
+      <div><strong>${game.i18n.localize("BG3.Hotbar.Tooltips.Duration")}:</strong> ${durationText}</div>
+      <div><strong>${game.i18n.localize("BG3.Hotbar.Tooltips.Status")}:</strong> ${isDisabled ? game.i18n.localize("BG3.Hotbar.Tooltips.Disabled") : game.i18n.localize("BG3.Hotbar.Tooltips.Active")}</div>
     `;
     content.appendChild(detailsEl);
 
@@ -62,32 +63,34 @@ export class EffectTooltip extends BaseTooltip {
     if (this.item.description || this.item.system?.description?.value) {
       const descHeader = document.createElement("div");
       descHeader.classList.add("tooltip-description-header");
-      descHeader.textContent = "Description";
+      descHeader.textContent = game.i18n.localize("BG3.Hotbar.Tooltips.Description");
       content.appendChild(descHeader);
 
       const descContainer = document.createElement("div");
       descContainer.classList.add("tooltip-description-container");
       const descEl = document.createElement("div");
       descEl.classList.add("tooltip-description");
-      descEl.textContent = "Loading description...";
+      descEl.textContent = game.i18n.localize("BG3.Hotbar.Tooltips.LoadingDescription");
       descContainer.appendChild(descEl);
       content.appendChild(descContainer);
 
       const description = this.item.description || this.item.system?.description?.value || "";
-      const rollData = this.item.getRollData ? this.item.getRollData() : {};
+      // Attempt to get the parent actor for better context
+      const actor = this.item.parent;
+      const rollData = actor ? actor.getRollData() : this.item.getRollData ? this.item.getRollData() : {};
       
       // Use async/await and proper error handling
       try {
         const cleanedHTML = await enrichHTMLClean(description, rollData, this.item);
-        descEl.innerHTML = cleanedHTML || "No description available.";
+        descEl.innerHTML = cleanedHTML || game.i18n.localize("BG3.Hotbar.Tooltips.NoDescription");
       } catch (err) {
         console.warn("BG3 Hotbar - Failed to enrich effect description:", err);
-        descEl.textContent = "No description available.";
+        descEl.textContent = game.i18n.localize("BG3.Hotbar.Tooltips.NoDescription");
       }
     } else {
       const noDesc = document.createElement("div");
       noDesc.classList.add("tooltip-description");
-      noDesc.textContent = "No description available.";
+      noDesc.textContent = game.i18n.localize("BG3.Hotbar.Tooltips.NoDescription");
       content.appendChild(noDesc);
     }
 

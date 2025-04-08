@@ -326,3 +326,22 @@
 .bg3-hud .hidden {
   display: none !important;
 }
+
+/* ==========================================================================
+   Global Styles
+   ========================================================================== */
+
+aside#tooltip .notes {
+  flex: 0 0 100%;
+  font-size: var(--font-size-12);
+  line-height: var(--line-height-16);
+  color: var(--color-text-light-primary);
+  margin: 3px 0;
+}
+
+aside#tooltip .custom-tooltip i {
+  margin: 0 1em;
+  color: var(--data-color);
+ /*  display: flex;
+  justify-content: flex-start; */
+}

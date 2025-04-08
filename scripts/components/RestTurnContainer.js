@@ -1,4 +1,5 @@
 import { BG3Hotbar } from "../bg3-hotbar.js";
+import { CONFIG } from "../utils/config.js";
 
 
 export class RestTurnContainer {
@@ -21,6 +22,46 @@ export class RestTurnContainer {
         // Clear existing buttons
         this.element.innerHTML = '';
         this._buttons = [];
+    
+        if(game.settings.get(CONFIG.MODULE_NAME, 'showRestTurnButton')) {
+            const dataEnd = {
+                type: 'div',
+                class: ["rest-turn-button", "turn-button"], 
+                label: 'End Turn',
+                icon: 'fa-clock-rotate-left',
+                visible: () => !!game.combat?.started && game.combat?.combatant?.actor === this.actor,
+                events: {
+                    'click': function() {
+                        game.combat.nextTurn.bind(game.combat)()
+                    }
+                }
+            }
+            this._buttons.push(new RestTurnButton(dataEnd));
+    
+            const dataShort = {
+                type: 'div',
+                class: ["rest-turn-button"],
+                label: 'Short Rest',
+                icon: "fa-campfire",
+                visible: () => !game.combat?.started,
+                events: {
+                    'click': this.actor.shortRest.bind(this.actor)
+                }
+            }
+            if(this.actor?.type != 'vehicle') this._buttons.push(new RestTurnButton(dataShort));
+    
+            const dataLong = {
+                type: 'div',
+                class: ["rest-turn-button"],
+                label: 'Long Rest',
+                icon: "fa-tent",
+                visible: () => !game.combat?.started,
+                events: {
+                    'click': this.actor.longRest.bind(this.actor)
+                }
+            }
+            if(this.actor?.type != 'vehicle') this._buttons.push(new RestTurnButton(dataLong));
+        }
 
         const dataToggle = {
             type: 'label',
@@ -28,45 +69,7 @@ export class RestTurnContainer {
             attr: {"title": 'Show/Hide HotBar UI', "for": 'toggle-input'}
         }
         this._buttons.push(new RestTurnButton(dataToggle));
-
-        const dataEnd = {
-            type: 'div',
-            class: ["rest-turn-button", "turn-button"], 
-            label: 'End Turn',
-            icon: 'fa-clock-rotate-left',
-            visible: () => !!game.combat?.started && game.combat?.combatant?.actor === this.actor,
-            events: {
-                'click': function() {
-                    game.combat.nextTurn.bind(game.combat)()
-                }
-            }
-        }
-        this._buttons.push(new RestTurnButton(dataEnd));
-
-        const dataShort = {
-            type: 'div',
-            class: ["rest-turn-button"],
-            label: 'Short Rest',
-            icon: "fa-campfire",
-            visible: () => !game.combat?.started,
-            events: {
-                'click': this.actor.shortRest.bind(this.actor)
-            }
-        }
-        if(this.actor?.type != 'vehicle') this._buttons.push(new RestTurnButton(dataShort));
-
-        const dataLong = {
-            type: 'div',
-            class: ["rest-turn-button"],
-            label: 'Long Rest',
-            icon: "fa-tent",
-            visible: () => !game.combat?.started,
-            events: {
-                'click': this.actor.longRest.bind(this.actor)
-            }
-        }
-        if(this.actor?.type != 'vehicle') this._buttons.push(new RestTurnButton(dataLong));
-
+    
         // Add buttons to container
         for(let i = 0; i < this._buttons.length; i++) {
             this.element.appendChild(this._buttons[i].element);
@@ -85,6 +88,7 @@ export class RestTurnContainer {
                 // If container doesn't exist yet, append to body
                 document.body.appendChild(toggleInput);
             }
+            this.ui.toggleUI();
         }
     }
 

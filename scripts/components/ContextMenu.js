@@ -136,6 +136,9 @@ export class ContextMenu {
                     // Remove the item
                     delete this.currentContainer.data.items[this.currentSlot];
                     this.currentContainer.render();
+
+                    // If container is a weapon container
+                    if(this.currentContainer.data.id == 'weapon-container') this.ui.switchSet(this.currentContainer.index);
                     
                     // Ensure we have UI and manager references before persisting
                     if (this.ui?.manager) {
@@ -220,6 +223,9 @@ export class ContextMenu {
                     // Clear all items
                     targetContainer.data.items = {};
                     targetContainer.render();
+
+                    // If container is a weapon container
+                    if(this.currentContainer.data.id == 'weapon-container') this.ui.switchSet(this.currentContainer.index);
                     
                     // Persist changes
                     if (this.ui?.manager) {

@@ -24,6 +24,22 @@
             "ClearAllItems": "Clear All Items",
             "ImportLayout": "Import Layout",
             "ExportLayout": "Export Layout"
+        },
+        "Tooltips": {
+            "Action": "Action",
+            "Range": "Range",
+            "Target": "Target",
+            "Duration": "Duration",
+            "Description": "Description",
+            "LoadingDescription": "Loading description...",
+            "NoDescription": "No description available.",
+            "Permanent": "Permanent",
+            "RoundsRemaining": "{count} Round(s) Remaining",
+            "TurnsRemaining": "{count} Turn(s) Remaining",
+            "SecondsRemaining": "{count} Seconds Remaining",
+            "Status": "Status",
+            "Active": "Active",
+            "Disabled": "Disabled"
         }
     },
     "BG3.Settings": {
@@ -132,6 +148,39 @@
             "Hint": "Choose whether to display token images or character portraits by default. This can be overridden per token. For the first time you enable this setting, it will apply to all tokens that do not have a portrait set.",
             "Token": "Always Use Token Image",
             "Portrait": "Always Use Character Portrait"
+        },
+        "ShapePortraitPreferences": {
+            "Name": "Shape Portrait Display",
+            "Hint": "Choose character portraits shape.",
+            "Round": "Round",
+            "Square": "Square"
+        },
+        "BorderPortraitPreferences": {
+            "Name": "Border Portrait Display",
+            "Hint": "Choose character portraits border.",
+            "None": "None",
+            "Simple": "Simple",
+            "Styled": "Styled (Round shape only)"
+        },
+        "BackgroundPortraitPreferences": {
+            "Name": "Background Portrait Image",
+            "Hint": "Choose character portraits background color."
+        },
+        "ShowHealthOverlay": {
+            "Name": "Show health overlay",
+            "Hint": ""
+        },
+        "ShowHPText": {
+            "Name": "Show HP text",
+            "Hint": ""
+        },
+        "ShowRestTurnButton": {
+            "Name": "Show Rest/Turns button",
+            "Hint": ""
+        },
+        "OverlayModePortrait": {
+            "Name": "Health Overlay as Mask",
+            "Hint": "If checked, Health Overlay won't cover transparent part of Character Portrait. Check it if you're using Dynamic Token Ring."
         },
         "SettingsCategories": {
             "HotbarContainer": "Hotbar buttons",

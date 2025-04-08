@@ -16,11 +16,16 @@
     min-width: 80px;
     flex-direction: column;
     gap: 0.25rem;
-    justify-content: space-around;
+    justify-content: flex-start;
     margin-left: 35px;
+    padding-bottom: 30px;
 }
 
 .bg3-hud .rest-turn-container i {
+    font-size: x-large;
+}
+
+.bg3-hud .rest-turn-container .turn-button i {
     font-size: xx-large;
 }
 
@@ -40,14 +45,16 @@
 
 .bg3-hud .rest-turn-button {
     display: flex;
-    padding: .5rem 1rem 2rem;
+    /* padding: .5rem 1rem 2rem; */
+    padding: 0.5rem 1rem 1.9rem;
     position: relative;
     transition: all .3s ease-in-out;
-    flex: 1;
+    /* flex: 1; */
     border-radius: 8px;
     align-items: center;
     justify-content: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    height: 66px;
 }
 
 .bg3-hud .rest-turn-button.end-turn {
@@ -63,13 +70,15 @@
 
 .bg3-hud .turn-button {
     /* background-image: url(../../icons/duration.webp); */
+    height: 136px;
 }
 
 .bg3-hud .rest-turn-label {
     align-items: center;
     bottom: 0px;
     display: flex;
-    height: 2.5rem;
+    /* height: 2.5rem; */
+    height: 2rem;
     justify-content: center;
     left: 0px;
     position: absolute;
@@ -82,7 +91,7 @@
 
 .bg3-hud .btn-toggle {
     position: absolute;
-    bottom: calc(100% + 5px);
+    bottom: 0;
     width: 100%;
     height: 25px;
     z-index: 90;
@@ -111,10 +120,22 @@
     transform: translateY(calc(100% + 5px));
 }
 
+#toggle-input:checked ~ #bg3-hotbar-container label.btn-toggle {
+    bottom: calc(100% + 15px);
+}
+
 #toggle-input:checked ~ #bg3-hotbar-container .filter-container, #toggle-input:checked ~ #bg3-hotbar-container .passives-container, #toggle-input:checked ~ #bg3-hotbar-container .effects-container, #toggle-input:checked ~ #bg3-hotbar-container .bg3-hotbar-weaponcontainer, #toggle-input:checked ~ #bg3-hotbar-container .portrait-card {
     transition: all .3s ease-in-out !important;
     opacity: 0 !important;
     pointer-events: none !important;
+}
+
+#toggle-input:checked ~ #bg3-hotbar-container .rest-turn-button {
+    pointer-events: none;
+}
+
+#toggle-input:checked ~ #bg3-hotbar-container .btn-toggle {
+    bottom: calc(100% + 5px);
 }
 
 #toggle-input:checked ~ #bg3-hotbar-container .btn-toggle::before {

@@ -7,13 +7,14 @@ import { ControlsManager } from './managers/ControlsManager.js';
 import { AutoPopulateCreateToken, AutoPopulateDefaults } from './features/AutoPopulateCreateToken.js';
 import { AutoPopulateContainer } from './features/AutoPopulateContainer.js';
 import { TooltipFactory } from './tooltip/TooltipFactory.js';
-import { ExtraInfosDialog } from './features/ExtraInfosDialog.js';
+import { ExtraInfosDialog, PortraitSettingDialog } from './features/ExtraInfosDialog.js';
 
 export class BG3Hotbar {
     static manager = null;
     static controlsManager = null;
     static combatActionsArray = [];
     static macroBarTimeout = null;
+    static controlTokenTimeout = null;
 
     static async init() {
         // Apply custom theme
@@ -68,7 +69,7 @@ export class BG3Hotbar {
       console.log()
     }
     
-    static _applyMacrobarCollapseSetting(msg) {
+    static _applyMacrobarCollapseSetting() {
         // We need to wait for the UI to be ready before collapsing the hotbar
         if (!ui.hotbar) {
             // UI not ready, deferring macrobar collapse
@@ -117,7 +118,7 @@ export class BG3Hotbar {
                 
                 // Check if we have a controlled token
                 if (controlled) {
-                    await this.manager.updateHotbarForControlledToken(true);
+                    await this.manager.updateHotbarForControlledToken(controlled, true);
                 } else {
                     // No token selected, but check if deselect lock is enabled
                     const isDeselectLocked = this.controlsManager.isLockSettingEnabled('deselect') && 
@@ -334,24 +335,36 @@ export class BG3Hotbar {
         });
       
         game.settings.register(CONFIG.MODULE_NAME, 'autoHideCombat', {
-          name: 'Hide UI when not in combat and show only on your turn',
+          name: 'Auto Hide UI',
           // hint: 'Display a extra container to for basic actions like dodge, dash, etc (Compatible with CPR)',
           scope: 'client',
           config: true,
-          type: Boolean,
+          type: String,
           default: false,
-          onChange: value => {
-            if(!value) document.getElementById("toggle-input").checked = false;
-            else BG3Hotbar._onUpdateCombat(true);
+          choices: {
+              'false': 'Never',
+              'true': 'When not in combat',
+              'init': 'When not in combat and it\'s not your turn'
+          },
+          onChange: () => {
+            BG3Hotbar._onUpdateCombat(true);
           }
         });
 
-        // Portrait Settings
+        // Portrait Settings        
+        game.settings.registerMenu(CONFIG.MODULE_NAME, "menuPortrait", {
+            name: 'Portrait settings',
+            label: 'Configure Portrait',
+            hint: 'Advanced settings for character portrait.',
+            icon: "fas fa-cogs",
+            type: PortraitSettingDialog,
+        });
+
         game.settings.register(CONFIG.MODULE_NAME, 'defaultPortraitPreferences', {
             name: 'BG3.Settings.DefaultPortraitPreferences.Name',
             hint: 'BG3.Settings.DefaultPortraitPreferences.Hint',
             scope: 'client',
-            config: true,
+            config: false,
             type: String,
             choices: {
                 'token': 'BG3.Settings.DefaultPortraitPreferences.Token',
@@ -366,20 +379,138 @@ export class BG3Hotbar {
             }
         });
 
+        game.settings.register(CONFIG.MODULE_NAME, 'shapePortraitPreferences', {
+            name: 'BG3.Settings.ShapePortraitPreferences.Name',
+            hint: 'BG3.Settings.ShapePortraitPreferences.Hint',
+            scope: 'client',
+            config: false,
+            type: String,
+            choices: {
+                'round': 'BG3.Settings.ShapePortraitPreferences.Round',
+                'square': 'BG3.Settings.ShapePortraitPreferences.Square'
+            },
+            default: 'round',
+            onChange: value => {
+                // Refresh UI if it exists
+                if (this.manager?.ui?.portraitCard?.element) {
+                    this.manager.ui.portraitCard.element.setAttribute("data-shape", value);
+                }
+            }
+        });
+
+        game.settings.register(CONFIG.MODULE_NAME, 'borderPortraitPreferences', {
+            name: 'BG3.Settings.BorderPortraitPreferences.Name',
+            hint: 'BG3.Settings.BorderPortraitPreferences.Hint',
+            scope: 'client',
+            config: false,
+            type: String,
+            choices: {
+                'none': 'BG3.Settings.BorderPortraitPreferences.None',
+                'simple': 'BG3.Settings.BorderPortraitPreferences.Simple',
+                'styled': 'BG3.Settings.BorderPortraitPreferences.Styled'
+            },
+            default: 'none',
+            onChange: value => {
+                // Refresh UI if it exists
+                if (this.manager?.ui?.portraitCard?.element) {
+                    this.manager.ui.portraitCard.element.setAttribute("data-border", value);
+                }
+            }
+        });
+
+        game.settings.register(CONFIG.MODULE_NAME, 'backgroundPortraitPreferences', {
+            name: 'BG3.Settings.BackgroundPortraitPreferences.Name',
+            hint: 'BG3.Settings.BackgroundPortraitPreferences.Hint',
+            scope: 'client',
+            config: false,
+            type: String,
+            default: '',
+            onChange: value => {
+                // Refresh UI if it exists
+                if (this.manager?.ui?.portraitCard?.element) {
+                    this.manager.ui.portraitCard.element.style.setProperty('--img-background-color', (value && value != '' ? value : 'transparent'));
+                }
+            }
+        });
+
+        game.settings.register(CONFIG.MODULE_NAME, 'hidePortraitImage', {
+            name: 'Hide Portrait Image',
+            hint: 'Also hide health overlay and text.',
+            scope: 'client',
+            config: false,
+            type: Boolean,
+            default: true,
+            onChange: value => {
+              if(BG3Hotbar.manager.ui.portraitCard) {
+                BG3Hotbar.manager.ui.portraitCard.element.classList.toggle('portrait-hidden', !value);
+              }
+            }
+        });
+
+        game.settings.register(CONFIG.MODULE_NAME, 'overlayModePortrait', {
+            name: 'BG3.Settings.OverlayModePortrait.Name',
+            hint: 'BG3.Settings.OverlayModePortrait.Hint',
+            scope: 'client',
+            config: false,
+            type: Boolean,
+            default: false,
+            onChange: value => {
+                // Refresh UI if it exists
+                if (this.manager?.ui?.portraitCard?.element) {
+                    const imageContainer = document.getElementsByClassName('portrait-image-subcontainer');
+                    if(imageContainer[0]) imageContainer[0].setAttribute('data-bend-mode', value);
+                }
+            }
+        });
+
         game.settings.register(CONFIG.MODULE_NAME, 'showSheetSimpleClick', {
             name: 'Open character sheet on click',
             hint: 'Open the character sheet with a single click on portrait instead of double click.',
             scope: 'client',
-            config: true,
+            config: false,
             type: Boolean,
             default: false
+        });
+
+        game.settings.register(CONFIG.MODULE_NAME, 'showHealthOverlay', {
+          name: 'Show health overlay on character portrait.',
+          // hint: 'Display a extra container to for basic actions like dodge, dash, etc (Compatible with CPR)',
+          scope: 'client',
+          config: false,
+          type: Boolean,
+          default: true,
+          onChange: value => {
+            /* if(BG3Hotbar.manager.ui.portraitCard) {
+                const actor = canvas.tokens.get(BG3Hotbar.manager.currentTokenId)?.actor;
+                BG3Hotbar.manager.ui.portraitCard.update(actor);
+            } */
+            if(BG3Hotbar.manager.ui.portraitCard) {
+                const overlay = document.getElementsByClassName('health-overlay');
+                if(overlay && overlay[0]) overlay[0].classList.toggle('hidden', !value)
+            }
+          }
+        });
+
+        game.settings.register(CONFIG.MODULE_NAME, 'showHPText', {
+          name: 'Show HP text on character portrait.',
+          // hint: 'Display a extra container to for basic actions like dodge, dash, etc (Compatible with CPR)',
+          scope: 'client',
+          config: false,
+          type: Boolean,
+          default: true,
+          onChange: value => {
+            if(BG3Hotbar.manager.ui.portraitCard) {
+                const text = document.getElementsByClassName('hp-text');
+                if(text && text[0]) text[0].classList.toggle('hidden', !value)
+            }
+          }
         });
 
         game.settings.register(CONFIG.MODULE_NAME, 'showExtraInfo', {
           name: 'Show extra datas on character portrait.',
           // hint: 'Display a extra container to for basic actions like dodge, dash, etc (Compatible with CPR)',
           scope: 'client',
-          config: true,
+          config: false,
           type: Boolean,
           default: false,
           onChange: value => {
@@ -405,7 +536,7 @@ export class BG3Hotbar {
         
         game.settings.registerMenu(CONFIG.MODULE_NAME, "menuExtraInfo", {
             name: 'Portrait extra datas settings',
-            label: 'Configure',
+            label: 'Configure Portait Extra Datas',
             hint: 'Extra datas to show on character portrait.',
             icon: "fas fa-cogs",
             type: ExtraInfosDialog,
@@ -465,6 +596,20 @@ export class BG3Hotbar {
             onChange: value => {
                 if (this.manager?.ui?.controlsContainer) {
                     this.manager.ui.controlsContainer.element.classList.toggle('fade', value);
+                }
+            }
+        });
+
+        game.settings.register(CONFIG.MODULE_NAME, 'showRestTurnButton', {
+            name: 'BG3.Settings.ShowRestTurnButton.Name',
+            hint: 'BG3.Settings.ShowRestTurnButton.Hint',
+            scope: 'client',
+            config: true,
+            type: Boolean,
+            default: true,
+            onChange: () => {
+                if (this.manager?.ui?.restTurnContainer) {
+                    this.manager.ui.restTurnContainer.render();
                 }
             }
         });
@@ -683,14 +828,16 @@ export class BG3Hotbar {
         // Add Categories to module settings
         Hooks.on("renderSettingsConfig", (app, html, data) => {
             $('<div>').addClass('form-group group-header').html(game.i18n.localize("BG3.Settings.SettingsCategories.Global")).insertBefore($('[name="bg3-inspired-hotbar.collapseFoundryMacrobar"]').parents('div.form-group:first'));
-            $('<div>').addClass('form-group group-header').html(game.i18n.localize("BG3.Settings.SettingsCategories.Portrait")).insertBefore($('[name="bg3-inspired-hotbar.defaultPortraitPreferences"]').parents('div.form-group:first'));
             $('<div>').addClass('form-group group-header').html(game.i18n.localize("BG3.Settings.SettingsCategories.CombatContainer")).insertBefore($('[name="bg3-inspired-hotbar.showCombatContainer"]').parents('div.form-group:first'));
             $('<div>').addClass('form-group group-header').html(game.i18n.localize("BG3.Settings.SettingsCategories.Tooltip")).insertBefore($('[name="bg3-inspired-hotbar.tooltipDelay"]').parents('div.form-group:first'));
             $('<div>').addClass('form-group group-header').html(game.i18n.localize("BG3.Settings.SettingsCategories.AutoPopulating")).insertBefore($('[name="bg3-inspired-hotbar.enforceSpellPreparationPC"]').parents('div.form-group:first'));
             $('<div>').addClass('form-group group-header').html(game.i18n.localize("BG3.Settings.SettingsCategories.HotbarContainer")).insertBefore($('[name="bg3-inspired-hotbar.showItemNames"]').parents('div.form-group:first'));
 
-            $('button[data-key="bg3-inspired-hotbar.menuExtraInfo"]').parents('div.form-group:first').appendTo($('[name="bg3-inspired-hotbar.showExtraInfo"]').parents('div.form-group:first'));
-            $('button[data-key="bg3-inspired-hotbar.containerAutoPopulateSettings"]').parents('div.form-group:first').appendTo($('[name="bg3-inspired-hotbar.autoPopulateUnlinkedTokens"]').parents('div.form-group:first'));
+            $('button[data-key="bg3-inspired-hotbar.menuExtraInfo"]').parents('div.form-group:first').insertAfter($('[name="bg3-inspired-hotbar.autoHideCombat"]').parents('div.form-group:first'));
+            $('button[data-key="bg3-inspired-hotbar.containerAutoPopulateSettings"]').parents('div.form-group:first').insertAfter($('[name="bg3-inspired-hotbar.autoPopulateUnlinkedTokens"]').parents('div.form-group:first'));
+            $('button[data-key="bg3-inspired-hotbar.menuPortrait"]').parents('div.form-group:first').insertAfter($('[name="bg3-inspired-hotbar.autoHideCombat"]').parents('div.form-group:first'));
+            
+            $('<div>').addClass('form-group group-header').html(game.i18n.localize("BG3.Settings.SettingsCategories.Portrait")).insertBefore($('button[data-key="bg3-inspired-hotbar.menuPortrait"]').parents('div.form-group:first'));
         });
 
         // Canvas and token control hooks
@@ -699,7 +846,7 @@ export class BG3Hotbar {
                 // When canvas is ready, check for selected token
                 const controlled = canvas.tokens?.controlled[0];
                 if (controlled) {
-                    await this.manager.updateHotbarForControlledToken(true);
+                    await this.manager.updateHotbarForControlledToken(controlled, true);
                 } else {
                     // Clean up UI if no token is selected
                     if (this.manager.ui) {
@@ -713,32 +860,22 @@ export class BG3Hotbar {
         Hooks.on("controlToken", async (token, controlled) => {
             if (!this.manager) return;
             
-            // Check if UI is enabled in settings
-            const isUIEnabled = game.settings.get(CONFIG.MODULE_NAME, 'uiEnabled');
-            if (!isUIEnabled) return;
-            
-            if (!controlled) {
-                // Token was deselected, clean up UI if not locked
-                const isDeselectLocked = this.controlsManager.isLockSettingEnabled('deselect') && 
-                                        this.controlsManager.isMasterLockEnabled();
-                if (this.manager.ui && !isDeselectLocked) {
-                    this.manager.ui.destroy();
-                    this.manager.ui = null;
-                    this.manager.currentTokenId = null;
+            if ((!controlled && !canvas.tokens.controlled.length) || canvas.tokens.controlled.length > 1) {
+                setTimeout(() => {
+                    if (!canvas.tokens.controlled.length || canvas.tokens.controlled.length > 1) this.manager.updateHotbarForControlledToken(null);
+                }, 100);
+            }
+            if (!controlled) return;
+            if (game.settings.get(CONFIG.MODULE_NAME, 'uiEnabled')) {
+                if (!this.manager.ui) {
+                    // UI doesn't exist but should (UI is enabled and token selected)
+                    await this.manager.updateHotbarForControlledToken(token, true);
+                } else {
+                    // UI exists, just update it
+                    await this.manager.updateHotbarForControlledToken(token);
                 }
-                this._applyMacrobarCollapseSetting('hide');
-                return;
+                if(game.settings.get(CONFIG.MODULE_NAME, 'collapseFoundryMacrobar') === 'select') this._applyMacrobarCollapseSetting();
             }
-            
-            // Token was selected, update or create UI
-            if (!this.manager.ui) {
-                // UI doesn't exist but should (UI is enabled and token selected)
-                await this.manager.updateHotbarForControlledToken(true);
-            } else {
-                // UI exists, just update it
-                await this.manager.updateHotbarForControlledToken();
-            }
-            this._applyMacrobarCollapseSetting('show');
         });
 
         // Token creation hook for auto-populating unlinked tokens
@@ -815,7 +952,7 @@ export class BG3Hotbar {
                         this.manager.ui.destroy();
                         this.manager.ui = null;
                     }
-                    await this.manager.updateHotbarForControlledToken();
+                    await this.manager.updateHotbarForControlledToken(null);
                 }
             }
         });
@@ -827,7 +964,7 @@ export class BG3Hotbar {
             // If this is our current token and actor-related data changed
             if (token.id === this.manager.currentTokenId && 
                 (changes.actorId || changes.actorData || changes.actorLink)) {
-                await this.manager.updateHotbarForControlledToken();
+                await this.manager.updateHotbarForControlledToken(token);
             }
         });
 
@@ -847,13 +984,12 @@ export class BG3Hotbar {
             const token = canvas.tokens.get(this.manager.currentTokenId);
             if (token && token.scene.id === scene.id) {
                 this.manager.currentTokenId = null;
-                await this.manager.updateHotbarForControlledToken();
+                await this.manager.updateHotbarForControlledToken(null);
             }
         });
 
         // Add combat turn update hooks
         Hooks.on("updateCombat", (combat, changed, options, userId) => {
-            
             this._onUpdateCombat(combat, changed);
             
             // Only process if the turn actually changed
@@ -873,14 +1009,17 @@ export class BG3Hotbar {
         // Handle when combat is actually deleted/removed
         Hooks.on("deleteCombat", (combat) => {
             this.manager?.ui?.combat?.forEach((component) => component.updateVisibility());
-            if (game.settings.get(CONFIG.MODULE_NAME, 'autoHideCombat')) BG3Hotbar.manager.ui?.toggleUI(false);
+            BG3Hotbar.manager.ui?.toggleUI();
             if (!this.manager?.ui?.filterContainer) return;
             this.manager.ui.filterContainer.resetUsedActions();
         });
 
         // Initialize the module when ready
-        Hooks.once('ready', () => {
+        Hooks.once('ready', async () => {
             // Module is ready
+            Handlebars.registerHelper({
+
+            });
         });
     }
 
@@ -987,21 +1126,17 @@ export class BG3Hotbar {
       // Token was selected, update or create UI
       if (!this.manager.ui) {
           // UI doesn't exist but should (UI is enabled and token selected)
-          await this.manager.updateHotbarForControlledToken(true);
+          await this.manager.updateHotbarForControlledToken(canvas.tokens.controlled[0], true);
       } else {
           // UI exists, just update it
-          await this.manager.updateHotbarForControlledToken();
+          await this.manager.updateHotbarForControlledToken(canvas.tokens.controlled[0]);
       }
+      BG3Hotbar.manager.ui?.toggleUI();
     }
 
     static async _onUpdateCombat(combat, updates) {
         this.manager?.ui?.combat?.forEach((component) => component.updateVisibility());
-        if (combat === true || "round" in updates || "turn" in updates) {
-          if (game.settings.get(CONFIG.MODULE_NAME, 'autoHideCombat')) {
-            const actor = canvas.tokens.get(BG3Hotbar.manager.currentTokenId)?.actor;
-            BG3Hotbar.manager.ui?.toggleUI(!!game.combat?.started && game.combat?.combatant?.actor === actor);
-          }
-        }
+        if (combat === true || (updates && ("round" in updates || "turn" in updates))) BG3Hotbar.manager.ui?.toggleUI();
         if (updates && updates.round === 1 && updates.turn === 0) this._onStartCombat(combat);
     }
 

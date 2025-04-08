@@ -67,7 +67,8 @@ export class ItemUpdateManager {
     }
 
     async _handleItemUpdate(item, changes, options, userId) {
-        if (!this.manager || game.user.id !== userId) return;
+        // if (!this.manager || game.user.id !== userId) return;
+        if (!this.manager) return;
         
         const token = canvas.tokens.get(this.manager.currentTokenId);
         if (!token || token.actor?.items.get(item.id) !== item) return;
