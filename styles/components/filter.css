@@ -1,10 +1,10 @@
-.bg3-hud .filter-container {
+#bg3-hotbar-container .bg3-filter-subcontainer {
     position: absolute;
-    bottom: calc(100% - 10px);
+    bottom: calc(100% - 5px);
     left: 50%;
     transform: translateX(-50%);
-    background: var(--bg3-background);
-    border: 1px solid var(--bg3-border);
+    background: var(--bg3-filter-background-color);
+    border: var(--bg3-filter-border-size) solid var(--bg3-filter-border-color);
     border-radius: 4px;
     z-index: var(--bg3-z-filter-container);
     padding: 1px;
@@ -18,68 +18,70 @@
     opacity: 0;
 }
 
-.bg3-hud .filter-content {
+#bg3-hotbar-container .filter-content {
     display: flex;
     flex-direction: row;
     gap: 2px;
     transition: all 0.2s ease;
 }
 
-.bg3-hud .action-type-button,
-.bg3-hud .feature-button,
-.bg3-hud .spell-level-button {
-    width: 32px;
-    height: 32px;
+#bg3-hotbar-container .action-type-button,
+#bg3-hotbar-container .feature-button,
+#bg3-hotbar-container .spell-level-button {
+    width: var(--bg3-filter-cell-size);
+    height: var(--bg3-filter-cell-size);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     border-radius: 4px;
-    border: 2px solid transparent;
+    border: var(--bg3-hotbar-border-size) solid transparent;
     transition: all 0.2s ease;
     font-size: 14px;
     box-sizing: border-box;
     background: transparent;
     filter: saturate(1);
+    box-shadow: 0px 0px 5px black;
 }
 
-.bg3-hud .action-type-button:hover,
-.bg3-hud .feature-button:hover,
-.bg3-hud .spell-level-button:hover {
-    background: var(--bg3-background-highlight);
+#bg3-hotbar-container .action-type-button:hover,
+#bg3-hotbar-container .feature-button:hover,
+#bg3-hotbar-container .spell-level-button:hover {
+    background: var(--bg3-filter-background-color-hover);
 }
 
-.bg3-hud .action-type-button.used,
-.bg3-hud .feature-button.used,
-.bg3-hud .spell-level-button.used {
+#bg3-hotbar-container .action-type-button.used,
+#bg3-hotbar-container .feature-button.used,
+#bg3-hotbar-container .spell-level-button.used {
     filter: saturate(0.3) brightness(0.7);
     cursor: default;
     opacity: 0.7;
 }
 
-.bg3-hud .action-type-button.used:hover,
-.bg3-hud .feature-button.used:hover,
-.bg3-hud .spell-level-button.used:hover {
+#bg3-hotbar-container .action-type-button.used:hover,
+#bg3-hotbar-container .feature-button.used:hover,
+#bg3-hotbar-container .spell-level-button.used:hover {
     background: transparent;
 }
 
-.bg3-hud .spell-level-wrapper {
+#bg3-hotbar-container .spell-level-wrapper {
     position: relative;
-    width: 32px;
-    height: 32px;
+    width: var(--bg3-filter-cell-size);
+    height: var(--bg3-filter-cell-size);
 }
 
-.bg3-hud .spell-level-button {
+#bg3-hotbar-container .spell-level-button {
     position: relative;
     display: flex;
-    flex-direction: column;
+    /* flex-direction: column; */
     justify-content: center;
     align-items: center;
-    gap: 2px;
+    gap: 1px 2px;
     padding: 2px;
+    flex-wrap: wrap;
 }
 
-.bg3-hud .spell-level-label {
+#bg3-hotbar-container .spell-level-label {
     position: absolute;
     top: -13px;
     left: 0;
@@ -89,52 +91,60 @@
     font-weight: bold;
     background: transparent;
     z-index: 1;
+    text-shadow: var(--shadow-text-stroke);
 }
 
-.bg3-hud .spell-slot-row {
+#bg3-hotbar-container .spell-slot-row {
     display: flex;
     gap: 2px;
     justify-content: center;
     width: 100%;
 }
 
-.bg3-hud .spell-slot-box {
+#bg3-hotbar-container .spell-slot-box {
     border-radius: 2px;
-    border-width: 1px;
+    border-width: var(--bg3-filter-border-size);
     border-style: solid;
     box-sizing: border-box;
+    width: 11px;
+    height: 11px;
+    background-color: currentColor;
 }
 
-.bg3-hud .spell-container {
+#bg3-hotbar-container .spell-slot-box.is-used, #bg3-hotbar-container .spell-cantrip-box .spell-slot-box {
+    background-color: transparent;
+}
+
+#bg3-hotbar-container .spell-cantrip-box .spell-slot-box {
+    border-width: 3px;
+}
+
+#bg3-hotbar-container .spell-container {
     display: flex;
     gap: 1px;
     align-items: center;
     margin-left: 2px;
 }
 
-.bg3-hud .action-container {
+#bg3-hotbar-container .action-container {
     display: flex;
     gap: 1px;
     align-items: center;
 }
 
-.bg3-hud .filter-container .spell-level-button[data-level="0"] .spell-slot-box {
-    border-width: 3px;
-}
-
 /** Spell Points **/
 
-.bg3-hud .filter-spell-point .spell-level-wrapper {
+#bg3-hotbar-container .filter-spell-point .spell-level-wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.bg3-hud .filter-spell-point .spell-level-button:not([data-level="0"]) .spell-slot-box {
+#bg3-hotbar-container .filter-spell-point .spell-level-button:not(.spell-cantrip-box) .spell-slot-box {
     display: none;
 }
 
-.bg3-hud .filter-spell-point .spell-level-label {
+#bg3-hotbar-container .filter-spell-point .spell-level-label {
     /* position: unset; */
     top: 50%;
     transform: translateY(-50%);

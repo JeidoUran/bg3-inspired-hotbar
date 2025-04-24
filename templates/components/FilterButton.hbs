@@ -1,0 +1,9 @@
+<div>
+    {{#if symbol}}<i class="fas {{symbol}}"></i>{{/if}}
+    {{#if max}}
+        {{#times max}}
+            <div class="spell-slot-box{{#if (gte @index value)}} is-used{{/if}}"></div>
+        {{/times}}
+    {{/if}}
+    {{#if short}}<div class="spell-level-label">{{short}}</div>{{/if}}
+</div>

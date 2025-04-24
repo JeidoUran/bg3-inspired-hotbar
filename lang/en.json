@@ -55,6 +55,15 @@
             "Name": "Show Material Components Description",
             "Hint": "Display the full description of material components in spell tooltips (e.g. 'diamonds worth 300gp, which the spell consumes')"
         },
+        "EnableLightTooltip": {
+            "Name": "Configure Tooltip display",
+            "Hint": "Choose what should be displayed in item tooltip",
+            "Choices": {
+                "Full": "Full",
+                "Light": "Show only item name & type",
+                "NoDesc": "Hide description only"
+            }
+        },
         "BypassSpellPreparationCheck": {
             "Name": "Include Unprepared Spells",
             "Hint": "When enabled, all spells will be included in the hotbar regardless of their preparation state"
@@ -135,7 +144,8 @@
             "Cancel": "Cancel",
             "Save": "Save Changes",
             "SaveSuccess": "Container auto-populate settings saved successfully",
-            "Configure": "Configure Container Auto-Populate"
+            "Configure": "Configure Container Auto-Populate",
+            "Export": "Export Theme"
         },
         "HighlightStyle": {
             "Name": "Highlight Style",
@@ -188,7 +198,42 @@
             "Global": "Global",
             "Portrait": "Character Portrait",
             "Tooltip": "Tooltip",
-            "AutoPopulating": "Auto-Populating"
+            "AutoPopulating": "Auto-Populating",
+            "FoundryUI": "Foundry UI Tweaks",
+            "MidiQoL": "Synchro MidiQoL"
+        },
+        "MenuTheme": {
+            "Name": "Theme configuration",
+            "Hint": "Choose between available themes or create a custom one.",
+            "Label": "Configure Theme"
+        },
+        "scopeTheme": {
+            "Name": "Theme Scope",
+            "Hint": "If checked every player will be able to choose it's own theme. Otherwise the theme selected by the GM will be the same for everyone."
+        },
+        "PlayerListVisibility": {
+            "Name": "Player List Visibility",
+            "Hint": "Control the visibility of the default Foundry player list in the bottom-left.",
+            "Choices": {
+                "always": "Always Visible",
+                "hover": "Show on Hover",
+                "hidden": "Hide Completely"
+            }
+        },
+        "ShowDeathSavingThrow": {
+            "Name": "Display Death Saving Throw",
+            "Hint": "Control how the Death Saving Throw should be displayed.",
+            "Choices": {
+                "show": "Default",
+                "hide": "Never",
+                "only": "Only display a clickable skull on portrait"
+            }
+        },
+        "synchroMidiQoL": {
+            "BR": {
+                "Name": "Bonus & Reaction active effects",
+                "Hint": "Set Bonus Action and Reaction as used based on MidiQoL active effects."
+            }
         }
     }
 } 

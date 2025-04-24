@@ -156,6 +156,15 @@
             "Portrait": "Personageportret",
             "Tooltip": "Tooltip",
             "AutoPopulating": "Automatisch vullen"
+        },
+        "PlayerListVisibility": {
+            "Name": "Zichtbaarheid spelerslijst",
+            "Hint": "Bepaal de zichtbaarheid van de standaard Foundry-spelerslijst linksonder.",
+            "Choices": {
+                "always": "Altijd zichtbaar",
+                "hover": "Toon bij zweven",
+                "hidden": "Volledig verbergen"
+            }
         }
     }
 } 

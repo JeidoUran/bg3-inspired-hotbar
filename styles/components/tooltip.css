@@ -1,0 +1,31 @@
+:is(#tooltip, .locked-tooltip).dnd5e-tooltip.bg3-tooltip {
+    /* background-color: var(--bg3-background-color);
+    color: var(--bg3-text-color);
+    border-color: var(--bg3-border-color);
+    border-width: var(--bg3-border-size); */
+}
+
+body[data-show-materials="false"] :is(#tooltip, .locked-tooltip).dnd5e-tooltip.bg3-tooltip .spell-block .materials {
+    display: none;
+}
+
+/** Tooltip w/o Description **/
+
+body[data-light-tooltip="nodesc"] :is(#tooltip, .locked-tooltip).dnd5e-tooltip.bg3-tooltip .content > .description {
+    display: none;
+}
+
+body[data-light-tooltip="nodesc"] :is(#tooltip, .locked-tooltip).dnd5e-tooltip.bg3-tooltip .content > .pills {
+    margin-top: .5rem;
+}
+
+
+/** Tooltip Light **/
+
+body[data-light-tooltip="light"] :is(#tooltip, .locked-tooltip).dnd5e-tooltip.bg3-tooltip {
+    width: auto;
+}
+
+body[data-light-tooltip="light"] :is(#tooltip, .locked-tooltip).dnd5e-tooltip.bg3-tooltip .content > *:not(.header), body[data-light-tooltip="light"] :is(#tooltip, .locked-tooltip).dnd5e-tooltip.bg3-tooltip .content > .header > *:not(.top), body[data-light-tooltip="light"] :is(#tooltip, .locked-tooltip).dnd5e-tooltip.bg3-tooltip .content > .header > .top > img {
+    display: none;
+}

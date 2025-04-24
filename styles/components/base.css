@@ -1,12 +1,86 @@
 :root {
+    /* --bg3-border-color: #444444;
+    --bg3-border-color-hover: #666666;
+    --bg3-background-color: #222222;
+    --bg3-background-color-hover: #3a3a3a;
+    --bg3-text-color: #dddddd;
+    --bg3-text-color-hover: #dddddd;
+    --bg3-text-secondary-color: #ffffff;
+    --bg3-border-size: 2px;
+    --bg3-border-radius: 8px;
+    --bg3-portrait-size: 175px;
+    --bg3-hotbar-border-color: var(--bg3-border-color);
+    --bg3-hotbar-border-color-hover: var(--bg3-border-color-hover);
+    --bg3-hotbar-sub-background-color: var(--bg3-background-color);
+    --bg3-hotbar-background-color: var(--bg3-background-color);
+    --bg3-hotbar-background-color-hover: var(--bg3-background-color-hover);
+    --bg3-hotbar-text-color: var(--bg3-text-color);
+    --bg3-hotbar-text-color-hover: var(--bg3-text-color-hover);
+    --bg3-hotbar-cell-size: 50px;
+    --bg3-hotbar-border-size: var(--bg3-border-size);
+    --bg3-hotbar-drag-color: #cc3333;
+    --bg3-hotbar-drag-color-hover: #d10000;
+    --bg3-weapon-border-color: var(--bg3-border-color);
+    --bg3-weapon-border-color-hover: var(--bg3-border-color-hover);
+    --bg3-weapon-background-color: var(--bg3-background-color);
+    --bg3-weapon-background-color-hover: var(--bg3-background-color-hover);
+    --bg3-weapon-text-color: var(--bg3-text-color);
+    --bg3-weapon-text-color-hover: var(--bg3-text-color-hover);
+    --bg3-weapon-cell-size: 75px;
+    --bg3-weapon-border-size: var(--bg3-border-size);
+    --bg3-filter-border-color: var(--bg3-border-color);
+    --bg3-filter-border-color-hover: var(--bg3-border-color-hover);
+    --bg3-filter-background-color: var(--bg3-background-color);
+    --bg3-filter-background-color-hover: var(--bg3-background-color-hover);
+    --bg3-filter-text-color: var(--bg3-text-color);
+    --bg3-filter-text-color-hover: var(--bg3-text-color-hover);
+    --bg3-filter-cell-size: 32px;
+    --bg3-filter-border-size: var(--bg3-border-size);
+    --bg3-passive-border-color: var(--bg3-border-color);
+    --bg3-passive-border-color-hover: var(--bg3-border-color-hover);
+    --bg3-passive-background-color: var(--bg3-background-color);
+    --bg3-passive-background-color-hover: var(--bg3-background-color-hover);
+    --bg3-passive-text-color: var(--bg3-text-color);
+    --bg3-passive-text-color-hover: var(--bg3-text-color-hover);
+    --bg3-passive-cell-size: 31px;
+    --bg3-passive-border-size: var(--bg3-border-size);
+    --bg3-active-border-color: var(--bg3-border-color);
+    --bg3-active-border-color-hover: var(--bg3-border-color-hover);
+    --bg3-active-background-color: var(--bg3-background-color);
+    --bg3-active-background-color-hover: var(--bg3-background-color-hover);
+    --bg3-active-text-color: var(--bg3-text-color);
+    --bg3-active-text-color-hover: var(--bg3-text-color-hover);
+    --bg3-active-cell-size: 31px;
+    --bg3-active-border-size: var(--bg3-border-size);
+    --bg3-rest-border-color: var(--bg3-border-color);
+    --bg3-rest-border-color-hover: var(--bg3-border-color-hover);
+    --bg3-rest-background-color: var(--bg3-background-color);
+    --bg3-rest-background-color-hover: var(--bg3-background-color-hover);
+    --bg3-rest-text-color: var(--bg3-text-color);
+    --bg3-rest-text-color-hover: var(--bg3-text-color-hover);
+    --bg3-turn-border-color: var(--bg3-border-color);
+    --bg3-turn-border-color-hover: var(--bg3-border-color-hover);
+    --bg3-turn-background-color: var(--bg3-background-color);
+    --bg3-turn-background-color-hover: var(--bg3-background-color-hover);
+    --bg3-turn-text-color: var(--bg3-text-color);
+    --bg3-turn-text-color-hover: var(--bg3-text-color-hover);
+    --bg3-rest-border-size: var(--bg3-border-size);
+    --bg3-tooltip-border-color: var(--bg3-border-color);
+    --bg3-tooltip-background-color: var(--bg3-background-color);
+    --bg3-tooltip-text-color: var(--bg3-text-color);
+    --bg3-tooltip-text-secondary-color: var(--bg3-text-secondary-color);
+    --bg3-tooltip-component-color: #aaaaaa;
+    --bg3-tooltip-border-size: var(--bg3-border-size); */
+    
     /* Colors */
     --bg3-background: #222222f2;
-    --bg3-border: #444;
+    --bg3-border: #161616;
     --bg3-border-width: 1px;
-    --primary-border-width: 1px;
+    --primary-border-width: 2px;
     --primary-border-color: #444;
     --bg3-text: #ddd;
     --bg3-background-highlight: #3a3a3a;
+    --shadow-text-stroke: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 
     /* Cells */
     --bg3-cell-border-width: 2px;
@@ -17,6 +91,7 @@
     --bg3-reaction: var(--color-reaction, #fe85f6);
     --bg3-spell: var(--color-spell, #3498db);
     --bg3-pact: var(--color-pact, #8e44ad);
+    --bg3-apothecary: var(--color-apothecary, #285348);
     --bg3-feature-default: var(--color-feature, #808080);
     --bg3-feature-class: var(--color-feature, #7b68ee);
     --bg3-feature-race: var(--color-feature, #20b2aa);
@@ -32,316 +107,114 @@
     /* Sizing */
     --bg3-cell-size: 50px;
     --bg3-filter-button-size: 32px;
-    --bg3-portrait-size: 200px;
-    --portrait-right: 172px;
+    --bg3-portrait-size: 175px;
+    --portrait-right: calc(2*(var(--bg3-weapon-cell-size) + 11px));
 }
 
 /* ==========================================================================
    Base Container Styles
    ========================================================================== */
-
+   
 #bg3-hotbar-container {
-  position: fixed;
-  display: flex;
-  align-self: end;
-  align-items: end;
-  justify-content: center;
-  align-items: end;
-  z-index: var(--bg3-z-grid);
-  font-family: "Signika", sans-serif;
-  scale: var(--bg3-scale-ui);
-  transform-origin: bottom;
-  /* margin-bottom: calc(10px* var(--bg3-scale-ui)); */
-  gap: 0.25rem;
-  padding: 0;
-  width: 100%;
-  padding-bottom: var(--position-bottom);
+    position: fixed;
+    display: flex;
+    align-self: end;
+    align-items: end;
+    justify-content: center;
+    align-items: end;
+    z-index: var(--bg3-z-grid);
+    font-family: "Signika", sans-serif;
+    scale: var(--bg3-scale-ui, 1);
+    gap: 0.25rem;
+    padding: 0;
+    padding-bottom: var(--position-bottom, 10px);
+    transition: transform .3s ease-in-out, opacity .3s ease-in-out var(--bg3-faded-delay);
+    width: fit-content;
+    left: 0;
+    right: 0;
+
+    opacity: var(--bg3-faded-opacity);
 }
 
-#bg3-hotbar-container {
-  /* width: calc(100% / var(--bg3-scale-ui));
-  left: calc(-100%*(1 - var(--bg3-scale-ui))); */
+#bg3-hotbar-container[data-position="center"] {
+    transform-origin: bottom;
+    margin: 0 auto;
+    padding-right: var(--position-padding);
 }
 
 #bg3-hotbar-container[data-position="left"] {
-  /* justify-content: flex-start;
-  padding-left: calc(var(--bg3-portrait-size) + 20px + var(--position-padding)); */
-  justify-content: flex-start;
   transform-origin: bottom left;
-  padding-left: calc(var(--portrait-right) + 15px + var(--position-padding));
+  margin: 0 auto 0 calc(var(--bg3-portrait-size) + 35px + var(--position-padding));
+  /* padding-left: calc(var(--bg3-portrait-size) + 15px + var(--position-padding)); */
 }
 
 #bg3-hotbar-container[data-position="right"] {
-  /* justify-content: flex-end;
-  padding-right: var(--position-padding); */
-  justify-content: flex-end;
+  /* justify-content: flex-end; */
   transform-origin: bottom right;
-  padding-right: var(--position-padding);
+  margin: 0 0 0 auto;
+  padding-right: var(--position-padding, 0);
 }
 
-.bg3-hud .bg3-hotbar-subcontainer {
-  position: relative;
-  display: flex;
-  background: var(--bg3-background);
-  border: var(--primary-border-width) solid var(--primary-border-color);
-  border-radius: 8px;
-  padding: 8px;
-  align-items: stretch;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+#bg3-hotbar-container .hidden {
+    display: none !important;
 }
 
-.bg3-hud .hotbar-container {
-  position: fixed;
-  bottom: 10px;
-  left: 220px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  z-index: var(--bg3-z-base);
+#bg3-hotbar-container img {
+    border: unset;
 }
 
-/* Ensure cursor inheritance throughout the module */
-.bg3-hud .hotbar-container,
-.bg3-hud .hotbar-subcontainer,
-.bg3-hud .hotbar-cell,
-.bg3-hud .hotbar-item,
-.bg3-hud .hotbar-item-name,
-.bg3-hud .hotbar-item-uses {
-  cursor: inherit !important;
+aside[role="tooltip"] .notes {
+    flex: 0 0 100%;
+    font-size: var(--font-size-12);
+    line-height: var(--line-height-16);
+    color: var(--color-text-light-primary);
+    margin: 3px 0;
+}
+  
+aside[role="tooltip"] .custom-tooltip i {
+    margin: 0 1em;
+    color: var(--data-color);
 }
 
-.bg3-hud .drag-cursor,
-.bg3-hud .drag-cursor * {
-  cursor: var(--cursor-drag) !important;
-}
-
-/* ==========================================================================
-   Grid Layout
-   ========================================================================== */
-
-.bg3-hud .hotbar-subcontainer {
-  display: grid;
-  grid-template-columns: repeat(var(--cols), var(--cell-size));
-  grid-template-rows: repeat(var(--rows), var(--cell-size));
-  gap: 4px;
-  padding: 4px;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  width: calc(var(--cols) * (var(--cell-size) + 4px) + 8px);
-  transition: width 0.1s ease;
-  width: var(--cols-override, calc(var(--cols) * (var(--cell-size) + 4px) + 8px));
-}
-
-/* ==========================================================================
-   Grid Cells
-   ========================================================================== */
-
-.bg3-hud .hotbar-cell {
-    width: var(--cell-size);
-    height: var(--cell-size);
-    background: #333;
-    border: var(--bg3-cell-border-width) solid var(--bg3-border);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--bg3-text);
-    font-size: 0.8em;
-    overflow: hidden;
-    position: relative;
-    transition: all 0.2s ease;
-    padding: 0;
-    box-sizing: border-box;
-    user-select: none;
+#bg3-hotbar-container:hover .bg3-filter-subcontainer {
     opacity: 1;
 }
 
-.bg3-hud.cell-bottom-highlight .hotbar-cell {
-  border-top-color: var(--bg3-border) !important;
-  border-left-color: var(--bg3-border) !important;
-  border-right-color: var(--bg3-border) !important;
-}
-
-.bg3-hud .hotbar-cell.action-used, .bg3-hud .hotbar-cell.action-excluded {
-  opacity: .25;
-}
-
-.bg3-hud .hotbar-cell.has-item[data-action-type="action"][data-highlight-type="action"] {
-  border-color: var(--bg3-action);
-}
-
-.bg3-hud .hotbar-cell[data-action-type="bonus"][data-highlight-type="action"] {
-  border-color: var(--bg3-bonus);
-}
-
-.bg3-hud .hotbar-cell[data-action-type="reaction"][data-highlight-type="action"] {
-  border-color: var(--bg3-reaction);
-}
-
-.bg3-hud .hotbar-cell[data-item-type="feat"][data-feat-type="default"][data-highlight-type="feat"] {
-  border-color: var(--bg3-feature-default);
-}
-
-.bg3-hud .hotbar-cell[data-item-type="feat"][data-feat-type="class"][data-highlight-type="feat"] {
-  border-color: var(--bg3-feature-class);
-}
-
-.bg3-hud .hotbar-cell[data-item-type="feat"][data-feat-type="race"][data-highlight-type="feat"] {
-  border-color: var(--bg3-feature-race);
-}
-
-.bg3-hud .hotbar-cell[data-item-type="feat"][data-feat-type="feat"][data-highlight-type="feat"] {
-  border-color: var(--bg3-feature-feat);
-}
-
-.bg3-hud .hotbar-cell[data-item-type="feat"][data-feat-type="monster"][data-highlight-type="feat"] {
-  border-color: var(--bg3-feature-monster);
-}
-
-.bg3-hud .hotbar-cell[data-item-type="feat"][data-feat-type="subclass"][data-highlight-type="feat"] {
-  border-color: var(--bg3-feature-subclass);
-}
-
-.bg3-hud .hotbar-cell[data-item-type="spell"][data-is-pact="false"][data-highlight-type="spell"] {
-  border-color: var(--bg3-spell);
-}
-
-.bg3-hud .hotbar-cell[data-item-type="spell"][data-is-pact="true"][data-highlight-type="spell"] {
-  border-color: var(--bg3-pact);
-}
-
-.bg3-hud .hotbar-cell:hover {
-    border-color: #666;
-    background: var(--bg3-background-highlight);
-}
-
-.bg3-hud .hotbar-cell.dragover {
-    background: #444;
-    border-color: #888;
-}
-
-.bg3-hud .hotbar-cell.dragging {
-    opacity: 0.5;
+/* ==========================================================================
+   Opacity Settings Handler
+   ========================================================================== */
+   
+#bg3-hotbar-container:hover {
+    transition-delay: 0s;
+    opacity: var(--bg3-normal-opacity);
 }
 
 /* ==========================================================================
-   Drag Bar
+   Player List Visibility
    ========================================================================== */
 
-.bg3-hud .hotbar-drag-bar {
-  width: 4px;
-  background: #cc3333;
-  cursor: ew-resize;
-  align-self: stretch;
-  border-radius: 2px;
-  transition: background-color 0.2s ease;
-  z-index: var(--bg3-z-grid);
-  margin: 4px;
-  position: relative;
+body[data-player-list="hidden"] #players {
+    display: none !important;
 }
 
-.bg3-hud .hotbar-drag-bar:hover, 
-.bg3-hud .hotbar-drag-bar.dragging {
-  background: #d10000;
+body[data-player-list="hover"] #players {
+    transition: opacity 0.3s ease, transform 0.3s ease; /* Add transitions for smoothness */
+    transform-origin: bottom left;
+    opacity: 0;
+    transform: translateY(10px);
 }
 
-.bg3-hud .drag-indicator {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #ff6400;
-  box-shadow: 0 0 8px rgba(255, 100, 0, 0.8);
-  border-radius: inherit;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  will-change: transform;
-}
-
-.bg3-hud .drag-indicator.visible {
-  opacity: 1;
+body[data-player-list="hover"] #players:hover {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* ==========================================================================
-   Hotbar Items
+   Settings
    ========================================================================== */
 
-.bg3-hud .hotbar-item {
-    width: calc(100% - 4px);
-    height: calc(100% - 4px);
-    object-fit: contain;
-    object-position: center;
-    display: block;
-    margin: 0;
-    padding: 0;
-    border-radius: 2px;
-    transition: filter 0.2s ease;
-    pointer-events: none;
-}
-
-.bg3-hud .hotbar-item.depleted {
-    filter: grayscale(100%) brightness(60%);
-}
-
-.bg3-hud .hotbar-item-name {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 2px;
-    font-size: 0.7em;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    z-index: 10;
-    pointer-events: none;
-}
-
-.bg3-hud .hotbar-item-uses {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    color: #fff;
-    padding: 1px 4px;
-    border-radius: 3px;
-    font-size: 0.8em;
+.group-header {
     font-weight: bold;
-    z-index: 11;
-    pointer-events: none;
-}
-
-.bg3-hud .hotbar-item-uses.depleted {
-    color: #ff4444;
-} 
-
-/* ==========================================================================
-   Global Styles
-   ========================================================================== */
-
-.bg3-hud .hidden {
-  display: none !important;
-}
-
-/* ==========================================================================
-   Global Styles
-   ========================================================================== */
-
-aside#tooltip .notes {
-  flex: 0 0 100%;
-  font-size: var(--font-size-12);
-  line-height: var(--line-height-16);
-  color: var(--color-text-light-primary);
-  margin: 3px 0;
-}
-
-aside#tooltip .custom-tooltip i {
-  margin: 0 1em;
-  color: var(--data-color);
- /*  display: flex;
-  justify-content: flex-start; */
+    padding: 8px 20px;
+    background-color: rgba(255, 255, 255, 0.4);
 }

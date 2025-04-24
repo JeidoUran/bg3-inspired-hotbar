@@ -156,6 +156,15 @@
             "Portrait": "Portrait du personnage",
             "Tooltip": "Infobulle",
             "AutoPopulating": "Remplissage automatique"
+        },
+        "PlayerListVisibility": {
+            "Name": "Visibilité de la liste des joueurs",
+            "Hint": "Contrôlez la visibilité de la liste des joueurs par défaut de Foundry dans le coin inférieur gauche.",
+            "Choices": {
+                "always": "Toujours visible",
+                "hover": "Afficher au survol",
+                "hidden": "Masquer complètement"
+            }
         }
     }
 } 

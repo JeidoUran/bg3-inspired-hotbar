@@ -1,36 +1,23 @@
 // Module Lifecycle Management
 import { BG3Hotbar } from './bg3-hotbar.js';
-import { CONFIG } from './utils/config.js';
-import { TooltipFactory } from './tooltip/TooltipFactory.js';
+import { BG3CONFIG, registerKeybinding, updateSettingsDisplay, registerEarly, registerSettings, registerHandlebars, registerLibWrapper } from './utils/config.js';
 
 Hooks.once('init', () => {
-    // Register module settings
-    BG3Hotbar._registerSettings();
+    registerEarly();
+    registerHandlebars();
+    registerKeybinding();
+    registerLibWrapper();
 });
 
-// Handle settings menu close
-Hooks.on('closeSettings', async (settingsApp) => {
-    const module = game.modules.get(CONFIG.MODULE_NAME);
-    if (!module?.active) {
-        cleanup();
+Hooks.once('ready', () => {
+    console.log(`${BG3CONFIG.MODULE_NAME} | Ready`);
+    if (!game.modules.get('lib-wrapper')?.active && game.user.isGM) {
+        ui.notifications.error("BG3 Inspired Hotbar requires the 'libWrapper' module. Please install and activate it.");
     }
+    console.log(`${BG3CONFIG.MODULE_NAME} | Registering Settings`);
+    registerSettings();
+    updateSettingsDisplay();
+    ui.BG3HOTBAR = new BG3Hotbar();
 });
 
-async function cleanup() {
-    if (BG3Hotbar.manager) {
-        // Clean up all token data and UI
-        await BG3Hotbar.manager.cleanupAllData();
-        
-        // Remove any event listeners
-        Hooks.off('canvasReady', BG3Hotbar.manager.updateHotbarForControlledToken);
-        Hooks.off('controlToken', BG3Hotbar.manager.updateHotbarForControlledToken);
-        
-        // Clean up any remaining DOM elements (safety check)
-        const container = document.getElementById('bg3-hotbar-container');
-        if (container) {
-            container.remove();
-        }
-    }
-    
-    // Module cleanup complete
-} 
+// BG3CONFIG.debug.hooks = true;

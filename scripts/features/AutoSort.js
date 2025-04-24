@@ -5,16 +5,14 @@ import { fromUuid } from '../utils/foundryUtils.js';
 
 export class AutoSort {
     static async sortContainer(container) {
-        // Handle both direct container and container.data structures
-        const containerData = container.data || container;
-        if (!containerData?.items) return;
+        if (!container?.data?.items) return;
 
         try {
             // Convert items object to array for sorting
             const items = [];
             
             // First pass: collect all items and their UUIDs
-            for (const [key, item] of Object.entries(containerData.items)) {
+            for (const [key, item] of Object.entries(container.data.items)) {
                 items.push({
                     key,
                     ...item,
@@ -55,23 +53,23 @@ export class AutoSort {
             this._sortItems(items);
 
             // Clear container
-            containerData.items = {};
+            container.data.items = {};
 
             // Re-add items in sorted order
             let r = 0;
             let c = 0;
-            const cols = containerData.cols || container.cols || 5;
-            const rows = containerData.rows || container.rows || 3;
+            const cols = container.data.cols || container.data.cols || 5;
+            const rows = container.data.rows || container.data.rows || 3;
 
             for (const item of items) {
                 const slotKey = `${c}-${r}`;
-                containerData.items[slotKey] = {
+                container.data.items[slotKey] = {
                     uuid: item.uuid,
-                    name: item.name,
-                    icon: item.icon,
-                    type: item.type,
-                    activation: item.activation,
-                    sortData: item.sortData
+                    // name: item.name,
+                    // icon: item.icon,
+                    // type: item.type,
+                    // activation: item.activation,
+                    // sortData: item.sortData
                 };
 
                 // Move to next position
@@ -89,8 +87,9 @@ export class AutoSort {
             if (container.render) {
                 container.render();
             }
-            if (container.ui?.manager?.persist) {
-                await container.ui.manager.persist();
+            if (ui.BG3HOTBAR?.manager?.persist) {
+                await ui.BG3HOTBAR.manager.persist();
+                // await container.ui.manager.persist();
             }
 
             ui.notifications.info("Container sorted successfully.");

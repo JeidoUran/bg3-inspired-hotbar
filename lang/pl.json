@@ -32,11 +32,11 @@
             "Duration": "Czas trwania",
             "Description": "Opis",
             "LoadingDescription": "Ładowanie opisu...",
-            "NoDescription": "Brak opisu.",
-            "Permanent": "Stały",
-            "RoundsRemaining": "Pozostało rund: {count}",
-            "TurnsRemaining": "Pozostało tur: {count}",
-            "SecondsRemaining": "Pozostało sekund: {count}",
+            "NoDescription": "Brak dostępnego opisu.",
+            "Permanent": "Permanentne",
+            "RoundsRemaining": "Pozostałe rundy {count}",
+            "TurnsRemaining": "Pozostałe tury {count}",
+            "SecondsRemaining": "Pozostałe sekundy {count}",
             "Status": "Status",
             "Active": "Aktywny",
             "Disabled": "Wyłączony"
@@ -155,7 +155,17 @@
             "Global": "Globalne",
             "Portrait": "Portret postaci",
             "Tooltip": "Podpowiedź",
-            "AutoPopulating": "Automatyczne wypełnianie"
+            "AutoPopulating": "Automatyczne wypełnianie",
+            "FoundryUI": "Poprawki interfejsu Foundry"
+        },
+        "PlayerListVisibility": {
+            "Name": "Widoczność listy graczy",
+            "Hint": "Kontroluj widoczność domyślnej listy graczy Foundry w lewym dolnym rogu.",
+            "Choices": {
+                "always": "Zawsze widoczny",
+                "hover": "Pokaż po najechaniu kursorem",
+                "hidden": "Ukryj całkowicie"
+            }
         }
     }
 } 
