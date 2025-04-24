@@ -1,0 +1,12 @@
+{
+  "core": [
+    "default",
+    "gold"
+  ],
+  "custom": [
+    "codex",
+    "etrian-odyssey",
+    "test",
+    "test2"
+  ]
+}

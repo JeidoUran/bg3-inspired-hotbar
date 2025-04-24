@@ -274,18 +274,22 @@ export class ThemeSettingDialog extends FormApplication {
     }
 
     async generateThemeList(current) {
-        if(current === undefined) current = game.settings.get(BG3CONFIG.MODULE_NAME, 'themeOption');
+        if (current === undefined) current = game.settings.get(BG3CONFIG.MODULE_NAME, 'themeOption');
         current = current.toLowerCase();
-
-        let coreThemes = (await FilePicker.browse("user", `modules/${BG3CONFIG.MODULE_NAME}/scripts/themes`, { extensions: [".json"] })).files;
-        if(coreThemes.length) coreThemes = coreThemes.map(t => t.split("/")[t.split("/").length - 1].replace(/\.json/gi, ""));
-        let customThemes = (await FilePicker.browse("user", `modules/${BG3CONFIG.MODULE_NAME}/storage/themes`, { extensions: [".json"] })).files;
-        if(customThemes.length) customThemes = customThemes.map(t => t.split("/")[t.split("/").length - 1].replace(/\.json/gi, ""));
-
-        let html = `<option value="custom">Custom</option><optgroup label="Core">${coreThemes.map(t => `<option data-folder="scripts" value="${t}">${t}</option>`).join('')}</optgroup><optgroup label="Custom">${customThemes.map(t => `<option data-folder="storage" value="${t}">${t}</option>`).join('')}</optgroup>`;
-        
+      
+        const indexUrl = "modules/bg3-inspired-hotbar/storage/themes/theme-index.json";
+        const response = await fetch(indexUrl);
+        const data = await response.json();
+      
+        let html = `<option value="custom">Custom</option>`;
+        if (data.core?.length)
+          html += `<optgroup label="Core">${data.core.map(t => `<option data-folder="scripts" value="${t}" ${t === current ? "selected" : ""}>${t}</option>`).join('')}</optgroup>`;
+        if (data.custom?.length)
+          html += `<optgroup label="Custom">${data.custom.map(t => `<option data-folder="storage" value="${t}" ${t === current ? "selected" : ""}>${t}</option>`).join('')}</optgroup>`;
+      
         return html;
-    }
+      }
+      
 
     generateThemeData() {
         const form = this.element[0].querySelectorAll('.css-var'),
@@ -320,6 +324,33 @@ export class ThemeSettingDialog extends FormApplication {
         }
     }
 
+    async updateThemeIndex() {
+        const base = `modules/${BG3CONFIG.MODULE_NAME}`;
+        const getNames = async (subpath) => {
+          const files = (await FilePicker.browse("user", `${base}/${subpath}`, { extensions: [".json"] })).files;
+          return files
+            .map(f => f.split("/").pop())
+            .filter(f => f.toLowerCase() !== "theme-index.json")
+            .map(f => f.replace(/\.json$/i, ""));
+        };
+      
+        const index = {
+          core: await getNames("scripts/themes"),
+          custom: await getNames("storage/themes")
+        };
+      
+        const blob = new Blob([JSON.stringify(index, null, 2)], { type: "application/json" });
+        const file = new File([blob], "theme-index.json");
+      
+        try {
+          await FilePicker.upload("data", `${base}/storage/themes`, file, {}, { notify: false });
+          console.log("[Theme DEBUG] theme-index.json mis à jour.");
+        } catch (err) {
+          console.warn("[Theme DEBUG] Erreur lors de la mise à jour de theme-index.json :", err);
+        }
+      }
+      
+
     createTheme() {
         new Dialog({
             title: 'Export Theme',
@@ -344,6 +375,7 @@ export class ThemeSettingDialog extends FormApplication {
                             themeName = $(event).find('input[name="bg3ThemeName"]').val();
                         const theme = new File([new Blob([JSON.stringify(themeData)], { type: "application/json" })], `${themeName}.json`);
                         FilePicker.uploadPersistent(BG3CONFIG.MODULE_NAME, "themes", theme).then(async (response) => {
+                            await this.updateThemeIndex();
                             // game.settings.set(BG3CONFIG.MODULE_NAME, 'themeOption', themeName);
                             const themeList = await this.generateThemeList(themeName);
                             $('[name="bg3-inspired-hotbar.themeOption"]').empty();
