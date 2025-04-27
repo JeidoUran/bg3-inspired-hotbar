@@ -63,5 +63,5 @@
   
   #bg3-hotbar-container .hotbar-control-button.locked {
     background: var(--bg3-hotbar-drag-color-hover);
-    color: var(--bg3-hotbar-drag-color-hover);
+    color: var(--bg3-hotbar-background-color);
   }

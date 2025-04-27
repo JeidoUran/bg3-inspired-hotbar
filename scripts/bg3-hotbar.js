@@ -11,8 +11,7 @@ import { DragDropManager } from './managers/DragDropManager.js';
 import { HotbarManager } from './managers/HotbarManager.js';
 import { ItemUpdateManager } from './managers/ItemUpdateManager.js';
 import { BG3CONFIG, preloadHandlebarsTemplates } from './utils/config.js';
-import { DND5E, Filter, applications, dataModels, dice, documents, enrichers, migrations, registry, utils } from '../../../systems/dnd5e/dnd5e.mjs';
-import { TooltipManager } from './managers/TooltipManager.js';
+import { BG3TooltipManager } from './managers/TooltipManager.js';
 
 export class BG3Hotbar extends Application {
     constructor() {
@@ -79,7 +78,7 @@ export class BG3Hotbar extends Application {
         this.manager = new HotbarManager();
         this.dragDropManager = new DragDropManager();
         this.itemUpdateManager = new ItemUpdateManager();
-        this.tooltipManager = new TooltipManager();
+        this.tooltipManager = new BG3TooltipManager();
         
         // Apply macrobar collapse setting immediately if it's enabled
         this._applyMacrobarCollapseSetting();
@@ -350,10 +349,11 @@ export class BG3Hotbar extends Application {
         // Apply setting
         html.style.setProperty('--bg3-scale-ui', this.updateUIScale());
         html.dataset.position = game.settings.get(BG3CONFIG.MODULE_NAME, 'uiPosition');
+        html.dataset.underPause = game.settings.get(BG3CONFIG.MODULE_NAME, 'underPause');
         html.style.setProperty('--position-padding', `${game.settings.get(BG3CONFIG.MODULE_NAME, 'posPadding')}px`);
         html.style.setProperty('--position-bottom', `${game.settings.get(BG3CONFIG.MODULE_NAME, 'posPaddingBottom')}px`);
         html.style.setProperty('--bg3-normal-opacity', game.settings.get(BG3CONFIG.MODULE_NAME, 'normalOpacity'));
-        html.style.setProperty('--bg3-faded-opacity', game.settings.get(BG3CONFIG.MODULE_NAME, 'fadedOpacity'));
+        if(game.settings.get(BG3CONFIG.MODULE_NAME, 'fadedOpacity') !== 1) html.style.setProperty('--bg3-faded-opacity', game.settings.get(BG3CONFIG.MODULE_NAME, 'fadedOpacity'));
         html.style.setProperty('--bg3-faded-delay', `${game.settings.get(BG3CONFIG.MODULE_NAME, 'fadeOutDelay')}s`);
         html.setAttribute('theme-option', game.settings.get(BG3CONFIG.MODULE_NAME, 'themeOption'));
         // html.style.setProperty('--position-bottom', `${game.settings.get(BG3CONFIG.MODULE_NAME, 'posPaddingBottom')}px`);
@@ -362,6 +362,7 @@ export class BG3Hotbar extends Application {
         html.dataset.cellHighlight = game.settings.get(BG3CONFIG.MODULE_NAME, 'highlightStyle');
         document.body.dataset.showMaterials = game.settings.get(BG3CONFIG.MODULE_NAME, 'showMaterialDescription');
         document.body.dataset.lightTooltip = game.settings.get(BG3CONFIG.MODULE_NAME, 'enableLightTooltip');
+        ControlsManager.updateUIDataset(html);
 
         this.components = {
             portrait: new PortraitContainer(),

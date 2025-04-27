@@ -30,10 +30,6 @@ export class MenuContainer extends BG3Component {
                     if(btn) btn.addEventListener('click', (event) => {
                         event.preventDefault();
                         event.stopPropagation();
-                        if(!this.data.keepOpen) {
-                            if(ui.BG3HOTBAR.menuManager) ui.BG3HOTBAR.menuManager.destroy();
-                            else this.destroy();
-                        }
                         if(b.subMenu?.length) {
                             const oldComponents = this.components;
                             this.components = [];
@@ -51,7 +47,11 @@ export class MenuContainer extends BG3Component {
                                 subMenu.render();
                             })
                         }
-                        else return b.click(event)
+                        else return b.click(event);
+                        if(!this.data.keepOpen) {
+                            if(ui.BG3HOTBAR.menuManager) ui.BG3HOTBAR.menuManager.destroy();
+                            else this.destroy();
+                        }
                     });
                 }
             })

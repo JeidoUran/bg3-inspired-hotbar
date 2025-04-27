@@ -10,7 +10,7 @@ export class ControlContainer extends BG3Component {
     }
 
     get classes() {
-        return ["bg3-control-container"]
+        return [...["bg3-control-container"], ...(game.settings.get(BG3CONFIG.MODULE_NAME, 'masterLockEnabled')) ? ['locked'] : []]
     }
 
     get btnData() {

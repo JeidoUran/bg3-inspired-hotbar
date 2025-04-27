@@ -1,3 +1,22 @@
+## [3.0.2] - 2025-04-27
+### Fixed
+- Optimize movable locked tooltip.
+
+## [3.0.1] - 2025-04-24
+### Fixed
+- Fix CSS for control button locked state.
+- Fix Opacity Lock Menu not working.
+- Fix Basic Actions Container not hiding sometimes. (Related Issue: [#122])
+- Fix players lacking "Use File Browser" permission not being able to customize their theme. (Related Issue: [#121])
+- Fix a bug with Forge-vtt.com. (Related Issue: [#128])
+- Fix a bug with Ability Check & Save roll. (Related Issue: [#127])
+- Passives container will now be shown on hover even if empty. (Related Issue: [#126])
+- Fix a css bug with cells border. (Related Issue: [#125])
+
+### Features
+- Locked Tooltips will now be movable and only dismissed with a right-click on it.
+- Add an option to display the UI below the "Game Paused" label. (Related Issue: [#129])
+
 ## [3.0.0] - 2025-04-21
 ### Disclaimer
 - BG3 Inspired Hotbar got a huge update ! We did a deep refactor of the module to make it more optimized, less laggy and easier for us to maintain. It includes a lot of bug fixes too. Let us know if you find new ones.

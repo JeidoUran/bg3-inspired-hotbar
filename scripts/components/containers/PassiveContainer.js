@@ -109,7 +109,7 @@ export class PassiveContainer extends BG3Component {
     async render() {
         await super.render();
         const passivesList = this.passivesList;
-        if(passivesList.length === 0) this.element.style.visibility = 'hidden';
+        // if(passivesList.length === 0) this.element.style.visibility = 'hidden';
 
         const passives = passivesList.map((passive) => new PassiveButton({item: passive}, this));
         for(const passive of passives) this.element.appendChild(passive.element);

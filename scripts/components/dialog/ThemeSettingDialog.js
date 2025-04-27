@@ -23,7 +23,7 @@ export class ThemeSettingDialog extends FormApplication {
             const setting = game.settings.settings.get(`${BG3CONFIG.MODULE_NAME}.${dataKeys[i]}`);
             if(setting.scope === 'client' || game.user.isGM) configData[dataKeys[i]] = game.settings.get(BG3CONFIG.MODULE_NAME, dataKeys[i]);
         }
-        const themeList = await this.generateThemeList(game.settings.get(BG3CONFIG.MODULE_NAME, 'themeOption'));
+        const themeList = game.user.hasPermission('FILES_BROWSE') ? await this.generateThemeList(game.settings.get(BG3CONFIG.MODULE_NAME, 'themeOption')) : false;
 
         const dataInput = [
             {
@@ -201,7 +201,7 @@ export class ThemeSettingDialog extends FormApplication {
             } */
         ];
 
-        return {configData, dataInput, themeList};
+        return {configData, dataInput, themeList, canExport: game.user.hasPermission('FILES_UPLOAD')};
     }
 
     async _render(force, options) {
@@ -308,15 +308,13 @@ export class ThemeSettingDialog extends FormApplication {
                 this.createTheme();
                 break;
             default:
-                const themeInput = this.element[0].querySelector('[name="bg3-inspired-hotbar.themeOption"]');
-                if(themeInput?.value) await game.settings.set(BG3CONFIG.MODULE_NAME, 'themeOption', themeInput.value);
-                /* const themeScope = this.element[0].querySelector('[name="bg3-inspired-hotbar.themeScope"]');
-                if(themeScope?.value) game.settings.set(BG3CONFIG.MODULE_NAME, 'themeScope', themeScope.value); */
-                if(themeInput.value === 'custom') {
+                const themeInput = this.element[0].querySelector('[name="bg3-inspired-hotbar.themeOption"]'),
+                    themeValue = themeInput?.value ?? 'custom';
+                await game.settings.set(BG3CONFIG.MODULE_NAME, 'themeOption', themeValue);
+                if(game.settings.get(BG3CONFIG.MODULE_NAME, 'themeOption') === 'custom') {
                     const form = this.element[0].querySelectorAll('.css-var'),
                         cssVars = this.generateThemeData();
                     await game.settings.set(BG3CONFIG.MODULE_NAME, 'themeCustom', cssVars);
-                    console.log(cssVars);
                 }
                 ui.BG3HOTBAR._applyTheme();
                 this.close();

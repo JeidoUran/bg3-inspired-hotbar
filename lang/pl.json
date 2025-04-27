@@ -55,6 +55,15 @@
             "Name": "Pokaż opis materialnych komponentów",
             "Hint": "Wyświetlanie pełnego opisu materialnych komponentów w podpowiedziach zaklęć (np. „diamenty o wartości 300 sz, które wykorzystuje zaklęcie”)."
         },
+        "EnableLightTooltip": {
+            "Name": "Konfiguracja wyświetlania podpowiedzi",
+            "Hint": "Wybierz, co ma być wyświetlane w podpowiedzi pozycji",
+            "Choices": {
+                "Full": "Całość",
+                "Light": "Pokaż tylko nazwę i typ pozycji",
+                "NoDesc": "Ukryj tylko opis"
+            }
+        },
         "BypassSpellPreparationCheck": {
             "Name": "Uwzględnij nieprzygotowane zaklęcia",
             "Hint": "Po włączeniu tej opcji wszystkie zaklęcia zostaną uwzględnione na pasku skrótów, niezależnie od stanu ich przygotowania."
@@ -135,7 +144,8 @@
             "Cancel": "Anuluj",
             "Save": "Zapisz Zmiany",
             "SaveSuccess": "Ustawienia automatycznego wypełniania kontenera zostały pomyślnie zapisane",
-            "Configure": "Konfiguracja automatycznego wypełniania kontenera"
+            "Configure": "Konfiguracja automatycznego wypełniania kontenera",
+            "Export": "Wyeksportuj Motyw"
         },
         "HighlightStyle": {
             "Name": "Styl podświetlenia",
@@ -149,6 +159,39 @@
             "Token": "Zawsze używaj obrazu tokena",
             "Portrait": "Zawsze używaj portretu postaci"
         },
+        "ShapePortraitPreferences": {
+            "Name": "Kształt widoku portretu",
+            "Hint": "Wybierz kształt portretów postaci.",
+            "Round": "Zaokrąglony",
+            "Square": "Kwadrat"
+        },
+        "BorderPortraitPreferences": {
+            "Name": "Obramowanie widoku portretu",
+            "Hint": "Wybierz obramowanie portretów postaci.",
+            "None": "Brak",
+            "Simple": "Proste",
+            "Styled": "Stylowy (tylko zaokrąglony kształt)"
+        },
+        "BackgroundPortraitPreferences": {
+            "Name": "Tło obrazu portretowego",
+            "Hint": "Wybierz kolor tła portretów postaci."
+        },
+        "ShowHealthOverlay": {
+            "Name": "Wyświetl nakładkę stanu zdrowia",
+            "Hint": ""
+        },
+        "ShowHPText": {
+            "Name": "Wyświetl tekst PW",
+            "Hint": ""
+        },
+        "ShowRestTurnButton": {
+            "Name": "Pokaż przycisk Wstrzymaj/Zatrzymaj",
+            "Hint": ""
+        },
+        "OverlayModePortrait": {
+            "Name": "Nakładka zdrowia jako maska",
+            "Hint": "Jeśli ta opcja jest zaznaczona, nakładka zdrowia nie będzie zakrywać przezroczystej części portretu postaci. Zaznacz to, jeśli używasz Dynamicznego Pierścienia Tokena."
+        },
         "SettingsCategories": {
             "HotbarContainer": "Przyciski paska skrótów",
             "CombatContainer": "Wspólne działania kontenera",
@@ -156,7 +199,17 @@
             "Portrait": "Portret postaci",
             "Tooltip": "Podpowiedź",
             "AutoPopulating": "Automatyczne wypełnianie",
-            "FoundryUI": "Poprawki interfejsu Foundry"
+            "FoundryUI": "Poprawki interfejsu Foundry",
+            "MidiQoL": "Synchronizacja MidiQoL"
+        },
+        "MenuTheme": {
+            "Name": "Konfiguracja motywu",
+            "Hint": "Wybierz jeden z dostępnych motywów lub stwórz własny.",
+            "Label": "Konfiguracja motywu"
+        },
+        "scopeTheme": {
+            "Name": "Zasięg motywu",
+            "Hint": "Jeśli opcja zostanie zaznaczona, każdy gracz będzie mógł wybrać własny motyw. W przeciwnym razie motyw wybrany przez MG będzie taki sam dla wszystkich."
         },
         "PlayerListVisibility": {
             "Name": "Widoczność listy graczy",
@@ -166,6 +219,25 @@
                 "hover": "Pokaż po najechaniu kursorem",
                 "hidden": "Ukryj całkowicie"
             }
+        },
+        "ShowDeathSavingThrow": {
+            "Name": "Wyświetl rzut obronny przed śmiercią",
+            "Hint": "Kontroluj sposób wyświetlania rzutu obronnego przed śmiercią.",
+            "Choices": {
+                "show": "Domyślne",
+                "hide": "Nigdy",
+                "only": "Wyświetlaj klikalną czaszkę tylko na portrecie"
+            }
+        },
+        "synchroMidiQoL": {
+            "BR": {
+                "Name": "Efekty aktywne bonusów i reakcji",
+                "Hint": "Ustaw akcję i reakcję bonusu zgodnie z aktywnymi efektami MidiQoL."
+            }
+        },
+        "GamePause": {
+            "Name": "„Gra wstrzymana” ponad interfejsem",
+            "Hint": "Jeśli opcja zostanie zaznaczona, interfejs użytkownika zostanie wyświetlony pod etykietą „Gra wstrzymana”."
         }
     }
 } 

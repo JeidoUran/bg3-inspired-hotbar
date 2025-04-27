@@ -126,9 +126,9 @@ export class WeaponContainer extends BG3Component {
         const combatContainer = new GridContainer(this.data.combat[0]);
         combatContainer.locked = game.settings.get(BG3CONFIG.MODULE_NAME, 'lockCombatContainer');
         combatContainer.id = 'combat';
-        combatContainer.element.classList.toggle('hidden', !game.settings.get(BG3CONFIG.MODULE_NAME, 'showCombatContainer'));
         this.components.combat.push(combatContainer);
         this.element.appendChild(combatContainer.element);
         await combatContainer.render();
+        combatContainer.element.classList.toggle('hidden', !game.settings.get(BG3CONFIG.MODULE_NAME, 'showCombatContainer'));
     }
 }

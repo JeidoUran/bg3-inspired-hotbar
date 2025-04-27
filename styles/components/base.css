@@ -132,8 +132,11 @@
     width: fit-content;
     left: 0;
     right: 0;
+    opacity: var(--bg3-faded-opacity, var(--bg3-normal-opacity));
+}
 
-    opacity: var(--bg3-faded-opacity);
+#bg3-hotbar-container[data-under-pause="true"] {
+    z-index: var(--z-index-canvas);
 }
 
 #bg3-hotbar-container[data-position="center"] {
@@ -184,7 +187,7 @@ aside[role="tooltip"] .custom-tooltip i {
    Opacity Settings Handler
    ========================================================================== */
    
-#bg3-hotbar-container:hover {
+#bg3-hotbar-container:hover, #bg3-hotbar-container:has(div.locked[data-key="controlLock"])[data-lock-settings*="opacity"] {
     transition-delay: 0s;
     opacity: var(--bg3-normal-opacity);
 }

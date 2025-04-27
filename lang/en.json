@@ -234,6 +234,10 @@
                 "Name": "Bonus & Reaction active effects",
                 "Hint": "Set Bonus Action and Reaction as used based on MidiQoL active effects."
             }
+        },
+        "GamePause": {
+            "Name": "Keep \"Game Paused\" on top",
+            "Hint": "If checked UI will be displayed under the \"Game Paused\" label."
         }
     }
 } 

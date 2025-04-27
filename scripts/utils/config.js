@@ -437,6 +437,9 @@ export function registerEarly() {
         });
     });
     
+    if (customElements.get('colorpicker-input2') != undefined) {
+        return;
+    }
     customElements.define('colorpicker-input2', colorPickerInput2, {
         extends: 'input'
     });
@@ -461,6 +464,17 @@ export function updateSettingsDisplay() {
 }
 
 export function registerSettings() {
+    // Theme settings
+    game.settings.register(BG3CONFIG.MODULE_NAME, 'scopeTheme', {
+        name: 'BG3.Settings.scopeTheme.Name',
+        hint: 'BG3.Settings.scopeTheme.Hint',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        requiresReload: true,
+        default: true
+    });
+
     // Core UI Settings
     game.settings.register(BG3CONFIG.MODULE_NAME, 'collapseFoundryMacrobar', {
         name: 'BG3.Settings.CollapseFoundryMacrobar.Name',
@@ -500,15 +514,6 @@ export function registerSettings() {
     });
     
     // Visual Settings - Appearance
-    game.settings.register(BG3CONFIG.MODULE_NAME, 'scopeTheme', {
-        name: 'BG3.Settings.scopeTheme.Name',
-        hint: 'BG3.Settings.scopeTheme.Hint',
-        scope: 'world',
-        config: true,
-        type: Boolean,
-        requiresReload: true,
-        default: true
-    });
 
     const scopeTheme = game.settings.get(BG3CONFIG.MODULE_NAME, "scopeTheme");
 
@@ -553,9 +558,21 @@ export function registerSettings() {
         }
     });
     
+    game.settings.register(BG3CONFIG.MODULE_NAME, 'underPause', {
+        name: 'BG3.Settings.GamePause.Name',
+        hint: 'BG3.Settings.GamePause.Hint',
+        scope: 'client',
+        config: true,
+        type: Boolean,
+        default: false,
+        onChange: value => {
+            if(ui.BG3HOTBAR.element?.[0]) ui.BG3HOTBAR.element?.[0].setAttribute('data-under-pause', value);
+        }
+    });
+    
     game.settings.register(BG3CONFIG.MODULE_NAME, 'autoScale', {
-        name: 'Auto UI scale',
-        hint: 'Auto scale the UI based on your browser. Disable the UI scale parameter below.',
+        name: 'BG3.Settings.NormalOpacity.Name',
+        hint: 'BG3.Settings.NormalOpacity.Hint',
         scope: 'client',
         config: true,
         type: Boolean,
@@ -652,9 +669,14 @@ export function registerSettings() {
         default: 1,
         onChange: value => {
             if(ui.BG3HOTBAR.element?.[0]) {
-                if(value === 1) ui.BG3HOTBAR.element?.[0].style.setProperty('--bg3-faded-delay', `0s`);
-                else ui.BG3HOTBAR.element?.[0].style.setProperty('--bg3-faded-delay', `${game.settings.get(BG3CONFIG.MODULE_NAME, 'fadeOutDelay')}s`);
-                ui.BG3HOTBAR.element?.[0].style.setProperty('--bg3-faded-opacity', value);
+                if(value === 1) {
+                    ui.BG3HOTBAR.element?.[0].style.setProperty('--bg3-faded-delay', `0s`);
+                    ui.BG3HOTBAR.element?.[0].style.removeProperty('--bg3-faded-opacity');
+                }
+                else {
+                    ui.BG3HOTBAR.element?.[0].style.setProperty('--bg3-faded-delay', `${game.settings.get(BG3CONFIG.MODULE_NAME, 'fadeOutDelay')}s`);
+                    ui.BG3HOTBAR.element?.[0].style.setProperty('--bg3-faded-opacity', value);
+                }
             }
         }
     });

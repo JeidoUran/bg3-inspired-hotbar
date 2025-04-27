@@ -1,6 +1,7 @@
 <form class="package-configuration">
     <div class="dialog-container" style="width: 600px; height: 900px;">
         <div class="form-group group-header">Theme settings</div>
+        {{#unless (eq themeList false)}}
         <div class="form-group" data-setting-id="bg3-inspired-hotbar.themeOption" style="margin-top: 1em;">
             <label>{{localize "BG3.Settings.MenuTheme.Name"}}</label>
             <div class="form-fields">
@@ -10,6 +11,7 @@
             </div>
             <p class="notes">{{localize "BG3.Settings.MenuTheme.Hint"}}</p>
         </div>
+        {{/unless}}
         {{#each dataInput}}
         <div>
             <details name="details-color">
@@ -53,10 +55,12 @@
         {{/each}}
     </div>
     <div class="dialog-buttons">
+        {{#if canExport}}
         <button data-type="export" class="dialog-button">
             <i class="fas fa-file-export"></i>
             {{localize "BG3.Settings.ContainerAutoPopulate.Export"}}
         </button>
+        {{/if}}
         <button type="submit" class="dialog-button">
             <i class="fas fa-save"></i>
             {{localize "BG3.Settings.ContainerAutoPopulate.Save"}}

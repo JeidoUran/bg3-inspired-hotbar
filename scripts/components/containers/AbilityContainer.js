@@ -24,6 +24,13 @@ export class AbilityContainer extends BG3Component {
 
     getAbilityMod(key) {
         const abilityScore = this.actor.system.abilities?.[key] || { value: 10, proficient: false },
+            mod = abilityScore.mod,
+            modString = mod >= 0 ? `+${mod}` : mod.toString();
+        return {value: modString, style: abilityScore.proficient === 1 ?  'color: #3498db' : ''  };
+    }
+
+    getSaveMod(key) {
+        const abilityScore = this.actor.system.abilities?.[key] || { value: 10, proficient: false },
             mod = abilityScore.save.value,
             modString = mod >= 0 ? `+${mod}` : mod.toString();
         return {value: modString, style: abilityScore.proficient === 1 ?  'color: #3498db' : ''  };
@@ -62,7 +69,7 @@ export class AbilityContainer extends BG3Component {
     getMenuData() {
         const saveRoll = (event) => {
             event.stopPropagation();
-            const parent = event.target.closest('[data-key]');
+            const parent = event.target.closest('.ability-container');
             try {
                 this.actor.rollAbilitySave({
                     ability: parent.dataset.key,
@@ -79,7 +86,7 @@ export class AbilityContainer extends BG3Component {
 
         const checkRoll = (event) => {
             event.stopPropagation();
-            const parent = event.target.closest('[data-key]');
+            const parent = event.target.closest('.ability-container');
             try {
                 this.actor.rollAbilityCheck({
                     ability: parent.dataset.key,
@@ -109,15 +116,16 @@ export class AbilityContainer extends BG3Component {
                     btns[abl] = {
                         ...{
                             label: this.abilities[abl].label,
-                            tooltip: tooltip
+                            tooltip: tooltip,
+                            class: 'ability-container'
                         },
                         ...abilityMod,
                         subMenu: [
                             {
                                 position: 'topright', name: 'saveMenu', event: 'click', 
                                 buttons: {
-                                    [`check${abl.toUpperCase}`]: {...{label: 'Check', icon: 'fas fa-dice-d20', click: checkRoll}, ...abilityMod},
-                                    [`save${abl.toUpperCase}`]: {...{label: 'Save', icon: 'fas fa-dice-d20', click: saveRoll}, ...abilityMod}
+                                    [`check${abl.toUpperCase()}`]: {...{label: 'Check', icon: 'fas fa-dice-d20', click: checkRoll}, ...abilityMod},
+                                    [`save${abl.toUpperCase()}`]: {...{label: 'Save', icon: 'fas fa-dice-d20', click: saveRoll}, ...this.getSaveMod(abl)}
                                 }
                             },
                             {
