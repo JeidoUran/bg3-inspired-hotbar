@@ -23,7 +23,7 @@ export class ThemeSettingDialog extends FormApplication {
             const setting = game.settings.settings.get(`${BG3CONFIG.MODULE_NAME}.${dataKeys[i]}`);
             if(setting.scope === 'client' || game.user.isGM) configData[dataKeys[i]] = game.settings.get(BG3CONFIG.MODULE_NAME, dataKeys[i]);
         }
-        const themeList = game.user.hasPermission('FILES_BROWSE') ? await this.generateThemeList(game.settings.get(BG3CONFIG.MODULE_NAME, 'themeOption')) : false;
+        const themeList = await this.generateThemeList(game.settings.get(BG3CONFIG.MODULE_NAME, 'themeOption'));
 
         const dataInput = [
             {
