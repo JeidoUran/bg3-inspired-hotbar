@@ -512,7 +512,8 @@ export function registerSettings() {
         label: 'Configure Portait Extra Datas',
         hint: 'Extra datas to show on character portrait.',
         icon: "fas fa-cogs",
-        type: ExtraInfosDialog
+        type: ExtraInfosDialog,
+        scope: 'client'
     });
     
     game.settings.registerMenu(BG3CONFIG.MODULE_NAME, "menuHotbar", {

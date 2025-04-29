@@ -1,3 +1,7 @@
+## [3.0.4] - 2025-04-29
+### Fixed
+- Fix Configure Portrait Extra Datas not shown for players.
+
 ## [3.0.3] - 2025-04-27
 ### Fixed
 - Fix Auto UI Scale wrong localization text. (Related Issue: [#134])
