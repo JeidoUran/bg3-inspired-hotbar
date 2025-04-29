@@ -1,3 +1,12 @@
+## [3.0.3] - 2025-04-27
+### Fixed
+- Fix Auto UI Scale wrong localization text. (Related Issue: [#134])
+
+### Features
+- Add on setting to add Advantage/Disadvantage buttons to add a source when using MidiQoL fast-forward. (Related Issue: [#124])
+- Move settings to submenu to make it easier to read.
+- Common Actions from CPR will be in Actions category. (Related Issue: [#133])
+
 ## [3.0.2] - 2025-04-27
 ### Fixed
 - Optimize movable locked tooltip.

@@ -240,21 +240,27 @@ export class AutoPopulateCreateToken {
     static async _populateCommonActions(actor, manager) {
         if(actor.type == 'vehicule') return;
         try {
-            const tmpArray = [],
-                actionsClone = foundry.utils.deepClone(BG3CONFIG.COMBATACTIONDATA);
-            Object.entries(actionsClone).forEach(([key, value]) => {
-              const hasItem = actor.items.find(item => item.type == 'feat' && item.name == value.name)
-              if(hasItem) value.uuid = hasItem.uuid;
-              else {
-                let tmpItem = ui.BG3HOTBAR.combatActionsArray.find(it => it.name == value.name);
-                if(tmpItem) tmpArray.push(tmpItem);
-              }
-            })
-            if(tmpArray.length) {
-              let tmpDoc = await actor.createEmbeddedDocuments('Item', tmpArray);
-              tmpDoc.forEach(doc => Object.values(actionsClone).find(value => value.name == doc.name).uuid = doc.uuid)
-            }
-            manager.containers.combat[0].items = actionsClone;
+            return new Promise((resolve, reject) => {
+                setTimeout(async () => {
+                    const tmpArray = [],
+                        actionsClone = foundry.utils.deepClone(BG3CONFIG.COMBATACTIONDATA);
+                    Object.entries(actionsClone).forEach(([key, value]) => {
+                      const hasItem = actor.items.find(item => item.type == 'feat' && item.name == value.name)
+                      if(hasItem) value.uuid = hasItem.uuid;
+                      else {
+                        let tmpItem = ui.BG3HOTBAR.combatActionsArray.find(it => it.name == value.name);
+                        if(tmpItem) tmpArray.push(tmpItem);
+                      }
+                    })
+                    if(tmpArray.length) {
+                      let tmpDoc = await actor.createEmbeddedDocuments('Item', tmpArray);
+                      tmpDoc.forEach(doc => Object.values(actionsClone).find(value => value.name == doc.name).uuid = doc.uuid);
+                      tmpDoc.forEach(doc => doc.setFlag('tidy5e-sheet', 'section', "CHRISPREMADES.Generic.Actions"));
+                    }
+                    manager.containers.combat[0].items = actionsClone;
+                    resolve();
+                }, 100);
+            });
         } catch (error) {
             console.error("BG3 Inspired Hotbar | Error auto-populating common actions token hotbar:", error);
         }

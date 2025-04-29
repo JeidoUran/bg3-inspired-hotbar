@@ -40,6 +40,9 @@
             "Status": "Status",
             "Active": "Active",
             "Disabled": "Disabled"
+        },
+        "Ability": {
+            "Tooltip": "Click to show ability checks and saving throws"
         }
     },
     "BG3.Settings": {
@@ -185,7 +188,7 @@
             "Hint": ""
         },
         "ShowRestTurnButton": {
-            "Name": "Show Rest/Turns button",
+            "Name": "Show Rest/Turns buttons",
             "Hint": ""
         },
         "OverlayModePortrait": {
@@ -233,11 +236,61 @@
             "BR": {
                 "Name": "Bonus & Reaction active effects",
                 "Hint": "Set Bonus Action and Reaction as used based on MidiQoL active effects."
+            },
+            "ADV": {
+                "Name": "Add Advantage/Disadvantage buttons",
+                "Hint": "Add an advantage or disadvantage source. Need MidiQoL fast forward to be enable."
             }
         },
         "GamePause": {
             "Name": "Keep \"Game Paused\" on top",
             "Hint": "If checked UI will be displayed under the \"Game Paused\" label."
+        },
+        "AutoScale": {
+            "Name": "Auto UI scale",
+            "Hint": "Auto scale the UI based on your browser. Disable the UI scale parameter below."
+        },
+        "Menu": {
+            "Global": {
+                "Name": "Global settings",
+                "Hint": "Native Foundry elements or global BG3 UI settings.",
+                "Label": "Configure Global"
+            },
+            "Theme": {
+                "Name": "Theme settings",
+                "Hint": "Choose between available themes or create a custom one.",
+                "Label": "Configure Theme"
+            },
+            "Portrait": {
+                "Name": "Portrait settings",
+                "Hint": "Advanced settings for character portrait.",
+                "Label": "Configure Portrait"
+            },
+            "Hotbar": {
+                "Name": "Hotbars settings",
+                "Hint": "Advanced settings for Hotbars.",
+                "Label": "Configure Hotbars"
+            },
+            "Combat": {
+                "Name": "Common Actions settings",
+                "Hint": "Advanced settings for common actions.",
+                "Label": "Configure Common Actions"
+            },
+            "Populate": {
+                "Name": "Auto-Populating settings",
+                "Hint": "Advanced settings for auto-populating feature.",
+                "Label": "Configure Auto-Populating"
+            },
+            "Tooltip": {
+                "Name": "Tooltip settings",
+                "Hint": "Advanced settings for Tooltip.",
+                "Label": "Configure Tooltip"
+            },
+            "Midi": {
+                "Name": "Synchro MidiQoL setting",
+                "Hint": "Synchonization with MidiQoL features. Must have MidiQoL module installed.",
+                "Label": "Configure Synchro MidiQoL"
+            }
         }
     }
 } 

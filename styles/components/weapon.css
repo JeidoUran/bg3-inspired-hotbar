@@ -15,7 +15,7 @@
     position: relative;
     /* height: 86px; */
     width: calc(2*(var(--bg3-weapon-cell-size) + 1px));
-    margin-right: 5px;
+    margin-right: 3px;
     z-index: 100;
 }
 

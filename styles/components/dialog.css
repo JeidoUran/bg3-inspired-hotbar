@@ -267,18 +267,38 @@ details[open] summary::marker {
   /* content: "- "; */
 }
 
-#bg3-inspired-hotbar-theme-settings ::placeholder {
+#bg3-inspired-hotbar-theme-settings ::placeholder, #bg3-inspired-hotbar-setting-dialog ::placeholder {
   opacity: 0.5 !important;
 }
 
-#bg3-inspired-hotbar-theme-settings ::-ms-input-placeholder {
+#bg3-inspired-hotbar-theme-settings ::-ms-input-placeholder, #bg3-inspired-hotbar-setting-dialog ::-ms-input-placeholder {
   opacity: 0.5 !important;
 }
 
-#bg3-inspired-hotbar-theme-settings .window-content {
+#bg3-inspired-hotbar-theme-settings .window-content, #bg3-inspired-hotbar-setting-dialog .window-content {
   overflow: visible;
 }
 
-#bg3-inspired-hotbar-theme-settings select {
+#bg3-inspired-hotbar-theme-settings select, #bg3-inspired-hotbar-setting-dialog select {
   text-transform: capitalize;
+}
+
+#bg3-inspired-hotbar-setting-dialog .package-configuration {
+  padding: 0 .5rem;
+}
+
+#bg3-inspired-hotbar-setting-dialog .dialog-container {
+  width: 650px;
+}
+
+#bg3-inspired-hotbar-setting-dialog .form-group:not(.group-header) {
+  padding: 0 .25rem;
+}
+
+#bg3-inspired-hotbar-setting-dialog .form-group > *:not(.notes):not(.hint), #bg3-inspired-hotbar-setting-dialog .submenu button {
+  flex: 2;
+}
+
+#bg3-inspired-hotbar-setting-dialog .form-group > label {
+  flex: 3;
 }

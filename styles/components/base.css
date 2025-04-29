@@ -179,10 +179,6 @@ aside[role="tooltip"] .custom-tooltip i {
     color: var(--data-color);
 }
 
-#bg3-hotbar-container:hover .bg3-filter-subcontainer {
-    opacity: 1;
-}
-
 /* ==========================================================================
    Opacity Settings Handler
    ========================================================================== */

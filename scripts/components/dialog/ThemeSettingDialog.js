@@ -17,7 +17,7 @@ export class ThemeSettingDialog extends FormApplication {
     }
 
     async getData() {
-        const dataKeys = ['themeOption'],
+        const dataKeys = ['scopeTheme'],
             configData = {};
         for(let i = 0; i < dataKeys.length; i++) {
             const setting = game.settings.settings.get(`${BG3CONFIG.MODULE_NAME}.${dataKeys[i]}`);
@@ -309,7 +309,8 @@ export class ThemeSettingDialog extends FormApplication {
                 break;
             default:
                 const themeInput = this.element[0].querySelector('[name="bg3-inspired-hotbar.themeOption"]'),
-                    themeValue = themeInput?.value ?? 'custom';
+                    themeValue = themeInput?.value ?? 'custom',
+                    themeScope = this.element[0].querySelector('[name="bg3-inspired-hotbar.scopeTheme"]');
                 await game.settings.set(BG3CONFIG.MODULE_NAME, 'themeOption', themeValue);
                 if(game.settings.get(BG3CONFIG.MODULE_NAME, 'themeOption') === 'custom') {
                     const form = this.element[0].querySelectorAll('.css-var'),
@@ -317,6 +318,12 @@ export class ThemeSettingDialog extends FormApplication {
                     await game.settings.set(BG3CONFIG.MODULE_NAME, 'themeCustom', cssVars);
                 }
                 ui.BG3HOTBAR._applyTheme();
+                if(game.user.isGM && themeScope) {
+                    if(game.settings.get(BG3CONFIG.MODULE_NAME, 'scopeTheme') !== themeScope.checked) {{
+                        await game.settings.set(BG3CONFIG.MODULE_NAME, 'scopeTheme', themeScope.checked);
+                        SettingsConfig.reloadConfirm({world: true});
+                    }}
+                }
                 this.close();
                 break;
         }

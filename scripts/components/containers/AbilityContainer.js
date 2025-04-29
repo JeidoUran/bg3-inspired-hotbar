@@ -101,7 +101,7 @@ export class AbilityContainer extends BG3Component {
             }
         };
 
-        const tooltip = "Click to show ability checks and saving throws";
+        const tooltip = "BG3.Hotbar.Ability.Tooltip";
 
         return {
             position: 'top',
@@ -116,7 +116,6 @@ export class AbilityContainer extends BG3Component {
                     btns[abl] = {
                         ...{
                             label: this.abilities[abl].label,
-                            tooltip: tooltip,
                             class: 'ability-container'
                         },
                         ...abilityMod,

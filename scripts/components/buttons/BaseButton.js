@@ -1,8 +1,8 @@
 import { BG3Component } from "../component.js";
 
 export class BaseButton extends BG3Component {
-    constructor(data) {
-        super(data);
+    constructor(data, parent) {
+        super(data, parent);
     }
 
     get classes() {

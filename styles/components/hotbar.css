@@ -11,6 +11,7 @@
     padding: 2px 6px;
     align-items: stretch;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    margin-left: 2px;
 }
 
 #bg3-hotbar-container .bg3-hotbar-subcontainer {
@@ -24,6 +25,10 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     transition: width 0.1s ease;
     /* width: calc(var(--cols) * (var(--bg3-hotbar-cell-size) + 4px) + 8px); */
+}
+
+#bg3-hotbar-container .bg3-hotbar-container:hover .bg3-filter-subcontainer {
+    opacity: 1;
 }
 
 /* ==========================================================================
@@ -228,4 +233,60 @@
 
 #bg3-hotbar-container[data-item-use="true"] .hotbar-item-uses {
     display: block;
+}
+
+#bg3-hotbar-container .bg3-adv-container {
+    display: flex;
+    flex-direction: column;
+    margin: 1px 0;
+    align-self: stretch;
+    gap: 5px;
+}
+
+#bg3-hotbar-container .bg3-adv-container > * {
+    background: var(--bg3-hotbar-background-color);
+    border: var(--bg3-border-size) solid var(--bg3-border-color);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--bg3-hotbar-text-color);
+    font-size: 0.8em;
+    /* overflow: hidden; */
+    position: relative;
+    transition: all 0.2s ease;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    opacity: 1;
+    flex: 1;
+    writing-mode: vertical-rl;
+    padding: 5px;
+    cursor: pointer;
+    text-orientation: upright;
+    margin-right: 1px;
+}
+
+#bg3-hotbar-container .bg3-adv-container > :first-child:hover, #bg3-hotbar-container .bg3-adv-container[data-state="advBtn"][data-once="true"] > :first-child {
+    border-color: green;
+}
+
+#bg3-hotbar-container .bg3-adv-container[data-state="advBtn"][data-once="true"] > :first-child {
+    color: green;
+}
+
+#bg3-hotbar-container .bg3-adv-container[data-state="advBtn"][data-once="false"] > :first-child {
+    background-color: green;
+}
+
+#bg3-hotbar-container .bg3-adv-container > :last-child:hover, #bg3-hotbar-container .bg3-adv-container[data-state="disBtn"][data-once="true"] > :last-child {
+    border-color: red;
+}
+
+#bg3-hotbar-container .bg3-adv-container[data-state="disBtn"][data-once="true"] > :last-child {
+    color: red;
+}
+
+#bg3-hotbar-container .bg3-adv-container[data-state="disBtn"][data-once="false"] > :last-child {
+    background-color: red;
 }

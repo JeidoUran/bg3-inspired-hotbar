@@ -201,9 +201,9 @@ export class GridCell extends BG3Component {
                     if(item.execute) item.execute();
                     else if(item.use) {
                         const options = {
-                        configureDialog: false,
-                        legacy: false,
-                        event: e
+                            configureDialog: false,
+                            legacy: false,
+                            event: e
                         };
                         if (e.ctrlKey) options.disadvantage = true;
                         if (e.altKey) options.advantage = true;

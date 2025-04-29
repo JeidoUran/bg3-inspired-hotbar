@@ -1,6 +1,6 @@
 import { BG3CONFIG } from "../../utils/config.js";
 
-export class PortraitSettingDialog extends FormApplication {
+/* export class PortraitSettingDialog extends FormApplication {
     constructor () {
         super();
     }
@@ -42,7 +42,8 @@ export class PortraitSettingDialog extends FormApplication {
         }
         this.close();
     }
-}
+} */
+
 export class ExtraInfosDialog extends FormApplication {
     constructor () {
         super();

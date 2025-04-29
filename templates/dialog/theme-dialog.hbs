@@ -12,6 +12,15 @@
             <p class="notes">{{localize "BG3.Settings.MenuTheme.Hint"}}</p>
         </div>
         {{/unless}}
+        {{#if (isdefined configData.scopeTheme)}}
+        <div class="form-group" data-setting-id="bg3-inspired-hotbar.scopeTheme" style="margin-top: 1em;">
+            <label>{{localize "BG3.Settings.scopeTheme.Name"}}</label>
+            <div class="form-fields">
+                <input type="checkbox" name="bg3-inspired-hotbar.scopeTheme" data-dtype="Boolean" {{#if configData.scopeTheme}}checked{{/if}}>
+            </div>
+            <p class="notes">{{localize "BG3.Settings.scopeTheme.Hint"}}</p>
+        </div>
+        {{/if}}
         {{#each dataInput}}
         <div>
             <details name="details-color">

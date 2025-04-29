@@ -21,6 +21,10 @@ export class MenuContainer extends BG3Component {
     async getData() {
         return {buttons: this.data.buttons};
     }
+
+    // get dataTooltip() {
+    //     return this.data.tooltip ?? null;
+    // }
     
     async _registerEvents() {
         if(this.data.buttons) {
@@ -47,7 +51,7 @@ export class MenuContainer extends BG3Component {
                                 subMenu.render();
                             })
                         }
-                        else return b.click(event);
+                        else b.click(event);
                         if(!this.data.keepOpen) {
                             if(ui.BG3HOTBAR.menuManager) ui.BG3HOTBAR.menuManager.destroy();
                             else this.destroy();
