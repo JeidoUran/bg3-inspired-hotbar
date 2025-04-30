@@ -96,13 +96,12 @@ export class AutoPopulateCreateToken {
             const tempManager = new HotbarManager();
             tempManager.currentTokenId = token.id;
             await tempManager._loadTokenData();
-
-            // if(!tempManager.combatContainer[0]?.items || Object.values(tempManager.combatContainer[0].items).length > 0) return;
             
             // Auto-populate combat container if setting on true
             if(!(!tempManager.containers.combat[0]?.items || Object.values(tempManager.containers.combat[0].items).length > 0)) {
                 if(game.settings.get(BG3CONFIG.MODULE_NAME, 'autoPopulateCombatContainer') && token.actor.type !== 'vehicle') await this._populateCommonActions(token.actor, tempManager);
             }
+            console.log('items', token)
 
             if(token.actor.type !== 'character' && ((!token.actorLink && game.settings.get(BG3CONFIG.MODULE_NAME, 'autoPopulateUnlinkedTokens')) || (token.actorLink && game.settings.get(BG3CONFIG.MODULE_NAME, 'autoPopulateLinkedTokens')))) {
                 // Get settings for each container
@@ -136,12 +135,12 @@ export class AutoPopulateCreateToken {
         try {
             // Get all items from the actor that match the selected types
             const itemsWithActivities = [];
-            
+
             // Process all items from the actor
             for (const item of actor.items) {
                 // Skip if item type is not in the selected types
                 if (!itemTypes.includes(item.type)
-                    || Object.values(BG3CONFIG.COMBATACTIONDATA).find(d => d.name === item.name)
+                    || Object.values(manager.containers.combat[0].items).find(d => d.uuid === item.uuid)
                     || manager.containers.weapon.reduce((acc, curr) => acc.concat(Object.values(curr.items)), []).find(i => i.uuid === item.uuid)
                 ) continue;
                 
@@ -179,7 +178,7 @@ export class AutoPopulateCreateToken {
                     itemsWithActivities.push(itemData);
                 }
             }
-            // console.log(itemsWithActivities)
+            
             if (itemsWithActivities.length === 0) return;
 
             // Sort items
@@ -188,9 +187,6 @@ export class AutoPopulateCreateToken {
             // Place items in grid format (rows first: left to right, then down)
             let x = 0;
             let y = 0;
-
-            // container.items = {};
-            // container.data.items = {};
 
             for (const item of itemsWithActivities) {
                 if (y >= container.rows) break; // Stop if we exceed container rows
@@ -237,30 +233,25 @@ export class AutoPopulateCreateToken {
       }
     }
 
+    static async _getCombatActionsList(actor) {
+        let ids = [];
+        if(game.modules.get("chris-premades")?.active && game.packs.get("chris-premades.CPRActions")?.index?.size) ids = game.settings.get(BG3CONFIG.MODULE_NAME, 'choosenCPRActions').map(id => actor.items.getName(game.packs.get("chris-premades.CPRActions").index.get(id).name).uuid)
+        else ids = await game.packs.get("bg3-inspired-hotbar.bg3-inspired-hud").folders.find(f => f.name === 'Common Actions').contents.map(m => m.uuid);
+        console.log(ids)
+        return ids;
+    }
+
     static async _populateCommonActions(actor, manager) {
         if(actor.type == 'vehicule') return;
         try {
-            return new Promise((resolve, reject) => {
-                setTimeout(async () => {
-                    const tmpArray = [],
-                        actionsClone = foundry.utils.deepClone(BG3CONFIG.COMBATACTIONDATA);
-                    Object.entries(actionsClone).forEach(([key, value]) => {
-                      const hasItem = actor.items.find(item => item.type == 'feat' && item.name == value.name)
-                      if(hasItem) value.uuid = hasItem.uuid;
-                      else {
-                        let tmpItem = ui.BG3HOTBAR.combatActionsArray.find(it => it.name == value.name);
-                        if(tmpItem) tmpArray.push(tmpItem);
-                      }
-                    })
-                    if(tmpArray.length) {
-                      let tmpDoc = await actor.createEmbeddedDocuments('Item', tmpArray);
-                      tmpDoc.forEach(doc => Object.values(actionsClone).find(value => value.name == doc.name).uuid = doc.uuid);
-                      tmpDoc.forEach(doc => doc.setFlag('tidy5e-sheet', 'section', "CHRISPREMADES.Generic.Actions"));
-                    }
-                    manager.containers.combat[0].items = actionsClone;
-                    resolve();
-                }, 100);
-            });
+            const ids = await this._getCombatActionsList(actor);
+            let count = 0;
+            for(let i = 0; i < 3; i++) {
+                for(let j = 0; j < 3; j++) {
+                    if(ids[count]) manager.containers.combat[0].items[`${i}-${j}`] = {uuid: ids[count]};
+                    count++;
+                }
+            }
         } catch (error) {
             console.error("BG3 Inspired Hotbar | Error auto-populating common actions token hotbar:", error);
         }

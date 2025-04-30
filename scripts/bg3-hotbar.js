@@ -48,9 +48,6 @@ export class BG3Hotbar extends Application {
 
         this._init();
 
-        // Retrieve Common Combat Actions based
-        this.loadCombatActions();
-
         // Preload Handlebars templates
         preloadHandlebarsTemplates();
     }
@@ -90,8 +87,9 @@ export class BG3Hotbar extends Application {
 
     async _onCreateToken(token) {
         if (!token?.actor) return;
-
-        await AutoPopulateCreateToken.populateUnlinkedToken(token);
+        setTimeout(async () => {
+            await AutoPopulateCreateToken.populateUnlinkedToken(token);
+        }, 100)
     }
 
     _onControlToken(token, controlled) {
@@ -275,23 +273,6 @@ export class BG3Hotbar extends Application {
         }
         // element.style.setProperty('--bg3-scale-ui', scale);
         return scale;
-    }
-    
-    async loadCombatActions() {
-        if (!game.modules.get("chris-premades")?.active) return;
-        let pack = game.packs.get("chris-premades.CPRActions"),
-            promises = [];
-        Object.entries(BG3CONFIG.COMBATACTIONDATA).forEach(([key, value]) => {
-            let macroID = pack.index.find(t =>  t.type == 'feat' && t.name === value.name)._id;
-            if(macroID) {
-                promises.push(new Promise(async (resolve, reject) => {
-                    let item = await pack.getDocument(macroID);
-                    if(item) this.combatActionsArray.push(item)
-                    resolve();
-                }))
-            }
-        })
-        await Promise.all(promises).then((values) => {})
     }
 
     toggle(state) {

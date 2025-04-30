@@ -96,7 +96,10 @@ export class BG3TooltipManager {
             return context;
         }
 
-        TooltipManager.prototype.dismissLockedTooltips = async function() {}
+        const oldDismiss = TooltipManager.prototype.dismissLockedTooltips;
+        TooltipManager.prototype.dismissLockedTooltips = function() {
+            if(!this.tooltip.classList.contains('bg3-tooltip')) oldDismiss.bind(this)();
+        }
         
         function handle_mousedown(e){
             e.preventDefault();
@@ -139,7 +142,8 @@ export class BG3TooltipManager {
             "attack", "award", "check", "concentration", "damage", "heal", "healing", "item", "save", "skill", "tool"
         ],
         pattern = new RegExp(`\\[\\[/(?<type>${stringNames.join("|")})(?<config> .*?)?]](?!])(?:{(?<label>[^}]+)})?`, "gi");
-        this.savedEnrichers.damage = this.enrichers.find(e => e.pattern.toString() == pattern.toString()).enricher;
+        this.savedEnrichers.damage = this.enrichers.find(e => e.pattern.toString() == pattern.toString());
+        if(this.savedEnrichers.damage) this.savedEnrichers.damage.enricher;
     }
     
     _tooltipRangeDamage() {        

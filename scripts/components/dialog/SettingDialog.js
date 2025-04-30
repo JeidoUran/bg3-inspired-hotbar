@@ -30,7 +30,7 @@ export class ThemeSettingDialog extends FormApplication {
             for(let j = 0; j < this.keys[i].fields.length; j++) {
                 const setting = game.settings.settings.get(`${BG3CONFIG.MODULE_NAME}.${this.keys[i].fields[j]}`) ?? null;
                 if(setting) {
-                    if(setting?.scope === 'client' || game.user.isGM) {
+                    if((setting?.scope === 'client' || game.user.isGM) && (setting.visible === undefined || setting.visible())) {
                         cFields[this.keys[i].fields[j]] = {
                             name: setting.name,
                             hint: setting.hint,
@@ -40,7 +40,7 @@ export class ThemeSettingDialog extends FormApplication {
                     }
                 } else {
                     const menu = game.settings.menus.get(`${BG3CONFIG.MODULE_NAME}.${this.keys[i].fields[j]}`);
-                    if(menu?.scope === 'client' || game.user.isGM) {
+                    if((menu?.scope === 'client' || game.user.isGM) && (menu.visible === undefined || menu.visible())) {
                         cFields[this.keys[i].fields[j]] = {
                             name: menu.name,
                             label: menu.label,
@@ -110,7 +110,7 @@ export class HotbarSettingDialog extends ThemeSettingDialog {
             {label: 'General',
             fields: ['showItemNames', 'showItemUses', 'highlightStyle']},
             {label: 'Common Actions',
-            fields: ['showCombatContainer', 'autoPopulateCombatContainer', 'lockCombatContainer']},
+            fields: ['showCombatContainer', 'autoPopulateCombatContainer', 'chooseCPRActions', 'lockCombatContainer']},
             {label: 'Others',
             fields: ['fadeControlsMenu', 'showRestTurnButton']}
         ]

@@ -280,6 +280,15 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   transition: all 0.2s ease;
 }
+
+#bg3-hotbar-container .ability-button i {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #bg3-hotbar-container .ability-button i:hover {
   font-size: large;
 }

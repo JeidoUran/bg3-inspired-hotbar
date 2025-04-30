@@ -53,7 +53,7 @@ export class HotbarManager {
         if(containersData) {
             this.containers = foundry.utils.deepClone(containersData);
             // Update Chris Premade Common Actions Section if needed
-            if(this.containers.combat?.[0]?.items) {
+            if(this.containers.combat?.[0]?.items && game.modules.get("chris-premades")?.active) {
                 for(const key in this.containers.combat[0].items) {
                     const item = this.actor.items.find(i => i.name === this.containers.combat[0].items[key].name);
                     if(item && item.getFlag('chris-premades', 'info')?.source === 'chris-premades' && item.getFlag('tidy5e-sheet', 'section') !== 'CHRISPREMADES.Generic.Actions') item.setFlag('tidy5e-sheet', 'section', 'CHRISPREMADES.Generic.Actions')

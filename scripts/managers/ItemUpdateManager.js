@@ -231,15 +231,15 @@ export class ItemUpdateManager {
     
     async _handleItemCreate(item, options, userId) {
         if (!ui.BG3HOTBAR.manager || game.user.id !== userId) return;
-
-        // Check if not already in combat container
-        if(Object.values(BG3CONFIG.COMBATACTIONDATA).find(d => d.name === item.name)) return;
         
         const token = ui.BG3HOTBAR.manager.token;
         if (!token) return;
 
         // Check if the created item is on the actor's sheet
         if (token.actor?.items.get(item.id) !== item) return;
+
+        // Check if not already in combat container
+        if(Object.values(ui.BG3HOTBAR.manager.containers.combat[0].items).find(d => d.uuid === item.uuid)) return;
         
         // Determine if the item should be added to the hotbar
         // Check for activation type or other activity indicators
@@ -306,7 +306,7 @@ export class ItemUpdateManager {
             let hasChanges = false;
             for (const [slot, item] of Object.entries(container.data.items)) {
                 const itemData = await fromUuid(item.uuid);
-                if(itemData?.documentName == 'Macro') continue;
+                if(itemData?.documentName == 'Macro' || itemData?.documentName == 'Activity') continue;
                 
                 if (!itemData || !actor.items.has(itemData.id)) {
                     // Removing invalid item
@@ -322,7 +322,7 @@ export class ItemUpdateManager {
             let hasChanges = false;
             for (const [slot, item] of Object.entries(container.data.items)) {
                 const itemData = await fromUuid(item.uuid);
-                if(itemData?.documentName == 'Macro') continue;
+                if(itemData?.documentName == 'Macro' || itemData?.documentName == 'Activity') continue;
                 
                 if (!itemData || !actor.items.has(itemData.id)) {
                     // Removing invalid item

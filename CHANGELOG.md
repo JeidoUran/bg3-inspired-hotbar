@@ -1,3 +1,11 @@
+## [3.0.5] - 2025-04-30
+### Fixed
+- Fix bug with Ability Container for D&D 3.3.1. (Related Issue: [#138])
+
+### Features
+- Add Right-Click on Portrait Dice to roll initiative. (Related Issue: [#118])
+- Add setting submenu to choose which CPR Actions used when auto-populating Basic Actions Container.  (Related Issue: [#132])
+
 ## [3.0.4] - 2025-04-29
 ### Fixed
 - Fix Configure Portrait Extra Datas not shown for players.

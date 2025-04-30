@@ -2,11 +2,12 @@
   "id": "bg3-inspired-hotbar",
   "title": "BG3 Inspired HUD",
   "description": "A custom, persistent, token-specific HUD inspired by Baldur's Gate 3's interface. Provides an intuitive and modern way to manage abilities, spells, and effects for your tokens.",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "authors": [
     {
       "name": "BragginRites",
-      "discord": "BragginRites"
+      "discord": "BragginRites",
+      "flags": {}
     }
   ],
   "compatibility": {
@@ -14,11 +15,10 @@
     "verified": "12",
     "maximum": "12"
   },
-  "scripts": [],
   "esmodules": [
     "scripts/module.js"
   ],
-  "styles": [ 
+  "styles": [
     "styles/index.css"
   ],
   "languages": [
@@ -54,25 +54,35 @@
     }
   ],
   "relationships": {
-      "requires": [
-        {
-          "id": "lib-wrapper",
-          "type": "module",
-          "compatibility": {}
-        },
-        {
-          "id": "colorsettings",
-          "type": "module",
-          "compatibility": {}
-        }
-      ],
-      "recommends": [],
-      "systems": []
+    "requires": [
+      {
+        "id": "lib-wrapper",
+        "type": "module",
+        "compatibility": {}
+      },
+      {
+        "id": "colorsettings",
+        "type": "module",
+        "compatibility": {}
+      }
+    ]
   },
   "persistentStorage": true,
   "url": "https://github.com/BragginRites/bg3-inspired-hotbar",
-  "manifest": "https://github.com/BragginRites/bg3-inspired-hotbar/releases/download/v3.0.4/module.json",
-  "download": "https://github.com/BragginRites/bg3-inspired-hotbar/releases/download/v3.0.4/bg3-inspired-hotbar.zip",
+  "manifest": "https://github.com/BragginRites/bg3-inspired-hotbar/releases/download/v3.0.5/module.json",
+  "download": "https://github.com/BragginRites/bg3-inspired-hotbar/releases/download/v3.0.5/bg3-inspired-hotbar.zip",
   "readme": "README.md",
-  "bugs": "https://github.com/BragginRites/bg3-inspired-hotbar/issues"
+  "bugs": "https://github.com/BragginRites/bg3-inspired-hotbar/issues",
+  "packs": [
+    {
+      "name": "bg3-inspired-hud",
+      "label": "BG3 Inspired HUD",
+      "path": "packs/bg3-inspired-hud",
+      "type": "Macro",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    }
+  ]
 }
