@@ -101,7 +101,6 @@ export class AutoPopulateCreateToken {
             if(!(!tempManager.containers.combat[0]?.items || Object.values(tempManager.containers.combat[0].items).length > 0)) {
                 if(game.settings.get(BG3CONFIG.MODULE_NAME, 'autoPopulateCombatContainer') && token.actor.type !== 'vehicle') await this._populateCommonActions(token.actor, tempManager);
             }
-            console.log('items', token)
 
             if(token.actor.type !== 'character' && ((!token.actorLink && game.settings.get(BG3CONFIG.MODULE_NAME, 'autoPopulateUnlinkedTokens')) || (token.actorLink && game.settings.get(BG3CONFIG.MODULE_NAME, 'autoPopulateLinkedTokens')))) {
                 // Get settings for each container
@@ -235,9 +234,14 @@ export class AutoPopulateCreateToken {
 
     static async _getCombatActionsList(actor) {
         let ids = [];
-        if(game.modules.get("chris-premades")?.active && game.packs.get("chris-premades.CPRActions")?.index?.size) ids = game.settings.get(BG3CONFIG.MODULE_NAME, 'choosenCPRActions').map(id => actor.items.getName(game.packs.get("chris-premades.CPRActions").index.get(id).name).uuid)
-        else ids = await game.packs.get("bg3-inspired-hotbar.bg3-inspired-hud").folders.find(f => f.name === 'Common Actions').contents.map(m => m.uuid);
-        console.log(ids)
+        if(game.modules.get("chris-premades")?.active && game.packs.get("chris-premades.CPRActions")?.index?.size) {
+            for(const id of game.settings.get(BG3CONFIG.MODULE_NAME, 'choosenCPRActions')) {
+                // const item = actor.items.getName(game.packs.get("chris-premades.CPRActions").index.get(id).name);
+                const item = actor.items.find(i => i.system.identifier === game.packs.get("chris-premades.CPRActions").index.get(id)?.system?.identifier);
+                if(item) ids.push(item.uuid);
+            }
+            // ids = game.settings.get(BG3CONFIG.MODULE_NAME, 'choosenCPRActions').map(id => actor.items.getName(game.packs.get("chris-premades.CPRActions").index.get(id).name).uuid)
+        } else ids = await game.packs.get("bg3-inspired-hotbar.bg3-inspired-hud").folders.find(f => f.name === 'Common Actions').contents.map(m => m.uuid);
         return ids;
     }
 

@@ -214,7 +214,7 @@
   display: flex;
 }
 
-.color-setting-header {
+#bg3-inspired-hotbar-theme-settings .color-setting-header {
   text-align: center;
   font-style: italic;
 }
@@ -223,24 +223,24 @@
   margin-bottom: 0.5rem;
 }
 
-details {
+#bg3-inspired-hotbar-theme-settings details {
   position: relative;
   border-top: 1px solid rgba(0, 0, 0, .1);
   /* padding-top: 1em; */
 }
 
-details summary {
+#bg3-inspired-hotbar-theme-settings details summary {
   /* margin-bottom: 1rem; */
   font-weight: 600;
   cursor: pointer;
   padding: 1em 0 1em 5px;
 }
 
-details summary:hover, details[open] summary {
+#bg3-inspired-hotbar-theme-settings details summary:hover, #bg3-inspired-hotbar-theme-settings details[open] summary {
   background-color: rgba(0, 0, 0, .1);
 }
 
-details summary::after {
+#bg3-inspired-hotbar-theme-settings details summary::after {
   content: "\f139";
   position: absolute;
   font-family: "Font Awesome 6 Pro";
@@ -250,12 +250,12 @@ details summary::after {
   margin-right: 0.5em;
 }
 
-details[open] summary::after {
+#bg3-inspired-hotbar-theme-settings details[open] summary::after {
   content: "\f13a";
 }
 
-details summary::marker,
-:is(::-webkit-details-marker) {
+#bg3-inspired-hotbar-theme-settings details summary::marker,
+#bg3-inspired-hotbar-theme-settings :is(::-webkit-details-marker) {
   content: '';
   /* content: "+ ";
   font-family: monospace;
@@ -263,7 +263,7 @@ details summary::marker,
   font-weight: bold; */
 }
 
-details[open] summary::marker {
+#bg3-inspired-hotbar-theme-settings details[open] summary::marker {
   /* content: "- "; */
 }
 

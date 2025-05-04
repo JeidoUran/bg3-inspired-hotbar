@@ -27,7 +27,7 @@ export class ThemeSettingDialog extends FormApplication {
 
         const dataInput = [
             {
-                name: 'Global',
+                name: 'General',
                 hint: 'Parameters applied to all others below if not specified.',
                 categories: [
                     {

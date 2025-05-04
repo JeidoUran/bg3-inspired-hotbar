@@ -4,6 +4,12 @@ export class ThemeSettingDialog extends FormApplication {
     constructor () {
         super();
         this.keys = [];
+        this.fields = {};
+        /* if (this.useMonkSettings()) {
+            let user = game.users.find(u => u.id === game.settings.sheet.userId);
+            let cs = foundry.utils.getProperty(user, "flags.monks-player-settings.client-settings");
+            this.clientSettings[user.id] = cs ? foundry.utils.flattenObject(JSON.parse(cs)) : null;
+        } */
     }
 
     static get defaultOptions() {
@@ -24,7 +30,6 @@ export class ThemeSettingDialog extends FormApplication {
     }
 
     async getData() {
-        const fields = {};
         for(let i = 0; i < this.keys.length; i++) {
             const cFields = {};
             for(let j = 0; j < this.keys[i].fields.length; j++) {
@@ -34,7 +39,7 @@ export class ThemeSettingDialog extends FormApplication {
                         cFields[this.keys[i].fields[j]] = {
                             name: setting.name,
                             hint: setting.hint,
-                            value: game.settings.get(BG3CONFIG.MODULE_NAME, this.keys[i].fields[j]),
+                            value: this._getClientData(this.keys[i].fields[j]),
                             ...this.getInputType(setting)
                         };
                     }
@@ -51,9 +56,9 @@ export class ThemeSettingDialog extends FormApplication {
                     }
                 }
             }
-            fields[this.keys[i].label] = cFields;
+            this.fields[this.keys[i].label] = cFields;
         }
-        return {fields};
+        return {fields: this.fields};
     }
 
     activateListeners(html) {
@@ -71,14 +76,40 @@ export class ThemeSettingDialog extends FormApplication {
 
     async _onSubmit(event) {
         event.preventDefault();
-        const form = this.element[0].querySelectorAll('div.form-fields:not([data-exclude="true"])');
+        const form = this.element[0].querySelectorAll('div.form-fields:not([data-exclude="true"])'),
+            formData = {};
         for (let i = 0; i < form.length; i++) {
             const input = form[i].querySelector("input") ?? form[i].querySelector("select");
             if(!input) continue;
             const value = input.type == 'checkbox' ? input.checked : input.value;
-            game.settings.set(BG3CONFIG.MODULE_NAME, input.name, value);
+            if (this.useMonkSettings() && value != this._getClientData(input.name)) formData[`${BG3CONFIG.MODULE_NAME}.${input.name}`] = input.dataset?.dtype === 'Number' ? Number(value) : value;
+            else game.settings.set(BG3CONFIG.MODULE_NAME, input.name, input.dataset?.dtype === 'Number' ? Number(value) : value);
+        }
+        if (this.useMonkSettings()) {
+            await game.settings.sheet._updateObject(event, formData);
+            if(Object.keys(formData).length) await game.settings.sheet.getData({});
         }
         this.close();
+    }
+
+    useMonkSettings() {
+        return game.modules.get("monks-player-settings")?.active && game.user.isGM && game.user.id !== game.settings.sheet.userId;
+    }
+
+    _getClientData(key) {
+        if (this.useMonkSettings()) {
+            let gmchanges = game.settings.sheet.userId != game.user.id ? game.settings.sheet.gmchanges[game.settings.sheet.userId] || {} : {};
+            let clientSettings = game.settings.sheet.userId != game.user.id ? game.settings.sheet.clientSettings[game.settings.sheet.userId] || {} : {};
+            let originalValue;
+            try {
+                originalValue = (game.settings.sheet.userId != game.user.id ? game.settings.sheet.getClientSetting(BG3CONFIG.MODULE_NAME, key, clientSettings) : game.settings.get(BG3CONFIG.MODULE_NAME, key));
+            } catch (err) {
+                log(`Settings detected issue ${s.namespace}.${s.key}`, err);
+            }
+            let value = (game.settings.sheet.userId != game.user.id ? (gmchanges[BG3CONFIG.MODULE_NAME] && gmchanges[BG3CONFIG.MODULE_NAME][key]) ?? originalValue : originalValue);
+            return value;
+        }
+        return game.settings.get(BG3CONFIG.MODULE_NAME, key);
     }
 }
 
@@ -208,7 +239,7 @@ export class GlobalSettingDialog extends ThemeSettingDialog {
     static get defaultOptions() {
         return {
             ...super.defaultOptions,
-            title: "Global settings"
+            title: "General settings"
         }
     }
 }

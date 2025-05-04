@@ -570,7 +570,9 @@ export function registerSettings() {
         config: false,
         type: Boolean,
         default: true,
-        onChange: () => ui.BG3HOTBAR.updateUIScale()
+        onChange: () => {
+            if(ui.BG3HOTBAR.element[0]) ui.BG3HOTBAR.element[0].style.setProperty('--bg3-scale-ui', ui.BG3HOTBAR.updateUIScale());
+        }
     });
 
     game.settings.register(BG3CONFIG.MODULE_NAME, 'uiScale', {

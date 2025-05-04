@@ -198,7 +198,7 @@
         "SettingsCategories": {
             "HotbarContainer": "Hotbar buttons",
             "CombatContainer": "Common Actions Container",
-            "Global": "Global",
+            "Global": "General",
             "Portrait": "Character Portrait",
             "Tooltip": "Tooltip",
             "AutoPopulating": "Auto-Populating",
@@ -252,9 +252,9 @@
         },
         "Menu": {
             "Global": {
-                "Name": "Global settings",
-                "Hint": "Native Foundry elements or global BG3 UI settings.",
-                "Label": "Configure Global"
+                "Name": "General settings",
+                "Hint": "Native Foundry elements or general BG3 UI settings.",
+                "Label": "Configure General"
             },
             "Theme": {
                 "Name": "Theme settings",

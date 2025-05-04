@@ -152,7 +152,7 @@
         "SettingsCategories": {
             "HotbarContainer": "Boutons de la barre de raccourcis",
             "CombatContainer": "Conteneur d'actions communes",
-            "Global": "Global",
+            "Global": "Général",
             "Portrait": "Portrait du personnage",
             "Tooltip": "Infobulle",
             "AutoPopulating": "Remplissage automatique"

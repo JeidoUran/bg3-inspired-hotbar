@@ -1,3 +1,15 @@
+## [3.0.6] - 2025-05-02
+### Fixed
+- Fix CSS details conflicts. (Related Issue: [#141])
+- Update socket synchro logic.
+- Fix UI not showing on load if a token was selected.
+- Fix CPR actions auto-populating for the common actions container. You may have to repopulate it. (Related Issue: [#147])
+- Add compatibility with Monks Player Settings. (Related Issue: [#146])
+- Fix display for Theme Settings menu for high font-size.
+
+### Features
+- Add tooltip on non-active weapon sets. (Related Issue: [#145])
+
 ## [3.0.5] - 2025-04-30
 ### Fixed
 - Fix bug with Ability Container for D&D 3.3.1. (Related Issue: [#138])
