@@ -17,7 +17,8 @@ export class ThemeSettingDialog extends FormApplication {
     }
 
     async getData() {
-        const dataKeys = ['scopeTheme'],
+        // const dataKeys = ['scopeTheme'],
+        const dataKeys = [],
             configData = {};
         for(let i = 0; i < dataKeys.length; i++) {
             const setting = game.settings.settings.get(`${BG3CONFIG.MODULE_NAME}.${dataKeys[i]}`);

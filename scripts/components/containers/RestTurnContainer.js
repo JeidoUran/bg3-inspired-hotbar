@@ -14,7 +14,7 @@ export class RestTurnContainer extends BG3Component {
 
     get btnData() {
         let btnData = [];
-        if(game.settings.get(BG3CONFIG.MODULE_NAME, 'showRestTurnButton')) {
+        if(game.settings.get(BG3CONFIG.MODULE_NAME, 'showRestTurnButton') && ui.BG3HOTBAR.manager.actor) {
             btnData = [...btnData, ...[
                 {
                     type: 'div',
@@ -46,6 +46,18 @@ export class RestTurnContainer extends BG3Component {
                     visible: () => !game.combat?.started,
                     events: {
                         'click': this.actor.longRest.bind(this.actor)
+                    }
+                }
+            ]]
+        } else if(ui.BG3HOTBAR.manager.canGMHotbar()) {
+            btnData = [...btnData, ...[
+                {
+                    type: 'div',
+                    class: ["rest-turn-button"],
+                    label: 'Macros',
+                    icon: "fa-folder",
+                    events: {
+                        'click': ev => ui.macros.renderPopout(true)
                     }
                 }
             ]]

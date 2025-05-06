@@ -20,9 +20,11 @@ export class HotbarContainer extends BG3Component {
         await super.render();
         this.components = {};
 
-        this.components.passiveContainer = new PassiveContainer();
-        this.components.activeContainer = new ActiveContainer();
-        this.components.filterContainer = new FilterContainer();
+        if(ui.BG3HOTBAR.manager.actor) {
+            this.components.passiveContainer = new PassiveContainer();
+            this.components.activeContainer = new ActiveContainer();
+            this.components.filterContainer = new FilterContainer();
+        }
         this.components.controlContainer = new ControlContainer();
 
         const toRender = Object.values(this.components);

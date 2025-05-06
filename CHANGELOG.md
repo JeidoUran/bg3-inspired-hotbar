@@ -1,3 +1,13 @@
+## [3.0.7] - 2025-05-06
+### Fixed
+- Fix "error" related to tidy5e-sheet flag. (Related Issue: [#151])
+- First step on making the module compatible with Foundry V13.
+- Fix Common Action Container not populated with CPR Actions if not automated with CPR. (Related Issue: [#153])
+
+### Features
+- Add a setting to show a special hotbar for GM when multiple or no token selected.
+- Add 5 presets macros for the GM Hotbar. (Related Issue: [#148])
+
 ## [3.0.6] - 2025-05-02
 ### Fixed
 - Fix CSS details conflicts. (Related Issue: [#141])
@@ -15,7 +25,7 @@
 - Fix bug with Ability Container for D&D 3.3.1. (Related Issue: [#138])
 
 ### Features
-- Add Right-Click on Portrait Dice to roll initiative. (Related Issue: [#118])
+- Add Right-Click on Portrait Dice to roll initiative. (Related Issue: [#118])git add .
 - Add setting submenu to choose which CPR Actions used when auto-populating Basic Actions Container.  (Related Issue: [#132])
 
 ## [3.0.4] - 2025-04-29

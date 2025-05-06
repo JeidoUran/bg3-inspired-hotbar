@@ -21,17 +21,46 @@ export class HotbarManager {
         return this.token?.actor ?? null;
     }
 
-    _initializeContainers() {
+    async _initializeContainers() {
         Object.entries(BG3CONFIG.CONTAINERSDATA).forEach(([index, data]) => {
             this.containers[index] = [];
             for(let i = 0; i < data.count; i++) {
                 this.containers[index].push({...foundry.utils.deepClone(data.config), ...{id: `${index}-container`, index: i}});
             }
-        })
+        });
+        if(this.canGMHotbar() && !game.settings.get(BG3CONFIG.MODULE_NAME, 'gmHotbarInit')) {
+            const compendium = await game.packs.get("bg3-inspired-hotbar.bg3-inspired-hud");
+            if(!compendium) return;
+            const ids = compendium.folders.find(f => f.name === 'GM Hotbar').contents.map(m => m.uuid);
+            let containerId = 0,
+                containerRow = 0,
+                containerCol = 0;
+            for(let i = 0; i < ids.length; i++) {
+                if(containerCol >= this.containers.hotbar[containerId].cols) {
+                    containerRow++;
+                    containerCol = 0;
+                }
+                if(containerRow >= this.containers.hotbar[containerId].rows && containerCol >= this.containers.hotbar[containerId].cols) {
+                    containerId++;
+                    containerRow = 0;
+                    containerCol = 0;
+                }
+                if(containerId >= this.containers.hotbar.length) break;
+                this.containers.hotbar[containerId].items[`${containerCol}-${containerRow}`] = {uuid: ids[i]};
+                containerCol++;
+            }
+            await this.persist();
+            await game.settings.set(BG3CONFIG.MODULE_NAME, 'gmHotbarInit', true);
+
+        }
     }
 
     convertOldFormat(savedData) {
         return [foundry.utils.deepClone(savedData.containers), foundry.utils.deepClone(savedData.weaponsContainers), foundry.utils.deepClone(savedData.combatContainer)];
+    }
+
+    canGMHotbar() {
+        return !this.actor && game.user.isGM && game.settings.get(BG3CONFIG.MODULE_NAME, 'enableGMHotbar') && game.settings.get(BG3CONFIG.MODULE_NAME, 'uiEnabled');
     }
     
     // Clean up specific token data
@@ -46,32 +75,27 @@ export class HotbarManager {
     }
 
     async _loadTokenData() {
-        if(!this.token || !this.actor) return;
-        const containersData = this.actor.getFlag(BG3CONFIG.MODULE_NAME, BG3CONFIG.CONTAINERS_NAME),
-            savedData = this.actor.getFlag(BG3CONFIG.MODULE_NAME, BG3CONFIG.FLAG_NAME);
+        if((!this.token || !this.actor) && !this.canGMHotbar()) return;
+        const containersData = this.actor ? this.actor.getFlag(BG3CONFIG.MODULE_NAME, BG3CONFIG.CONTAINERS_NAME) : game.settings.get(BG3CONFIG.MODULE_NAME, 'gmHotbarData'),
+            savedData = this.actor?.getFlag(BG3CONFIG.MODULE_NAME, BG3CONFIG.FLAG_NAME) ?? null;
         
         if(containersData) {
             this.containers = foundry.utils.deepClone(containersData);
             // Update Chris Premade Common Actions Section if needed
-            if(this.containers.combat?.[0]?.items && game.modules.get("chris-premades")?.active) {
+            if(this.containers.combat?.[0]?.items && game.modules.get("chris-premades")?.active && game.modules.get("tidy5e-sheet")?.active) {
                 for(const key in this.containers.combat[0].items) {
-                    const item = this.actor.items.find(i => i.name === this.containers.combat[0].items[key].name);
+                    const item = this.actor.items.find(i => i.uuid === this.containers.combat[0].items[key].uuid);
                     if(item && item.getFlag('chris-premades', 'info')?.source === 'chris-premades' && item.getFlag('tidy5e-sheet', 'section') !== 'CHRISPREMADES.Generic.Actions') item.setFlag('tidy5e-sheet', 'section', 'CHRISPREMADES.Generic.Actions')
                 }
             }
         } else if(savedData) {
-            let hotbarContainersData, weaponsContainersData, combatContainerData;
+            let hotbarContainersData;
             if (Array.isArray(savedData)) {
                 // Old format: direct array of containers
                 hotbarContainersData = foundry.utils.deepClone(savedData);
                 this.portraitVisible = true; // Default for old format
                 // Using old data format, portrait defaulted to hidden
             } else {
-                // New format: object with containers and portraitVisible
-                /* containersData = foundry.utils.deepClone(savedData.containers);
-                weaponsContainersData = foundry.utils.deepClone(savedData.weaponsContainers);
-                combatContainerData = foundry.utils.deepClone(savedData.combatContainer); */
-                // console.log(this.convertAllFormat(savedData));
                 const [hotbarData, weaponData, combatData] = this.convertOldFormat(savedData);
                 if(Array.isArray(hotbarData)) {
                     hotbarData.forEach(c => {
@@ -97,7 +121,7 @@ export class HotbarManager {
             }
         } else {
             // No saved data so we create blank ones
-            this._initializeContainers();
+            await this._initializeContainers();
         }
     }
 
@@ -112,6 +136,7 @@ export class HotbarManager {
     }
 
     async persist() {
-        this.actor.setFlag(BG3CONFIG.MODULE_NAME, BG3CONFIG.CONTAINERS_NAME, this.containers)
+        if(this.actor) this.actor.setFlag(BG3CONFIG.MODULE_NAME, BG3CONFIG.CONTAINERS_NAME, this.containers);
+        else if(this.canGMHotbar()) game.settings.set(BG3CONFIG.MODULE_NAME, 'gmHotbarData', this.containers);
     }
 } 

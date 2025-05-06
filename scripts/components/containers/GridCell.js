@@ -81,6 +81,14 @@ export class GridCell extends BG3Component {
             closeParent: true,
             standalone: true,
             buttons: {
+                macro: {
+                    label: game.i18n.format("SIDEBAR.Create", {type: 'Macro'}),
+                    icon: 'fas fa-code',
+                    visibility: !!this.data.item || !!ui.BG3HOTBAR.manager.actor || !ui.BG3HOTBAR.manager.canGMHotbar(),
+                    click: () => {
+                        this.menuItemAction('macro');
+                    }
+                },
                 edit: {
                     label: game.i18n.localize("BG3.Hotbar.ContextMenu.EditItem"),
                     icon: 'fas fa-edit',
@@ -112,14 +120,14 @@ export class GridCell extends BG3Component {
                 divider: {visibility: !this.data.item},
                 populate: {
                     label: 'Auto-Populate This Container', icon: 'fas fa-magic',
-                    visibility: this.data.delOnly,
+                    visibility: this.data.delOnly || (!ui.BG3HOTBAR.manager.actor && ui.BG3HOTBAR.manager.canGMHotbar()),
                     click: () => {
                         this._parent.menuItemAction('populate');
                     }
                 },
                 sort: {
                     label: 'Sort Items In This Container', icon: 'fas fa-sort',
-                    visibility: this.data.delOnly,
+                    visibility: this.data.delOnly || (!ui.BG3HOTBAR.manager.actor && ui.BG3HOTBAR.manager.canGMHotbar()),
                     click: () => {
                         this._parent.menuItemAction('sort');
                     }
@@ -172,6 +180,30 @@ export class GridCell extends BG3Component {
                 delete ui.BG3HOTBAR.manager.containers[this._parent.id][this._parent.index].items[this.slotKey];
                 await this._renderInner();
                 await ui.BG3HOTBAR.manager.persist();
+                break;
+            case 'macro':
+                try {
+                    const cls = getDocumentClass("Macro"),
+                        macro = new cls({name: cls.defaultName({type: "chat"}), type: "chat", scope: "global"}),
+                        newMacro = macro.sheet.render(true),
+                        saveSubmit = newMacro._onSubmit,
+                        // currentContainer = this._parent,
+                        currentSlot = this;
+                    newMacro._onSubmit = async (...args) => {
+                        await saveSubmit.bind(newMacro)(...args);
+                        if(currentSlot && newMacro.object.uuid) {
+                            const newItem = {uuid: newMacro.object.uuid};
+                            currentSlot.data.item = newItem;
+                            // Update manager stored data
+                            ui.BG3HOTBAR.manager.containers[currentSlot._parent.id][currentSlot._parent.index].items[currentSlot.slotKey] = newItem;        
+                            await currentSlot._renderInner();
+                            await ui.BG3HOTBAR.manager.persist();
+                        }
+                    }                        
+                } catch (error) {
+                    console.error("BG3 Inspired Hotbar | Error new macro:", error);
+                    ui.notifications.error(`Error new macro: ${error.message}`);
+                }
                 break;
             default:
                 break;

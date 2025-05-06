@@ -212,7 +212,7 @@
         },
         "scopeTheme": {
             "Name": "Theme Scope",
-            "Hint": "If checked every player will be able to choose it's own theme. Otherwise the theme selected by the GM will be the same for everyone."
+            "Hint": "If checked every player will be able to choose his own theme. Otherwise the theme selected by the GM will be the same for everyone."
         },
         "PlayerListVisibility": {
             "Name": "Player List Visibility",
@@ -250,11 +250,20 @@
             "Name": "Auto UI scale",
             "Hint": "Auto scale the UI based on your browser. Disable the UI scale parameter below."
         },
+        "EnableGMHotbar": {
+            "Name": "Enable GM Hotbar",
+            "Hint": "Show GM special hotbar when no or multiple tokens are selected."
+        },
         "Menu": {
             "Global": {
                 "Name": "General settings",
                 "Hint": "Native Foundry elements or general BG3 UI settings.",
-                "Label": "Configure General"
+                "Label": "Configure General",
+                "Sub": {
+                    "Foundry": "Foundry UI",
+                    "Scale": "Scale & Position",
+                    "Opacity": "Opacity & Hide"
+                }
             },
             "Theme": {
                 "Name": "Theme settings",
@@ -264,12 +273,22 @@
             "Portrait": {
                 "Name": "Portrait settings",
                 "Hint": "Advanced settings for character portrait.",
-                "Label": "Configure Portrait"
+                "Label": "Configure Portrait",
+                "Sub": {
+                    "Show": "Show/Hide settings",
+                    "Portrait": "Portrait settings",
+                    "Other": "Other settings"
+                }
             },
             "Hotbar": {
                 "Name": "Hotbars settings",
                 "Hint": "Advanced settings for Hotbars.",
-                "Label": "Configure Hotbars"
+                "Label": "Configure Hotbars",
+                "Sub": {
+                    "General": "General",
+                    "Common": "Common Actions",
+                    "Other": "Other"
+                }
             },
             "Combat": {
                 "Name": "Common Actions settings",
