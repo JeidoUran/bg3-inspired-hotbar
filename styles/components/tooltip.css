@@ -65,3 +65,8 @@ body[data-light-tooltip="light"] :is(#tooltip, .locked-tooltip).dnd5e-tooltip.bg
     left: 0;
     right: 0;
 } */
+
+:is(#tooltip, .locked-tooltip).no-wrap {
+    white-space: nowrap;
+    max-width: unset;
+}

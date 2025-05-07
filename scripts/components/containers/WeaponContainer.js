@@ -48,13 +48,13 @@ export class WeaponContainer extends BG3Component {
         Object.values(c.data.items).forEach(nw => {
             const itemId = nw.uuid.split('.').pop(),
                 item = this.actor.items.get(itemId);
-            if(item.type !== 'weapon' && !item.system.equipped) toUpdate.push({_id: itemId, "system.equipped": 1});
+            if(item && item.type !== 'weapon' && !item.system.equipped) toUpdate.push({_id: itemId, "system.equipped": 1});
         });
         if(compareOld) {
             Object.values(compareOld).forEach(ow => {
                 const itemId = ow.uuid.split('.').pop(),
                     item = this.actor.items.get(itemId);
-                if(item.type !== 'weapon' && item.system.equipped && !Object.values(c.data.items).find(w => w.uuid === ow.uuid)) toUpdate.push({_id: itemId, "system.equipped": 0});
+                if(item && item.type !== 'weapon' && item.system.equipped && !Object.values(c.data.items).find(w => w.uuid === ow.uuid)) toUpdate.push({_id: itemId, "system.equipped": 0});
             });
         }
         

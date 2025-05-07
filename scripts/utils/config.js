@@ -374,7 +374,6 @@ export function registerEarly() {
 }
 
 const hookRollEvent = (rollConfig, dialogConfig, messageConfig) => {
-    console.log(rollConfig)
     if(!game.modules.get("midi-qol")?.active || !game.settings.get(BG3CONFIG.MODULE_NAME, 'addAdvBtnsMidiQoL') || !ui.BG3HOTBAR.manager?.actor || ui.BG3HOTBAR.manager?.actor !== rollConfig.workflow?.actor) return;
     const state = ui.BG3HOTBAR.manager.actor.getFlag(BG3CONFIG.MODULE_NAME, "advState"),
         once = ui.BG3HOTBAR.manager.actor.getFlag(BG3CONFIG.MODULE_NAME, "advOnce");
