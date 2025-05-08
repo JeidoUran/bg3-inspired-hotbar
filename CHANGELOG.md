@@ -1,6 +1,15 @@
+## [3.0.9] - 2025-05-07
+### Fixed
+- [Foundry V13] Fix duplicated weapons set on switch. (Related Issues: [#161])
+- Fix bug with weapon container after drag & drop. (Related Issues: [#166])
+
+### Features
+- Add a setting to disable Weapon Sets auto-equip. (Related Issue: [#164])
+- Add a setting to show extra "filters" based on items with limited uses. Those extra filters can't hightlight or grey out hotbars items. (Related Issue: [#168])
+
 ## [3.0.8] - 2025-05-06
 ### Fixed
-- Fix potential bug with Weapon Container. (Related Issues: [#160], [#161])
+- Fix potential bug with Weapon Container. (Related Issues: [#160])
 
 ### Features
 - Add CTRL/ALT modifier on Initiative button. (Related Issue: [#158])

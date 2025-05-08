@@ -226,6 +226,7 @@ export class ItemUpdateManager {
         if (needSave) {
             // Save the changes
             await ui.BG3HOTBAR.manager.persist();
+            await ui.BG3HOTBAR.components.container.components.filterContainer.updateExtendedFilter();
         }
     }
     
@@ -305,6 +306,7 @@ export class ItemUpdateManager {
         for (const container of ui.BG3HOTBAR.components.container.components.hotbar) {
             let hasChanges = false;
             for (const [slot, item] of Object.entries(container.data.items)) {
+                if(!item.uuid) continue;
                 const itemData = await fromUuid(item.uuid);
                 if(itemData?.documentName == 'Macro' || itemData?.documentName == 'Activity') continue;
                 

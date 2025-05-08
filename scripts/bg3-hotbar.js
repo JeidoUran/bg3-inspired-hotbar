@@ -253,7 +253,7 @@ export class BG3Hotbar extends Application {
     }
 
     _autoPopulateToken(token) {
-        return AutoPopulateCreateToken.populateUnlinkedToken(token, true);
+        return AutoPopulateCreateToken.populateUnlinkedToken(token.document ?? token, true);
     }
 
     async _applyTheme() {
@@ -331,8 +331,9 @@ export class BG3Hotbar extends Application {
         html.dataset.itemName = game.settings.get(BG3CONFIG.MODULE_NAME, 'showItemNames');
         html.dataset.itemUse = game.settings.get(BG3CONFIG.MODULE_NAME, 'showItemUses');
         html.dataset.cellHighlight = game.settings.get(BG3CONFIG.MODULE_NAME, 'highlightStyle');
+        html.dataset.cellHighlight = game.settings.get(BG3CONFIG.MODULE_NAME, 'highlightStyle');
+        html.dataset.filterHover = game.settings.get(BG3CONFIG.MODULE_NAME, 'hoverFilterShow');
         document.body.dataset.showMaterials = game.settings.get(BG3CONFIG.MODULE_NAME, 'showMaterialDescription');
-        document.body.dataset.lightTooltip = game.settings.get(BG3CONFIG.MODULE_NAME, 'enableLightTooltip');
         ControlsManager.updateUIDataset(html);
 
         if(this.manager.currentTokenId) {

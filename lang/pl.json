@@ -42,7 +42,7 @@
             "Disabled": "Wyłączony"
         },
         "Ability": {
-            "Tooltip": "Kliknij lewym przyciskiem myszy, aby wyświetlić testy atrybutów i rzuty obronne.<br>Kliknij prawym przyciskiem myszy, aby rzucić inicjatywę."
+            "Tooltip": "Kliknij lewym przyciskiem myszy, aby wyświetlić testy umiejętności i rzuty obronne.<br>Kliknij prawym przyciskiem myszy, aby rzucić inicjatywę (ALT: Ułatw./ CTRL: Utrudn.)."
         }
     },
     "BG3.Settings": {

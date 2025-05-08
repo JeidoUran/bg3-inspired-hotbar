@@ -197,12 +197,63 @@ export class FilterContainer extends BG3Component {
         if((ui.BG3HOTBAR.components.container.components.activeContainer.activesList.find(a => a._id === 'dnd5ereaction000') && !this.used.includes(reactionFilter)) || (!ui.BG3HOTBAR.components.container.components.activeContainer.activesList.find(a => a._id === 'dnd5ereaction000') && this.used.includes(reactionFilter))) this.used = reactionFilter;
     }
 
+    async getExtendedFilter() {
+        if(!game.settings.get(BG3CONFIG.MODULE_NAME, 'showExtendedFilter')) return;
+        const resources = [],
+            color = '#d5a25b';
+        for(const item of this.actor.items) {
+            if(item.hasLimitedUses) {
+                resources.push(new FilterButton({
+                    color: color,
+                    class: ['filter-spell-point', 'filter-custom'],
+                    background: item.img,
+                    custom: {
+                        value: item.system.uses.value,
+                        max: item.system.uses.max,
+                        tooltip: {
+                            label: item.name,
+                            // pills: item.system.requirements ? item.system.requirements.split(';') : null
+                        }
+                    }
+                }, this));
+            }
+        }
+        for(const resourceId in this.actor.system.resources) {
+            const oResource = this.actor.system.resources[resourceId];
+            if(oResource.value && oResource.label !== '') {
+                resources.push(new FilterButton({
+                    color: color,
+                    class: ['filter-spell-point', 'filter-custom'],
+                    background: null,
+                    custom: {
+                        value: oResource.value,
+                        max: oResource.max,
+                        tooltip: {
+                            label: oResource.label
+                        }
+                    }
+                }, this));
+            }
+        }
+        await Promise.all(resources.map(async (filter) => {
+            this.element.appendChild(filter.element);
+            await filter.render();
+        }));
+    }
+
+    async updateExtendedFilter() {
+        $(this.element).find('.filter-custom').remove();
+        await this.getExtendedFilter();
+    }
+
     async render() {
         await super.render();
         
         this.components = this.filterData.map((filter) => new FilterButton(filter, this));
         for(const filter of this.components) this.element.appendChild(filter.element);
         await Promise.all(this.components.map((filter) => filter.render()));
+
+        await this.getExtendedFilter();
 
         return this.element;
     }

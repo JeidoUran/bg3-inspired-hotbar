@@ -43,6 +43,8 @@ export class FilterButton extends BG3Component {
                 desc = `<div class="custom-tooltip"><h4 style="--data-color:${this.data.color}">${label}</h4><p class="notes"><i>Left Click to highlight items using this slot.</i></p><p class="notes"><i>Right Click to grey out.</i></p></div>`; 
                 break;
             default:
+                // desc = this.data.custom?.tooltip ? `<div class="custom-tooltip dnd5e2"><h4 style="--data-color:${this.data.color}">${this.data.custom?.tooltip?.label}</h4>${this.data.custom?.tooltip?.pills ? `<ul class="pills">${this.data.custom.tooltip.pills.map(p => `<li class="pill"><span class="label" style="color: #4e4e4e;">${p}</label></li>`).join('')}</ul>` : ''}</div>` : false;
+                desc = this.data.custom?.tooltip ? `<div class="custom-tooltip dnd5e2"><h4 style="--data-color:${this.data.color}">${this.data.custom?.tooltip?.label}</h4></div>` : false;
                 break;
         }
         return {type: 'simple', content: desc};
@@ -51,12 +53,13 @@ export class FilterButton extends BG3Component {
     async _registerEvents() {
         this.element.addEventListener("click", (e) => {
             e.preventDefault();
-            if(this._parent.used.includes(this)) return;
+            if(this.data.custom || this._parent.used.includes(this)) return;
             this._parent.highlighted = this;
         });
 
         this.element.addEventListener("contextmenu", (e) => {
             e.preventDefault();
+            if(this.data.custom) return;
             this._parent.used = this;
         });
     }
@@ -64,6 +67,7 @@ export class FilterButton extends BG3Component {
     async render() {
         await super.render();
         this.element.style.color = this.data.color;
+        if(this.data.background) this.element.style.backgroundImage = `url(${this.data.background})`;
         return this.element;
     }
 }
