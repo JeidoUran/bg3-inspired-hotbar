@@ -74,7 +74,7 @@ export class AbilityContainer extends BG3Component {
             event.stopPropagation();
             const parent = event.target.closest('.ability-container');
             try {
-                this.actor.rollAbilitySave({
+                this.actor.rollSavingThrow({
                     ability: parent.dataset.key,
                     event: event,
                     advantage: event.altKey,

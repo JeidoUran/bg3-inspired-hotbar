@@ -73,7 +73,7 @@
   text-shadow: var(--shadow-text-stroke);
   font-size: 1.2em;
   font-weight: bold;
-  pointer-events: none;
+  /* pointer-events: none; */
   text-align: center;
   width: 100%;
   z-index: 20;
@@ -84,6 +84,68 @@
   font-size: 1.2em;
   margin-bottom: 0;
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+/* ==========================================================================
+   HP Controls
+   ========================================================================== */
+
+#bg3-hotbar-container .hp-label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#bg3-hotbar-container .hp-label, #bg3-hotbar-container .hp-controls {
+  height: 1.75em;
+}
+
+#bg3-hotbar-container .hp-controls {
+  align-items: center;
+  justify-content: center;
+  margin: 0 1rem;
+  display: none;
+}
+
+#bg3-hotbar-container .bg3-portrait-container:has(.hp-controls):has(.portrait-image-container:hover) .hp-label, #bg3-hotbar-container .hp-text:hover .hp-label, #bg3-hotbar-container .hp-text[data-hp-locked="true"] .hp-label {
+  display: none;
+}
+
+#bg3-hotbar-container .bg3-portrait-container:has(.hp-controls):has(.portrait-image-container:hover) .hp-controls, #bg3-hotbar-container .hp-text:hover .hp-controls, #bg3-hotbar-container .hp-text[data-hp-locked="true"] .hp-controls {
+  display: flex;
+}
+
+#bg3-hotbar-container .hp-controls > * {
+  flex: 1;
+}
+
+#bg3-hotbar-container .hp-controls i {
+  font-size: larger;
+}
+
+#bg3-hotbar-container .hp-controls > .hp-control-death {
+  cursor: pointer;
+  padding-right: 0.25rem;
+}
+
+#bg3-hotbar-container .hp-controls > .hp-control-full {
+  cursor: pointer;
+  padding-left: 0.25rem;
+}
+
+#bg3-hotbar-container .hp-controls > .hp-control-death, #bg3-hotbar-container .hp-controls > .hp-control-minus {
+  color: red;
+}
+
+#bg3-hotbar-container .hp-controls > .hp-control-full, #bg3-hotbar-container .hp-controls > .hp-control-plus {
+  color: #74cf00;
+}
+
+#bg3-hotbar-container .hp-controls input {
+  background: url(../../../../ui/parchment.jpg) repeat;
+  flex: 2;
+  text-align: center;
+  color: var(--color-text-dark-primary);
 }
 
 /* ==========================================================================
@@ -289,7 +351,7 @@
   justify-content: center;
 }
 
-#bg3-hotbar-container .ability-button i:hover {
+#bg3-hotbar-container .ability-button > i:hover {
   font-size: large;
 }
 

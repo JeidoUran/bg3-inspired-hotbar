@@ -440,7 +440,7 @@ export function updateSettingsDisplay() {
                 categories: [
                     {
                         label: 'BG3.Settings.Menu.Portrait.Sub.Show',
-                        fields: ['hidePortraitImage', 'showHealthOverlay', 'showHPText', 'showDeathSavingThrow', 'menuExtraInfo', 'showExtraInfo']
+                        fields: ['hidePortraitImage', 'showHealthOverlay', 'showHPText', 'enableHPControls', 'showDeathSavingThrow', 'menuExtraInfo', 'showExtraInfo']
                     },
                     {
                         label: 'BG3.Settings.Menu.Portrait.Sub.Portrait',
@@ -792,8 +792,22 @@ export function registerSettings() {
       type: Boolean,
       default: true,
       onChange: () => {
-        if(ui.BG3HOTBAR.components.portrait) {
-            ui.BG3HOTBAR.components.portrait.toggleHPText.bind(ui.BG3HOTBAR.components.portrait)();
+        if(ui.BG3HOTBAR.components.portrait?.components?.healthContainer) {
+            ui.BG3HOTBAR.components.portrait.components.healthContainer.render();
+        }
+      }
+    });
+
+    game.settings.register(BG3CONFIG.MODULE_NAME, 'enableHPControls', {
+      name: 'BG3.Settings.EnableHPControls.Name',
+      hint: 'BG3.Settings.EnableHPControls.Name',
+      scope: 'world',
+      config: true,
+      type: Boolean,
+      default: false,
+      onChange: () => {
+        if(ui.BG3HOTBAR.components.portrait?.components?.healthContainer) {
+            ui.BG3HOTBAR.components.portrait.components.healthContainer.render();
         }
       }
     });

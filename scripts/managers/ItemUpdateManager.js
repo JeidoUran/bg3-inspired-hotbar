@@ -108,7 +108,7 @@ export class ItemUpdateManager {
                 // Check if it's already in any container
                 let exists = false;
                 for (const container of ui.BG3HOTBAR.components.container.components.hotbar) {
-                    if (Object.values(container.data.items).some(i => i.uuid === item.uuid)) {
+                    if (Object.values(container.data.items).some(i => i && i.uuid === item.uuid)) {
                         exists = true;
                         break;
                     }
@@ -248,7 +248,7 @@ export class ItemUpdateManager {
             // Check if the item already exists in any container
             let exists = false;
             for (const container of ui.BG3HOTBAR.components.container.components.hotbar) {
-                if (Object.values(container.data.items).some(i => i.uuid === item.uuid)) {
+                if (Object.values(container.data.items).some(i => i && i.uuid === item.uuid)) {
                     exists = true;
                     break;
                 }
@@ -306,7 +306,7 @@ export class ItemUpdateManager {
         for (const container of ui.BG3HOTBAR.components.container.components.hotbar) {
             let hasChanges = false;
             for (const [slot, item] of Object.entries(container.data.items)) {
-                if(!item.uuid) continue;
+                if(!item?.uuid) continue;
                 const itemData = await fromUuid(item.uuid);
                 if(itemData?.documentName == 'Macro' || itemData?.documentName == 'Activity') continue;
                 

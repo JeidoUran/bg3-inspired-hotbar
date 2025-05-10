@@ -254,6 +254,18 @@
             "Name": "Włącz pasek skrótów MG",
             "Hint": "Pokaż specjalny pasek MG, gdy nie wybrano żadnego tokenu lub wybrano wiele tokenów."
         },
+        "EnableWeaponAutoEquip": {
+            "Name": "Włącz automatyczne wyposażanie zestawów broni",
+            "Hint": "Jeśli opcja jest zaznaczona, wybranie tokenu lub przełączenie między zestawami broni spowoduje automatyczne wyposażenie lub wyjęcie przedmiotów."
+        },
+        "HoverFilterShow": {
+            "Name": "Filtr paska szybkiego dostępu po najechaniu kursorem",
+            "Hint": "Jeśli opcja jest zaznaczona, filtr paska szybkiego dostępu będzie wyświetlany tylko po najechaniu na niego kursorem."
+        },
+        "ShowExtendedFilter": {
+            "Name": "Pokaż rozszerzone filtry",
+            "Hint": "Jeśli zaznaczone, pokaż elementy o ograniczonym zastosowaniu jako filtr (bez podświetlenia/szarego tła)."
+        },
         "Menu": {
             "Global": {
                 "Name": "Ustawienia ogólne",
@@ -286,9 +298,13 @@
                 "Label": "Konfiguracja paska skrótów",
                 "Sub": {
                     "General": "Ogólne",
+                    "Weapon": "Zestawy broni",
                     "Common": "Wspólne działania",
                     "Other": "Inne"
                 }
+            },
+            "Filter": {
+                "Name": "Ustawienia filtra"
             },
             "Combat": {
                 "Name": "Ustawienia wspólnych działań",

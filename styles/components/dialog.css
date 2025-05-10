@@ -266,6 +266,8 @@ section[data-tab="bg3-inspired-hotbar"] details summary {
   cursor: pointer;
   background-color: rgba(0, 0, 0, 0.05);
   border: 2px groove var(--color-border-light-highlight);
+  background: url(../../../../ui/parchment.jpg) repeat;
+  color: var(--color-text-dark-primary);
 }
 
 /* section[data-tab="bg3-inspired-hotbar"] :nth-child(odd) summary {

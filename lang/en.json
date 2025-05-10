@@ -45,6 +45,12 @@
             "Tooltip": "Left-Click to show ability checks and saving throws.<br>Right-click to roll Initiative (ALT: Adv / CTRL: Disadv)."
         }
     },
+    "BG3.Portrait": {
+        "HP": {
+            "Death": "Kill !",
+            "Full": "Fully heal"
+        }
+    },
     "BG3.Settings": {
         "EnableUI": {
             "Name": "Enable BG3 Hotbar UI",
@@ -81,7 +87,7 @@
         },
         "CollapseFoundryMacrobar": {
             "Name": "Collapse Foundry Macrobar",
-            "Hint": "Automatically collapse the default Foundry macrobar"
+            "Hint": "Automatically collapse the default Foundry macrobar. On Foundry V13 or higher, \"Always\" and \"Fully Hidden\" do the same thing."
         },
         "ShowPassiveFeaturesContainer": {
             "Name": "Show Passive Features Container",
@@ -231,6 +237,10 @@
                 "hide": "Never",
                 "only": "Only display a clickable skull on portrait"
             }
+        },
+        "EnableHPControls": {
+            "Name": "Enable HP controls",
+            "Hint": "Add extra controls on HP on hover."
         },
         "synchroMidiQoL": {
             "BR": {

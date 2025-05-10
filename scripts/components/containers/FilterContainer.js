@@ -202,7 +202,7 @@ export class FilterContainer extends BG3Component {
         const resources = [],
             color = '#d5a25b';
         for(const item of this.actor.items) {
-            if(item.hasLimitedUses) {
+            if(item.hasLimitedUses && item.name) {
                 resources.push(new FilterButton({
                     color: color,
                     class: ['filter-spell-point', 'filter-custom'],
@@ -220,7 +220,7 @@ export class FilterContainer extends BG3Component {
         }
         for(const resourceId in this.actor.system.resources) {
             const oResource = this.actor.system.resources[resourceId];
-            if(oResource.value && oResource.label !== '') {
+            if(oResource.value && oResource.label && oResource.label !== '') {
                 resources.push(new FilterButton({
                     color: color,
                     class: ['filter-spell-point', 'filter-custom'],

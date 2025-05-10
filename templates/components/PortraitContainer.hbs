@@ -7,13 +7,10 @@
     <div class="portrait-image-container">
         <div class="portrait-image-subcontainer">
             <img class="portrait-image" src="{{img}}">
+            {{!-- <img class="portrait-image" src="{{img}}" style="scale: {{scale}}"> --}}
             <div class="health-overlay">
                 <div class="damage-overlay" style="height: {{health.damage}}%; opacity: {{opacity}}"></div>
             </div>
-        </div>
-        <div class="hp-text">
-            {{#if (gt health.temp 0)}}<div class="temp-hp-text">+{{health.temp}}</div>{{/if}}
-            <div>{{health.current}}/{{health.max}}</div>
         </div>
     </div>
     {{!-- <div class="ability-button">

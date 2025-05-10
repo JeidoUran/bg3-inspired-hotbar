@@ -270,6 +270,7 @@ export class GridCell extends BG3Component {
             document.body.classList.add('dragging-active');
             document.body.classList.add('drag-cursor');
             this.element.classList.add("dragging");
+            if(game.tooltip) game.tooltip.deactivate()
 
             ui.BG3HOTBAR.dragDropManager.dragSourceCell = this;
         });
