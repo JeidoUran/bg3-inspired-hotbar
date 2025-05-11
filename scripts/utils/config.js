@@ -800,7 +800,7 @@ export function registerSettings() {
 
     game.settings.register(BG3CONFIG.MODULE_NAME, 'enableHPControls', {
       name: 'BG3.Settings.EnableHPControls.Name',
-      hint: 'BG3.Settings.EnableHPControls.Name',
+      hint: 'BG3.Settings.EnableHPControls.Hint',
       scope: 'world',
       config: true,
       type: Boolean,

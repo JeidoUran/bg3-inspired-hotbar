@@ -202,3 +202,21 @@
   position: relative;
   z-index: 1;
 }
+
+#bg3-hotbar-container .menu-item[data-key="token"] .menu-item-content .menu-item-special {
+  display: flex;
+  align-items: center;
+}
+
+#bg3-hotbar-container .menu-item[data-key="token"] .menu-item-content .menu-item-special input {
+  display: none;
+}
+
+#bg3-hotbar-container .menu-item[data-key="token"] .menu-item-content .menu-item-special label {
+  cursor: pointer;
+  margin: 0 0 0 10px;
+}
+
+#bg3-hotbar-container .menu-item[data-key="token"] .menu-item-content .menu-item-special label i {
+  pointer-events: none;
+}

@@ -1,3 +1,11 @@
+## [3.1.1] - 2025-05-07
+### Fixed
+- Auto select HP in HP Control input to allow faster editing.
+- Fix a bug when deactivating "Show Damage as Ranges" setting.
+
+### Features
+- Add new parameter in Right-Click Portrait Menu to scale Token Image based of Token Scale (Ratio). (Related Issues: [#181])
+
 ## [3.1.0] - 2025-05-07
 ### Fixed
 - [Foundry V13] Fix saving throw new method name. (Related Issues: [#173])

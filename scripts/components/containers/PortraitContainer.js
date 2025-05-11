@@ -10,6 +10,7 @@ export class PortraitContainer extends BG3Component {
         super(data);
         this.components = {};
         this.useTokenImage = this.actor.getFlag(BG3CONFIG.MODULE_NAME, "useTokenImage") ?? false;
+        this.scaleTokenImage = this.actor.getFlag(BG3CONFIG.MODULE_NAME, "scaleTokenImage") ?? false;
     }
 
     get classes() {
@@ -92,7 +93,13 @@ export class PortraitContainer extends BG3Component {
             this.actor.sheet.render(true);
         });
 
-        $(this.element).on('contextmenu', '.portrait-image-container', (event) => MenuContainer.toggle(this.getPortraitMenu(), this.element, event));
+        $(this.element).on('contextmenu', '.portrait-image-container', async (event) => {
+            await MenuContainer.toggle(this.getPortraitMenu(), this.element, event);
+            $('div[data-key="token"] .menu-item-content input[type="checkbox"]').change(async (event) => {
+                this.scaleTokenImage = !this.scaleTokenImage;
+                await this.actor.setFlag(BG3CONFIG.MODULE_NAME, "scaleTokenImage", this.scaleTokenImage);
+            });
+        });
     }
     
     _parseAttributeInput(input) {
@@ -125,6 +132,12 @@ export class PortraitContainer extends BG3Component {
         this._renderInner();
     }
 
+    setTokenImageScale() {
+        const image = this.element.querySelector('.portrait-image');
+        if(!this.scaleTokenImage || !this.useTokenImage || this.token.document?._source?.texture?.scaleX === 1) image.style.removeProperty('scale');
+        else image.style.setProperty('scale', this.token.document._source.texture.scaleX);
+    }
+
     setImgBGColor() {
         const value = game.settings.get(BG3CONFIG.MODULE_NAME, 'backgroundPortraitPreferences');
         this.element.style.setProperty('--img-background-color', (value && value != '' ? value : 'transparent'));
@@ -155,10 +168,12 @@ export class PortraitContainer extends BG3Component {
             name: 'baseMenu',
             buttons: {
                 token: {
-                    label: 'Use Token Image', icon: 'fas fa-chess-pawn', custom: this.useTokenImage ? '<i class="fas fa-check"></i>' : '', click: !this.useTokenImage ? this.updateImagePreference.bind(this) : null
+                    label: 'Use Token Image', icon: 'fas fa-chess-pawn', custom: this.useTokenImage ? `<i class="fas fa-check"></i>${this.token.document._source.texture.scaleX !== 1 ? `<label for="input-token-scale" data-tooltip="Apply Token Scale" data-tooltip-direction="UP"><i class="fa-solid fa-up-right-and-down-left-from-center"${this.scaleTokenImage ? 'style="color: rgb(46, 204, 113)"' : ''}></i></label><input name="input-token-scale" type="checkbox"${this.scaleTokenImage ? ' checked' : ''}>` : ''}` : '', click: !this.useTokenImage ? this.updateImagePreference.bind(this) : (event) => {
+                        if($(event.target).attr('for') === 'input-token-scale') $('div[data-key="token"] .menu-item-content input[type="checkbox"]').trigger('change');
+                    }
                 },
                 portrait: {
-                    label: 'Use Character Portrait', icon: 'fas fa-user', custom: !this.useTokenImage ? '<i class="fas fa-check"></i>' : '', click: this.useTokenImage ? this.updateImagePreference.bind(this) : null
+                    label: 'Use Character Portrait', icon: 'fas fa-user', custom: !this.useTokenImage ? '<i class="fas fa-check"></i>' : '', click: this.useTokenImage ? this.updateImagePreference.bind(this) : () => {}
                 }
             }
         }
@@ -172,6 +187,7 @@ export class PortraitContainer extends BG3Component {
         this.setPortraitBendMode();
         this.togglePortraitOverlay();
         this.toggleExtraInfos();
+        this.setTokenImageScale();
     }
     
     async _renderInner() {

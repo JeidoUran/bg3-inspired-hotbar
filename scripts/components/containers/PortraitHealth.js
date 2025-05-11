@@ -40,6 +40,7 @@ export class PortraitHealth extends BG3Component {
         }).on('keydown', '.hp-input', (event) => {
             if ( (event.code === "Enter") || (event.code === "NumpadEnter") ) event.currentTarget.blur();
         }).on('focusin', '.hp-input', (event) => {
+            event.target.select();
             const parent = event.target.closest('.hp-text');
             if(parent) parent.dataset.hpLocked = true;
         }).on('focusout', '.hp-input', async (event) => {

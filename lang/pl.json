@@ -45,6 +45,12 @@
             "Tooltip": "Kliknij lewym przyciskiem myszy, aby wyświetlić testy umiejętności i rzuty obronne.<br>Kliknij prawym przyciskiem myszy, aby rzucić inicjatywę (ALT: Ułatw./ CTRL: Utrudn.)."
         }
     },
+    "BG3.Portrait": {
+        "HP": {
+            "Death": "Martwy!",
+            "Full": "Pełen zdrowia"
+        }
+    },
     "BG3.Settings": {
         "EnableUI": {
             "Name": "Włącz interfejs BG3 Hotbar",
@@ -81,7 +87,7 @@
         },
         "CollapseFoundryMacrobar": {
             "Name": "Zwiń pasek makr Foundry",
-            "Hint": "Automatycznie zwiń domyślny pasek makr Foundry"
+            "Hint": "Automatycznie zwijaj domyślny pasek makr Foundry. W Foundry V13 lub nowszych wersjach opcje „Zawsze” i „Całkowicie ukryte” działają tak samo."
         },
         "ShowPassiveFeaturesContainer": {
             "Name": "Pokaż kontener pasywnych cech",
@@ -231,6 +237,10 @@
                 "hide": "Nigdy",
                 "only": "Wyświetlaj klikalną czaszkę tylko na portrecie"
             }
+        },
+        "EnableHPControls": {
+            "Name": "Włącz sterowanie PW",
+            "Hint": "Dodaj dodatkowe elementy sterujące na PW po najechaniu kursorem."
         },
         "synchroMidiQoL": {
             "BR": {

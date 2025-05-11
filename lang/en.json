@@ -240,7 +240,7 @@
         },
         "EnableHPControls": {
             "Name": "Enable HP controls",
-            "Hint": "Add extra controls on HP on hover."
+            "Hint": "Add extra controls on HP when hovering portrait."
         },
         "synchroMidiQoL": {
             "BR": {
