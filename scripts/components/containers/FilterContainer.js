@@ -202,7 +202,7 @@ export class FilterContainer extends BG3Component {
         const resources = [],
             color = '#d5a25b';
         for(const item of this.actor.items) {
-            if(item.hasLimitedUses && item.name) {
+            if(item.hasLimitedUses && item.name && item.type === 'feat') {
                 resources.push(new FilterButton({
                     color: color,
                     class: ['filter-spell-point', 'filter-custom'],

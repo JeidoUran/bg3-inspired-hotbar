@@ -241,6 +241,7 @@ export function registerLibWrapper() {
                 })
             }
         }
+        if(!this.hasOwnProperty('identified') && this.hasLimitedUses) context.uses = this.uses;
         return context;
     }, "MIXED");
 }

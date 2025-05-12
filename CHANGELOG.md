@@ -1,10 +1,18 @@
+## [3.1.2] - 2025-05-07
+### Fixed
+- Fix UI sometimes displayed to the top of the screen (with camera activated for example). (Related Issues: [#179])
+- Limit "Extra Filters" to items with the "feat" type. (Related Issues: [#182])
+
+### Features
+- Patch DnD 5e Tooltip method to display charges for items without the "identified" property. Also non-identified items won't display their charges in hotbar anymore. (Related Issues: [#180])
+
 ## [3.1.1] - 2025-05-07
 ### Fixed
 - Auto select HP in HP Control input to allow faster editing.
 - Fix a bug when deactivating "Show Damage as Ranges" setting.
 
 ### Features
-- Add new parameter in Right-Click Portrait Menu to scale Token Image based of Token Scale (Ratio). (Related Issues: [#181])
+- Add new parameter in Right-Click Portrait Menu to scale Token Image based of Token Scale (Ratio). (Related Issues: [#163])
 
 ## [3.1.0] - 2025-05-07
 ### Fixed

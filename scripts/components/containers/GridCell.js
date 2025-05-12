@@ -61,7 +61,7 @@ export class GridCell extends BG3Component {
 
     async getItemUses() {
         const itemData = await this.item;
-        if (itemData?.system?.uses) {
+        if (itemData.hasLimitedUses && (game.user.isGM || !itemData.system.hasOwnProperty('identified') || itemData.system.identified)) {
             const uses = itemData.system.uses;
             const value = uses.value ?? 0;
             const max = uses.max ?? 0;

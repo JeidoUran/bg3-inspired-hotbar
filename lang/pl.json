@@ -240,7 +240,7 @@
         },
         "EnableHPControls": {
             "Name": "Włącz sterowanie PW",
-            "Hint": "Dodaj dodatkowe elementy sterujące na PW po najechaniu kursorem."
+            "Hint": "Dodano dodatkowe elementy sterujące dla PW podczas najechania kursorem na portret."
         },
         "synchroMidiQoL": {
             "BR": {
