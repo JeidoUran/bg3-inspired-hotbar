@@ -191,7 +191,7 @@ export class ControlContainer extends BG3Component {
             closeParent: true,
             buttons: {
                 deselect: {
-                    label: 'Deselecting Token',
+                    label: ui.BG3HOTBAR.manager.canGMHotbar() ? 'Keep GM Hotbar' : 'Deselecting Token',
                     icon: 'fas fa-user-slash',
                     class: ControlsManager.getLockSetting('deselect') ? 'checked' : '',
                     custom: '<div class="menu-item-checkbox "><i class="fas fa-check"></i></div>',

@@ -1,4 +1,13 @@
-## [3.1.2] - 2025-05-07
+## [3.1.3] - 2025-05-13 
+### Fixed
+- Fix Hide Macrobar logic.
+- Fix HP Controls removing temp HP. (Related Issues: [#184])
+- Allow players with permission to see HP Controls. (Related Issues: [#184])
+
+### Features
+- Add a option in Controls Container to "lock" the GM Hotbar to keep it even after selecting a token. (Related Issues: [#185])
+
+## [3.1.2] - 2025-05-11
 ### Fixed
 - Fix UI sometimes displayed to the top of the screen (with camera activated for example). (Related Issues: [#179])
 - Limit "Extra Filters" to items with the "feat" type. (Related Issues: [#182])
@@ -6,7 +15,7 @@
 ### Features
 - Patch DnD 5e Tooltip method to display charges for items without the "identified" property. Also non-identified items won't display their charges in hotbar anymore. (Related Issues: [#180])
 
-## [3.1.1] - 2025-05-07
+## [3.1.1] - 2025-05-10
 ### Fixed
 - Auto select HP in HP Control input to allow faster editing.
 - Fix a bug when deactivating "Show Damage as Ranges" setting.
@@ -14,7 +23,7 @@
 ### Features
 - Add new parameter in Right-Click Portrait Menu to scale Token Image based of Token Scale (Ratio). (Related Issues: [#163])
 
-## [3.1.0] - 2025-05-07
+## [3.1.0] - 2025-05-09
 ### Fixed
 - [Foundry V13] Fix saving throw new method name. (Related Issues: [#173])
 - [Foundry V13] Fix "Collapse Macro" setting, it can't be collapsed anymore since V13.
