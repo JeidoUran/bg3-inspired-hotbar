@@ -18,15 +18,8 @@ export class PassiveContainer extends BG3Component {
     get passivesList() {
         if(!this.token && !this.actor) return null;
 
-        const availablePassives = this.actor.items.filter(item => 
-            item.type === "feat" && (!item.system.activation?.type || item.system.activation.type === "passive")
-        );
-        const saved = this.actor.getFlag(BG3CONFIG.MODULE_NAME, "selectedPassives");
-        let featuresToShow = [];
-        if (this.selectedPassives) {
-            featuresToShow = availablePassives.filter(item => this.selectedPassives.has(item.uuid));
-        }
-        return featuresToShow;
+        const availablePassives = this.actor.items.filter(item => item.type === "feat" && (!item.system.activation?.type || item.system.activation.type === "passive"));
+        return this.selectedPassives?.size ? availablePassives.filter(item => this.selectedPassives.has(item.uuid)) : availablePassives;
     }
 
     get selectedPassives() {

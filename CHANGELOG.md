@@ -1,3 +1,22 @@
+## [3.1.4] - 2025-05-22 
+### Disclaimer
+- To improve performances and avoid bugs, Auto-equip items feature will now only look for items found in weapons sets, any other items will be ignored. This way, it allows you to manually equip items and still switch between your sets without having those manually equipped to be unequipped (as long as they are not in a weapon set).
+
+### Fixed
+- Fix players not allowed to use common actions macros. (Related Issues: [#191])
+- Fix CPR setting button displayed even without CPR module installed. (Related Issues: [#191])
+- Open Journal pages added to the hotbar when you click on them. (Related Issues: [#192])
+- Fix Passives & Actives not showing correctly. (Related Issues: [#194])
+- Fix Ability Check/Save & Skill roll for D&D previous to v4. (Related Issues: [#195])
+- Fix Common Actions macros (non-cpr) text to adapt to 2014/2024 rules. (Related Issues: [#199])
+- When minimized, the toggle button should be displayed on top of Taskbar (theripper93 module). (Related Issues: [#200])
+- Fix a bug with auto-equip weapons. (Related Issues: [#201])
+
+### Features
+- Handle Classes without a native tooltip when added to hotbar.
+- Display quantity on items if there is more than 1. (Related Issues: [#196])
+- Change the way minize/maximize UI is handled.
+
 ## [3.1.3] - 2025-05-13 
 ### Fixed
 - Fix Hide Macrobar logic.

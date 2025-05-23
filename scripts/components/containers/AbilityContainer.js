@@ -43,13 +43,20 @@ export class AbilityContainer extends BG3Component {
         event.stopPropagation();
         const parent = event.target.closest('[data-key]');
         try {
-            this.actor.rollSkill({
-                skill: parent.dataset.key,
+            const rollData = {
                 event: event,
                 advantage: event.altKey,
                 disadvantage: event.ctrlKey,
                 fastForward: event.shiftKey
-            });
+            };
+            if(ui.BG3HOTBAR.isDnDPrev4()) {
+                this.actor.rollSkill(parent.dataset.key, rollData);
+            } else {
+                this.actor.rollSkill({
+                    skill: parent.dataset.key,
+                    ...rollData
+                });
+            }
         } catch (error) {
             ui.notifications.error(`Error rolling ${parent.dataset.key.toUpperCase()} save. See console for details.`);
         }
@@ -74,13 +81,22 @@ export class AbilityContainer extends BG3Component {
             event.stopPropagation();
             const parent = event.target.closest('.ability-container');
             try {
-                this.actor.rollSavingThrow({
-                    ability: parent.dataset.key,
+                const rollData = {
                     event: event,
                     advantage: event.altKey,
                     disadvantage: event.ctrlKey,
                     fastForward: event.shiftKey
-                });
+                };
+                if(ui.BG3HOTBAR.isDnDPrev4()) {
+                    this.actor.rollAbilitySave(
+                        parent.dataset.key, rollData
+                    )
+                } else {
+                    this.actor.rollSavingThrow({
+                        ability: parent.dataset.key,
+                        ...rollData
+                    });
+                };
                 // this.element.querySelectorAll('.bg3-menu-container').forEach(e => e.classList.add('hidden'));
             } catch (error) {
                 ui.notifications.error(`Error rolling ${parent.dataset.key.toUpperCase()} save. See console for details.`);
@@ -91,13 +107,22 @@ export class AbilityContainer extends BG3Component {
             event.stopPropagation();
             const parent = event.target.closest('.ability-container');
             try {
-                this.actor.rollAbilityCheck({
-                    ability: parent.dataset.key,
+                const rollData = {
                     event: event,
                     advantage: event.altKey,
                     disadvantage: event.ctrlKey,
                     fastForward: event.shiftKey
-                });
+                };
+                if(ui.BG3HOTBAR.isDnDPrev4()) {
+                    this.actor.rollAbilityTest(
+                        parent.dataset.key, rollData
+                    )
+                } else {
+                    this.actor.rollAbilityCheck({
+                        ability: parent.dataset.key,
+                        ...rollData
+                    });
+                };
                 // this.element.querySelectorAll('.bg3-menu-container').forEach(e => e.classList.add('hidden'));
             } catch (error) {
                 ui.notifications.error(`Error rolling ${parent.dataset.key.toUpperCase()} save. See console for details.`);

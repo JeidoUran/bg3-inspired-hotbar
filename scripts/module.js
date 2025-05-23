@@ -18,6 +18,14 @@ Hooks.once('ready', () => {
     registerSettings();
     updateSettingsDisplay();
     ui.BG3HOTBAR = new BG3Hotbar();
+
+    // Temp Fix for compendium macros
+    (async () => {
+        const compendium = await game.packs.get("bg3-inspired-hotbar.bg3-inspired-hud");
+        if(compendium?.ownership && compendium?.ownership?.['PLAYER'] !== 'LIMITED') {
+            compendium.configure({ownership: {...compendium.ownership, ...{'PLAYER': 'LIMITED'}}});
+        }
+    })()
 });
 
 // CONFIG.debug.hooks = true;

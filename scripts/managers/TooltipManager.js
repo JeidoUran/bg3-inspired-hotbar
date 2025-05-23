@@ -16,84 +16,93 @@ export class BG3TooltipManager {
         if(game.settings.get(BG3CONFIG.MODULE_NAME, 'showDamageRanges')) this._tooltipRangeDamage();
         
         // Add Tooltip to Activity
-        game.dnd5e.dataModels.activity.BaseActivityData.ACTIVITY_TOOLTIP_TEMPLATE = `modules/${BG3CONFIG.MODULE_NAME}/templates/tooltips/activity-tooltip.hbs`;
-        game.dnd5e.dataModels.activity.BaseActivityData.prototype.richTooltip = async function (enrichmentOptions={}) {
-            return {
-                content: await renderTemplate(
-                this.constructor.ACTIVITY_TOOLTIP_TEMPLATE, await this.getCardData(enrichmentOptions)
-                ),
-                classes: ["dnd5e2", "dnd5e-tooltip", "item-tooltip"]
-            };
-        }    
-        game.dnd5e.dataModels.activity.BaseActivityData.prototype.getDataParent = function (property) {
-            return this[property] ?? this.parent?.parent[property] ?? this.parent[property];
-        }        
-        game.dnd5e.dataModels.activity.BaseActivityData.prototype.getCardData = async function ({ activity, ...enrichmentOptions }={}) {
-            const { name, type, img } = this;
-            const isIdentified = this.identified !== false || this.parent?.parent.identified !== false || this.parent.identified !== false;
-            const context = {
-                name, type, img,
-                labels: foundry.utils.deepClone(this.getDataParent('labels')),
-                config: CONFIG.DND5E,
-                controlHints: game.settings.get("dnd5e", "controlHints"),
-                description: {
-                    value: await TextEditor.enrichHTML(this.description?.chatFlavor ?? "", {
-                        rollData: this.getRollData(), relativeTo: this, ...enrichmentOptions
-                    })
-                },
-                uses: (this.hasLimitedUses || this.parent?.parent.hasLimitedUses || this.parent.hasLimitedUses) && (game.user.isGM || this.parent?.parent.identified || this.parent.identified) ? this.getDataParent('uses') : null,
-                materials: this.getDataParent('materials'),
-                tags: this.labels?.components?.tags ?? this.parent?.parent?.labels?.components?.tags ?? this.parent.labels?.components?.tags,
-                isSpell : this.getDataParent('isSpell'),
-                parentType: this.parent?.parent.type ?? this.parent.type
-            }
-            if(context.isSpell && !context.labels.components) {
-                context.labels.components = this.parent?.parent.labels.components ?? this.parent.labels.components;
-            }
-            if(context.labels?.damage?.length) {
-                let textDamage = '';
-                const rollData = (activity ?? this.parent).getRollData();
-                for(let i = 0; i < context.labels.damage.length; i++) {
-                    // [[/damage {{damage.formula}}{{#if damage.damageType}} type={{damage.damageType}}{{/if}}]]
-                    textDamage += `[[/damage ${context.labels.damage[i].formula}${context.labels.damage[i].damageType ? ` type=${context.labels.damage[i].damageType}` : ''}]]`;
-                    if(i < context.labels.damage.length - 1) textDamage += ' | ';
+        if(game.dnd5e.dataModels.activity) {
+            game.dnd5e.dataModels.activity.BaseActivityData.ACTIVITY_TOOLTIP_TEMPLATE = `modules/${BG3CONFIG.MODULE_NAME}/templates/tooltips/activity-tooltip.hbs`;
+            game.dnd5e.dataModels.activity.BaseActivityData.prototype.richTooltip = async function (enrichmentOptions={}) {
+                return {
+                    content: await renderTemplate(
+                    this.constructor.ACTIVITY_TOOLTIP_TEMPLATE, await this.getCardData(enrichmentOptions)
+                    ),
+                    classes: ["dnd5e2", "dnd5e-tooltip", "item-tooltip"]
+                };
+            }    
+            game.dnd5e.dataModels.activity.BaseActivityData.prototype.getDataParent = function (property) {
+                return this[property] ?? this.parent?.parent[property] ?? this.parent[property];
+            }        
+            game.dnd5e.dataModels.activity.BaseActivityData.prototype.getCardData = async function ({ activity, ...enrichmentOptions }={}) {
+                const { name, type, img } = this;
+                const isIdentified = this.identified !== false || this.parent?.parent.identified !== false || this.parent.identified !== false;
+                const context = {
+                    name, type, img,
+                    labels: foundry.utils.deepClone(this.getDataParent('labels')),
+                    config: CONFIG.DND5E,
+                    controlHints: game.settings.get("dnd5e", "controlHints"),
+                    description: {
+                        value: await TextEditor.enrichHTML(this.description?.chatFlavor ?? "", {
+                            rollData: this.getRollData(), relativeTo: this, ...enrichmentOptions
+                        })
+                    },
+                    uses: (this.hasLimitedUses || this.parent?.parent.hasLimitedUses || this.parent.hasLimitedUses) && (game.user.isGM || this.parent?.parent.identified || this.parent.identified) ? this.getDataParent('uses') : null,
+                    materials: this.getDataParent('materials'),
+                    tags: this.labels?.components?.tags ?? this.parent?.parent?.labels?.components?.tags ?? this.parent.labels?.components?.tags,
+                    isSpell : this.getDataParent('isSpell'),
+                    parentType: this.parent?.parent.type ?? this.parent.type
                 }
-                context.enrichDamage = {
-                    value: await TextEditor.enrichHTML(textDamage ?? "", {
-                        rollData, relativeTo: this.parent, ...enrichmentOptions
-                    })
+                if(context.isSpell && !context.labels.components) {
+                    context.labels.components = this.parent?.parent.labels.components ?? this.parent.labels.components;
                 }
+                if(context.labels?.damage?.length) {
+                    let textDamage = '';
+                    const rollData = (activity ?? this.parent).getRollData();
+                    for(let i = 0; i < context.labels.damage.length; i++) {
+                        // [[/damage {{damage.formula}}{{#if damage.damageType}} type={{damage.damageType}}{{/if}}]]
+                        textDamage += `[[/damage ${context.labels.damage[i].formula}${context.labels.damage[i].damageType ? ` type=${context.labels.damage[i].damageType}` : ''}]]`;
+                        if(i < context.labels.damage.length - 1) textDamage += ' | ';
+                    }
+                    context.enrichDamage = {
+                        value: await TextEditor.enrichHTML(textDamage ?? "", {
+                            rollData, relativeTo: this.parent, ...enrichmentOptions
+                        })
+                    }
+                }
+                context.properties = [];
+                if ( game.user.isGM || isIdentified ) {
+                    context.properties.push(
+                        ...Object.values((this.activationLabels ? this.activationLabels : (this.parent?.parent.labels?.activations?.[0] ? this.parent?.parent.labels?.activations?.[0] : this.parent.labels?.activations?.[0])) ?? {})
+                    );
+                }
+                context.properties = context.properties.filter(_ => _);
+                context.hasProperties = context.tags?.length || context.properties.length;
+                
+                return context;
             }
-            context.properties = [];
-            if ( game.user.isGM || isIdentified ) {
-                context.properties.push(
-                    ...Object.values((this.activationLabels ? this.activationLabels : (this.parent?.parent.labels?.activations?.[0] ? this.parent?.parent.labels?.activations?.[0] : this.parent.labels?.activations?.[0])) ?? {})
-                );
-            }
-            context.properties = context.properties.filter(_ => _);
-            context.hasProperties = context.tags?.length || context.properties.length;
-            
-            return context;
         }
 
         // Add Tooltip to Macro
-        Macro.MACRO_TOOLTIP_TEMPLATE = `modules/${BG3CONFIG.MODULE_NAME}/templates/tooltips/macro-tooltip.hbs`;
-        Macro.prototype.richTooltip = async function (enrichmentOptions={}) {
+        const customRichTooltip = async function (enrichmentOptions={}) {
             return {
                 content: await renderTemplate(
-                this.constructor.MACRO_TOOLTIP_TEMPLATE, await this.getCardData(enrichmentOptions)
+                this.MACRO_TOOLTIP_TEMPLATE, await this.getCardData(enrichmentOptions)
                 ),
                 classes: ["dnd5e2", "dnd5e-tooltip", "item-tooltip"]
             };
         }
-        Macro.prototype.getCardData = async function ({ activity, ...enrichmentOptions }={}) {
-            const { name, type, img } = this;
+        const customGetCardData = async function ({ activity, ...enrichmentOptions }={}) {
+            const { name, type, img = 'icons/svg/book.svg' } = this;
             const context = {
                 name, type, img,
                 config: CONFIG.DND5E,
                 controlHints: game.settings.get("dnd5e", "controlHints")
             }
             return context;
+        }
+
+        const oldActivate = dnd5e.tooltips._onHoverContentLink;
+        dnd5e.tooltips._onHoverContentLink = async function(doc) {
+            if(!doc.MACRO_TOOLTIP_TEMPLATE) doc.MACRO_TOOLTIP_TEMPLATE = `modules/${BG3CONFIG.MODULE_NAME}/templates/tooltips/macro-tooltip.hbs`;
+            if(!doc.richTooltip) doc.richTooltip = customRichTooltip;
+            if(!doc.getCardData) doc.getCardData = customGetCardData;
+            oldActivate.bind(this)(doc);
         }
 
         const oldDismiss = TooltipManager.prototype.dismissLockedTooltips;

@@ -62,7 +62,7 @@ export class AdvContainer extends BG3Component {
     
     async _renderInner() {
         await super._renderInner();
-        if(!game.settings.get(BG3CONFIG.MODULE_NAME, 'addAdvBtnsMidiQoL')) return;
+        if(!game.modules.get("midi-qol")?.active || !game.settings.get(BG3CONFIG.MODULE_NAME, 'addAdvBtnsMidiQoL')) return;
         const buttons = this.btnData.map((btn) => new BaseButton(btn, this));
         for(const btn of buttons) this.element.appendChild(btn.element);
         await Promise.all(buttons.map((btn) => btn.render()));

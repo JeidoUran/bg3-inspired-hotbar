@@ -982,8 +982,8 @@ export function registerSettings() {
     });
 
     game.settings.register(BG3CONFIG.MODULE_NAME, 'showItemUses', {
-        name: 'Show Item Uses',
-        hint: 'Display remaining uses in the top-right corner of items',
+        name: 'Show Item Uses & Quantity',
+        hint: 'Display remaining uses in the top-right corner of items and quanity  in the top-left corner.',
         scope: 'client',
         config: true,
         type: Boolean,
@@ -1036,31 +1036,33 @@ export function registerSettings() {
 
     game.settings.register(BG3CONFIG.MODULE_NAME, 'autoPopulateCombatContainer', {
         name: 'Autopopulate the basic actions container',
-        hint: 'Auto-populate the basic actions with dodge, dash, etc (Compatible with CPR). Disable this will unlock the container.',
+        hint: 'Auto-populate the basic actions with dodge, dash, etc (Compatible with CPR) for newly created tokens. Disable this will unlock the container.',
         scope: 'world',
         config: true,
         type: Boolean,
         default: true
     });
 
-    game.settings.registerMenu(BG3CONFIG.MODULE_NAME, "chooseCPRActions", {
-        name: 'BG3.Settings.Menu.CPR.Name',
-        label: 'BG3.Settings.Menu.CPR.Label',
-        hint: 'BG3.Settings.Menu.CPR.Hint',
-        icon: "fas fa-cog",
-        type: CPRActionsDialog,
-        scope: 'world',
-        visible: () => {
-            return game.modules.get("chris-premades")?.active;
-        }
-    });
+    if(game.modules.get("chris-premades")?.active) {
+        game.settings.registerMenu(BG3CONFIG.MODULE_NAME, "chooseCPRActions", {
+            name: 'BG3.Settings.Menu.CPR.Name',
+            label: 'BG3.Settings.Menu.CPR.Label',
+            hint: 'BG3.Settings.Menu.CPR.Hint',
+            icon: "fas fa-cog",
+            type: CPRActionsDialog,
+            scope: 'world',
+            visible: () => {
+                return game.modules.get("chris-premades")?.active;
+            }
+        });
 
-    game.settings.register(BG3CONFIG.MODULE_NAME, 'choosenCPRActions', {
-        scope: 'client',
-        config: false,
-        type: Array,
-        default: ["9wbU6kYxfAaRFrbI", "ga6foNaesV3UJFKm", "eqOOv3smPuxTq7Xm", "pmn1iLabeps5aPtW", "nmkcJWUba7hyi5m5", "34jFXjMOseErle3M"]
-    });
+        game.settings.register(BG3CONFIG.MODULE_NAME, 'choosenCPRActions', {
+            scope: 'client',
+            config: false,
+            type: Array,
+            default: ["9wbU6kYxfAaRFrbI", "ga6foNaesV3UJFKm", "eqOOv3smPuxTq7Xm", "pmn1iLabeps5aPtW", "nmkcJWUba7hyi5m5", "34jFXjMOseErle3M"]
+        });
+    }
 
     game.settings.register(BG3CONFIG.MODULE_NAME, 'lockCombatContainer', {
         name: 'Lock the basic actions container',
@@ -1303,7 +1305,7 @@ export function registerSettings() {
         name: 'BG3.Settings.synchroMidiQoL.BR.Name',
         hint: 'BG3.Settings.synchroMidiQoL.BR.Hint',
         scope: 'client',
-        config: true,
+        config: game.modules.get("midi-qol")?.active,
         type: Boolean,
         default: false,
         onChange: () => {
@@ -1315,7 +1317,7 @@ export function registerSettings() {
         name: 'BG3.Settings.synchroMidiQoL.ADV.Name',
         hint: 'BG3.Settings.synchroMidiQoL.ADV.Hint',
         scope: 'client',
-        config: true,
+        config: game.modules.get("midi-qol")?.active,
         type: Boolean,
         default: false,
         onChange: value => {

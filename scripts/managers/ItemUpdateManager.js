@@ -71,6 +71,8 @@ export class ItemUpdateManager {
         if (!token || token.actor?.items.get(item.id) !== item) return;
         let needSave = false;
         
+        if(changes.system && Object.keys(changes.system).length === 1 && changes.system.hasOwnProperty('equipped')) return;
+        
         // Check if this is a spell and its preparation state changed
         if (item.type === "spell" && changes.system?.preparation !== undefined) {
             const prep = item.system.preparation;

@@ -37,9 +37,10 @@ export class GridCell extends BG3Component {
             data = {...data, ...{
                     uuid: itemData.uuid,
                     name: itemData.name,
-                    icon: itemData.img,
+                    icon: itemData.img ?? 'icons/svg/book.svg',
                     actionType: itemData.system?.activation?.type?.toLowerCase() ?? itemData.activation?.type?.toLowerCase() ?? null,
-                    itemType: itemData.type
+                    itemType: itemData.type,
+                    quantity: itemData.system?.quantity && itemData.system?.quantity > 1 ? itemData.system?.quantity : false
                 },
                 ...await this.getItemUses()
             };
@@ -230,6 +231,7 @@ export class GridCell extends BG3Component {
             }
             if(item) {
                 try {
+                    console.log(item)
                     if(item.execute) item.execute();
                     else if(item.use) {
                         const options = {
@@ -241,7 +243,7 @@ export class GridCell extends BG3Component {
                         if (e.altKey) options.advantage = true;
                         const used = await item.use(options, { event: e });
                         if (used) this._renderInner();
-                    }
+                    } else if(item.sheet?.render) item.sheet.render(true)
                 } catch (error) {
                     console.error("BG3 Inspired Hotbar | Error using item:", error);
                     ui.notifications.error(`Error using item: ${error.message}`);

@@ -3,6 +3,7 @@
         <img src="{{icon}}"{{#if name}} alt="{{name}}"{{/if}} class="hotbar-item{{#if (eq uses.value 0)}} depleted{{/if}}" draggable="false">
         {{#if name}}<div class="hotbar-item-name">{{name}}</div>{{/if}}
         {{#if uses}}<div class="hotbar-item-uses{{#if (eq uses.value 0)}} depleted{{/if}}">{{uses.value}}/{{uses.max}}</div>{{/if}}
+        {{#if quantity}}<div class="hotbar-item-quantity">{{quantity}}</div>{{/if}}
     {{else}}
         <div>{{name}}</div>
     {{/if}}
