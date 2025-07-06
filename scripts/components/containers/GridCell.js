@@ -2,6 +2,8 @@ import { BG3Component } from "../component.js";
 import { fromUuid } from "../../utils/foundryUtils.js";
 import { ControlsManager } from "../../managers/ControlsManager.js";
 import { MenuContainer } from "./MenuContainer.js";
+import { TargetSelector } from "../../managers/TargetSelector.js";
+import { needsTargeting, getTargetRequirements, validateTargets } from "../../utils/targetingRules.js";
 
 export class GridCell extends BG3Component {
     constructor(data, parent) {
@@ -232,18 +234,47 @@ export class GridCell extends BG3Component {
             if(item) {
                 try {
                     console.log(item)
-                    if(item.execute) item.execute();
-                    else if(item.use) {
-                        const options = {
-                            configureDialog: false,
-                            legacy: false,
-                            event: e
-                        };
-                        if (e.ctrlKey) options.disadvantage = true;
-                        if (e.altKey) options.advantage = true;
-                        const used = await item.use(options, { event: e });
-                        if (used) this._renderInner();
-                    } else if(item.sheet?.render) item.sheet.render(true)
+                    
+                    // Check if target selector is enabled and item needs targeting
+                    const targetSelectorEnabled = game.settings.get('bg3-inspired-hotbar', 'enableTargetSelector') ?? true;
+                    
+                    if (targetSelectorEnabled && needsTargeting(item)) {
+                        const currentToken = ui.BG3HOTBAR.manager.token;
+                        if (!currentToken) {
+                            ui.notifications.warn("No token selected for targeting");
+                            return;
+                        }
+                        
+                        // Get targeting requirements
+                        const requirements = getTargetRequirements(item);
+                        
+                        // Create and show target selector
+                        const targetSelector = new TargetSelector({
+                            token: currentToken,
+                            requirements: requirements
+                        });
+                        
+                        // Wait for target selection
+                        const selectedTargets = await targetSelector.select();
+                        
+                        // If no targets selected (cancelled), don't proceed
+                        if (!selectedTargets || selectedTargets.length === 0) {
+                            return;
+                        }
+                        
+                        // Validate targets
+                        const validation = validateTargets(item, selectedTargets);
+                        if (!validation.success) {
+                            ui.notifications.error(validation.error);
+                            return;
+                        }
+                        
+                        // Use item with targets
+                        await this.useItemWithTargets(item, selectedTargets, e);
+                    } else {
+                        // Use item without targeting
+                        await this.useItemDirectly(item, e);
+                    }
                 } catch (error) {
                     console.error("BG3 Inspired Hotbar | Error using item:", error);
                     ui.notifications.error(`Error using item: ${error.message}`);
@@ -316,6 +347,51 @@ export class GridCell extends BG3Component {
         });
     }
 
+    /**
+     * Use item with selected targets
+     * @param {Item} item - The item to use
+     * @param {Token[]} targets - Selected targets
+     * @param {Event} event - The triggering event
+     */
+    async useItemWithTargets(item, targets, event) {
+        // Set targets for the item use
+        const targetIds = targets.map(t => t.id);
+        game.user.updateTokenTargets(targetIds);
+        
+        try {
+            // Use the item - MidiQoL will handle the targets
+            await this.useItemDirectly(item, event);
+        } finally {
+            // Clear targets after a short delay to ensure MidiQoL has processed them
+            setTimeout(() => {
+                game.user.updateTokenTargets([]);
+            }, 100);
+        }
+    }
+
+    /**
+     * Use item directly without targeting
+     * @param {Item} item - The item to use
+     * @param {Event} event - The triggering event
+     */
+    async useItemDirectly(item, event) {
+        if(item.execute) {
+            item.execute();
+        } else if(item.use) {
+            const options = {
+                configureDialog: false,
+                legacy: false,
+                event: event
+            };
+            if (event.ctrlKey) options.disadvantage = true;
+            if (event.altKey) options.advantage = true;
+            const used = await item.use(options, { event: event });
+            if (used) this._renderInner();
+        } else if(item.sheet?.render) {
+            item.sheet.render(true);
+        }
+    }
+
     async _renderInner() {
         await super._renderInner();
         const slotKey = `${this.data.col}-${this.data.row}`;
@@ -327,6 +403,17 @@ export class GridCell extends BG3Component {
             if(itemData) {
                 this.element.dataset.actionType = itemData.system?.activation?.type?.toLowerCase() ?? itemData.activation?.type?.toLowerCase() ?? null;
                 this.element.dataset.itemType = itemData.type;
+
+                if (itemData.system?.activities) {
+                    const activityActionTypes = itemData.system.activities
+                      .values()
+                      .toArray()
+                      .filter((a) => !!a.activation?.type)
+                      .map((a) => a.activation.type);
+
+                    this.element.dataset.activityActionTypes = [...new Set(activityActionTypes)].join(',');
+                }
+
                 switch (itemData.type) {
                     case 'spell':
                         this.element.dataset.preparationMode = itemData.system.preparation?.mode;
@@ -351,3 +438,4 @@ export class GridCell extends BG3Component {
         }
     }
 }
+

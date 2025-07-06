@@ -13,7 +13,11 @@ export class RestTurnContainer extends BG3Component {
 
     get btnData() {
         let btnData = [];
-        if(game.settings.get(BG3CONFIG.MODULE_NAME, 'showRestTurnButton') && ui.BG3HOTBAR.manager.actor) {
+        const restTurnSetting = game.settings.get(BG3CONFIG.MODULE_NAME, 'showRestTurnButton');
+        
+        if(restTurnSetting !== 'none' && ui.BG3HOTBAR.manager.actor) {
+            // Add Turn buttons (End Turn) if setting is 'both' or 'turn'
+            if(restTurnSetting === 'both' || restTurnSetting === 'turn') {
             btnData = [...btnData, ...[
                 {
                     type: 'div',
@@ -26,7 +30,13 @@ export class RestTurnContainer extends BG3Component {
                             game.combat.nextTurn.bind(game.combat)()
                         }
                     }
-                },
+                    }
+                ]];
+            }
+            
+            // Add Rest buttons (Short Rest, Long Rest) if setting is 'both' or 'rest'
+            if(restTurnSetting === 'both' || restTurnSetting === 'rest') {
+                btnData = [...btnData, ...[
                 {
                     type: 'div',
                     class: ["rest-turn-button"],
@@ -47,7 +57,8 @@ export class RestTurnContainer extends BG3Component {
                         'click': this.actor.longRest.bind(this.actor)
                     }
                 }
-            ]]
+                ]];
+            }
         } else if(ui.BG3HOTBAR.manager.canGMHotbar()) {
             btnData = [...btnData, ...[
                 {

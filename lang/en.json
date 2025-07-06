@@ -194,8 +194,30 @@
             "Hint": ""
         },
         "ShowRestTurnButton": {
-            "Name": "Show Rest/Turns buttons",
-            "Hint": ""
+            "Name": "Show Rest/Turn buttons",
+            "Hint": "Control which rest and turn buttons are displayed in the hotbar",
+            "Choices": {
+                "Both": "Show Both (Rest & Turn)",
+                "Rest": "Show Rest Only",
+                "Turn": "Show Turn Only", 
+                "None": "Show Neither"
+            }
+        },
+        "EnableTargetSelector": {
+            "Name": "Enable Target Selector",
+            "Hint": "Show an interactive target selector for spells and abilities that require targeting. When enabled, clicking items that need targets will show a crosshair cursor and allow you to select targets on the canvas."
+        },
+        "ShowRangeIndicators": {
+            "Name": "Show Range Indicators",
+            "Hint": "Display visual range indicators when using the target selector. Shows circles around your token indicating the maximum range of spells and abilities."
+        },
+        "AutoTargetSelf": {
+            "Name": "Auto-Target Self",
+            "Hint": "Automatically target yourself for spells and abilities that can only target the caster (like self-buffs). When enabled, self-targeting spells will skip the target selector."
+        },
+        "EnableRangeChecking": {
+            "Name": "Enable Range Checking",
+            "Hint": "Check if targets are within range when using the target selector. When disabled, you can target any token regardless of spell/ability range."
         },
         "OverlayModePortrait": {
             "Name": "Health Overlay as Mask",
@@ -312,6 +334,11 @@
                     "Common": "Common Actions",
                     "Other": "Other"
                 }
+            },
+            "TargetSelector": {
+                "Name": "Target Selector settings",
+                "Hint": "Settings for the interactive target selector system.",
+                "Label": "Configure Target Selector"
             },
             "Filter": {
                 "Name": "Filter settings"

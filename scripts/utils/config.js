@@ -226,7 +226,7 @@ export function registerKeybinding() {
 
 export function registerLibWrapper() {
     patchFunc("game.dnd5e.dataModels.ItemDataModel.prototype.getCardData", async function (wrapped, { activity, ...enrichmentOptions }={}) {
-        const context = await wrapped.call(this);
+        const context = await wrapped.call(this, {activity, ...enrichmentOptions});
         if(context.labels?.damages?.length) {
             let textDamage = '';
             const rollData = (activity ?? this.parent).getRollData();
@@ -468,9 +468,19 @@ export function updateSettingsDisplay() {
                         label: 'BG3.Settings.Menu.Hotbar.Sub.Common',
                         fields: ['showCombatContainer', 'autoPopulateCombatContainer', 'chooseCPRActions', 'lockCombatContainer']
                     },
+
                     {
                         label: 'BG3.Settings.Menu.Hotbar.Sub.Other',
                         fields: ['fadeControlsMenu', 'showRestTurnButton', 'enableGMHotbar']
+                    }
+                ]
+            },
+            {
+                label: 'BG3.Settings.Menu.TargetSelector.Name',
+                categories: [
+                    {
+                        label: null,
+                        fields: ['enableTargetSelector', 'showRangeIndicators', 'autoTargetSelf', 'enableRangeChecking']
                     }
                 ]
             },
@@ -1094,13 +1104,55 @@ export function registerSettings() {
         hint: 'BG3.Settings.ShowRestTurnButton.Hint',
         scope: 'client',
         config: true,
-        type: Boolean,
-        default: true,
+        type: String,
+        choices: {
+            'both': 'BG3.Settings.ShowRestTurnButton.Choices.Both',
+            'rest': 'BG3.Settings.ShowRestTurnButton.Choices.Rest',
+            'turn': 'BG3.Settings.ShowRestTurnButton.Choices.Turn',
+            'none': 'BG3.Settings.ShowRestTurnButton.Choices.None'
+        },
+        default: 'both',
         onChange: () => {
             if (ui.BG3HOTBAR.components.restTurn) {
                 ui.BG3HOTBAR.components.restTurn.render();
             }
         }
+    });
+
+    game.settings.register(BG3CONFIG.MODULE_NAME, 'enableTargetSelector', {
+        name: 'BG3.Settings.EnableTargetSelector.Name',
+        hint: 'BG3.Settings.EnableTargetSelector.Hint',
+        scope: 'client',
+        config: true,
+        type: Boolean,
+        default: true
+    });
+
+    game.settings.register(BG3CONFIG.MODULE_NAME, 'showRangeIndicators', {
+        name: 'BG3.Settings.ShowRangeIndicators.Name',
+        hint: 'BG3.Settings.ShowRangeIndicators.Hint',
+        scope: 'client',
+        config: true,
+        type: Boolean,
+        default: true
+    });
+
+    game.settings.register(BG3CONFIG.MODULE_NAME, 'autoTargetSelf', {
+        name: 'BG3.Settings.AutoTargetSelf.Name',
+        hint: 'BG3.Settings.AutoTargetSelf.Hint',
+        scope: 'client',
+        config: true,
+        type: Boolean,
+        default: true
+    });
+
+    game.settings.register(BG3CONFIG.MODULE_NAME, 'enableRangeChecking', {
+        name: 'BG3.Settings.EnableRangeChecking.Name',
+        hint: 'BG3.Settings.EnableRangeChecking.Hint',
+        scope: 'client',
+        config: true,
+        type: Boolean,
+        default: true
     });
 
     game.settings.register(BG3CONFIG.MODULE_NAME, 'enableGMHotbar', {
@@ -1496,7 +1548,7 @@ export let patchFunc = (prop, func, type = "WRAPPER") => {
     }
     if (game.modules.get("lib-wrapper")?.active) {
         try {
-            libWrapper.register("po0lp-personal-module", prop, func, type);
+            libWrapper.register("bg3-inspired-hotbar", prop, func, type);
         } catch (e) {
             nonLibWrapper();
         }

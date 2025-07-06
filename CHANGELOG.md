@@ -1,3 +1,34 @@
+## [3.2.3] - 2025-07-04
+### Fixed
+- **Show Secrets Module Compatibility** - Fixed compatibility issue with Show Secrets module by properly passing enrichment options through libWrapper and correcting module name registration. Thanks to @kaelad02 (Show Secrets module developer) for identifying the issue and providing the fix. (Related Issue: [#219])
+
+## [3.2.2] - 2025-07-04
+### Fixed
+- **Target Selector (Beta)** - Fixed issue where AOE spells and abilities with templates (like Fireball, Cone of Cold, etc.) were incorrectly using the target selector instead of Foundry's native template placement system. Now only creature-targeted spells use the target selector, while AOE spells that place templates (cone, cube, cylinder, line, radius, sphere) use the standard template placement.
+
+## [3.2.1] - 2025-07-04
+### Fixed
+- **Target Selector (Beta)** - Fixed issue where healing spells (like Healing Word, Mass Healing Word, Cure Wounds) were not applying healing when using the target selector. The target selector was clearing selected targets too quickly, preventing MidiQoL from properly detecting and applying the healing effects. Now targets are maintained during spell execution with a small delay before clearing.
+
+## [3.2.0] - 2025-07-04
+### Features (Beta)
+- **Target Selector System** - Added interactive target selection for spells and abilities inspired by Argon Combat HUD. When enabled, clicking items that require targeting will show a crosshair cursor and allow you to select targets on the canvas with visual feedback.
+  - **Visual Feedback**: Crosshair cursor, range indicators, and target count display
+  - **Range Validation**: D&D 5e grid-based distance calculation with visual range circles
+  - **Multi-targeting**: Support for spells that can target multiple creatures (e.g., Aid, Magic Missile)
+  - **Dynamic Target Adjustment**: Use `[` and `]` keys during targeting to increase/decrease target count for spells that scale with level (e.g., Eldritch Blast at higher levels)
+  - **Settings**: Dedicated "Target Selector settings" section with options to enable/disable the system, range indicators, auto-targeting, and range checking
+  - **⚠️ Beta Warning**: This feature is in beta and requires more testing. If you encounter issues or prefer not to use it, you can disable it in the Target Selector settings.
+
+## [3.1.6] - 2025-07-04
+### Features
+- Split "Show Rest/Turn buttons" setting into granular dropdown control with options: "Show Both (Rest & Turn)", "Show Rest Only", "Show Turn Only", and "Show Neither". This allows GMs to show the End Turn button to players without showing rest buttons, giving more precise control over which buttons are visible. (Related Issue: [#213])
+
+## [3.1.5] - 2025-07-04
+### Features
+- Add toggle button to switch between GM Hotbar and Token Hotbar when GM Hotbar is enabled. It's above the row controls buttons on the far right. (Related Issues: [#212], PR [#215] - Thanks @gubacelar!)
+- Extend action type filters to search activities - items with activities now highlight when their activity action types match the selected filter. (PR [#208] - Thanks @kgsherman!)
+
 ## [3.1.4] - 2025-05-22 
 ### Disclaimer
 - To improve performances and avoid bugs, Auto-equip items feature will now only look for items found in weapons sets, any other items will be ignored. This way, it allows you to manually equip items and still switch between your sets without having those manually equipped to be unequipped (as long as they are not in a weapon set).
