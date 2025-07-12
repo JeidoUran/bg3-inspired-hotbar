@@ -32,8 +32,16 @@ export class AutoPopulateDefaults extends FormApplication {
             weapon: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Weapons"),
             feat: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Features"),
             spell: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Spells"),
-            consumable: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Consumables"),
             equipment: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Equipment"),
+            // Replace single "consumable" with individual subtypes
+            "consumable:potion": game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Potions"),
+            "consumable:scroll": game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Scrolls"),
+            "consumable:ammo": game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Ammunition"),
+            "consumable:food": game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Food"),
+            "consumable:wand": game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Wands"),
+            "consumable:rod": game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Rods"),
+            "consumable:poison": game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Poisons"),
+            "consumable:trinket": game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Trinkets"),
             tool: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Tools"),
             loot: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Loot")
         };
@@ -150,8 +158,28 @@ export class AutoPopulateCreateToken {
 
             // Process all items from the actor
             for (const item of actor.items) {
-                // Skip if item type is not in the selected types
-                if (!itemTypes.includes(item.type)
+                // Enhanced filtering logic to handle consumable subtypes
+                let includeItem = false;
+                
+                for (const selectedType of itemTypes) {
+                  if (selectedType.includes(':')) {
+                    // Handle subtype (e.g., "consumable:potion")
+                    const [mainType, subType] = selectedType.split(':');
+                    if (item.type === mainType && item.system?.type?.value === subType) {
+                      includeItem = true;
+                      break;
+                    }
+                  } else {
+                    // Handle main type (e.g., "weapon")
+                    if (item.type === selectedType) {
+                      includeItem = true;
+                      break;
+                    }
+                  }
+                }
+                
+                // Skip if item doesn't match any selected types or is already in hotbar
+                if (!includeItem
                     || Object.values(manager.containers.combat[0].items).find(d => d.uuid === item.uuid)
                     || manager.containers.weapon.reduce((acc, curr) => acc.concat(Object.values(curr.items)), []).find(i => i.uuid === item.uuid)
                 ) continue;

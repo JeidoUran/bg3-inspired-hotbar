@@ -49,10 +49,29 @@ export class ItemUpdateManager {
         const container2Types = game.settings.get(BG3CONFIG.MODULE_NAME, 'container2AutoPopulate');
         const container3Types = game.settings.get(BG3CONFIG.MODULE_NAME, 'container3AutoPopulate');
 
-        // Check each container's preferred types
-        if (container1Types.includes(item.type)) return 0;
-        if (container2Types.includes(item.type)) return 1;
-        if (container3Types.includes(item.type)) return 2;
+        // Helper function to check if item matches any of the selected types
+        const itemMatchesTypes = (selectedTypes) => {
+            for (const selectedType of selectedTypes) {
+                if (selectedType.includes(':')) {
+                    // Handle subtype (e.g., "consumable:potion")
+                    const [mainType, subType] = selectedType.split(':');
+                    if (item.type === mainType && item.system?.type?.value === subType) {
+                        return true;
+                    }
+                } else {
+                    // Handle main type (e.g., "weapon")
+                    if (item.type === selectedType) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        };
+
+        // Check each container's preferred types using enhanced matching
+        if (itemMatchesTypes(container1Types)) return 0;
+        if (itemMatchesTypes(container2Types)) return 1;
+        if (itemMatchesTypes(container3Types)) return 2;
 
         // If no preference found, return the first container with space
         for (let i = 0; i < ui.BG3HOTBAR.components.container.length; i++) {

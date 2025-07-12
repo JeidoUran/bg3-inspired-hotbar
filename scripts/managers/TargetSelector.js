@@ -22,10 +22,15 @@ export class TargetSelector {
         // Event handlers (bound to preserve context)
         this.onCanvasClick = this.onCanvasClick.bind(this);
         this.onCanvasRightClick = this.onCanvasRightClick.bind(this);
+        this.onCanvasRightDown = this.onCanvasRightDown.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
         this.onTokenHover = this.onTokenHover.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
         this.onDocumentClick = this.onDocumentClick.bind(this);
+        
+        // Right-click drag tracking
+        this.rightClickStartPos = null;
+        this.isDragging = false;
         
         // Promise resolution
         this.resolvePromise = null;
@@ -56,6 +61,9 @@ export class TargetSelector {
         this.isActive = true;
         this.selectedTargets = [];
         
+        // Set as global active target selector for keybindings
+        window.activeTargetSelector = this;
+        
         // Change cursor to crosshair
         this.originalCursor = document.body.style.cursor;
         document.body.style.cursor = 'crosshair';
@@ -66,6 +74,7 @@ export class TargetSelector {
         // Add event listeners
         canvas.stage.on('click', this.onCanvasClick);
         canvas.stage.on('rightclick', this.onCanvasRightClick);
+        canvas.stage.on('rightdown', this.onCanvasRightDown);
         document.addEventListener('keydown', this.onKeyDown);
         document.addEventListener('mousemove', this.onMouseMove, { passive: true });
         
@@ -73,7 +82,6 @@ export class TargetSelector {
         document.addEventListener('click', this.onDocumentClick, { capture: true });
         
         // Show UI elements
-        this.showTargetCountDisplay();
         this.showMouseTargetDisplay();
         this.showRangeIndicators();
         
@@ -89,6 +97,11 @@ export class TargetSelector {
         
         this.isActive = false;
         
+        // Clear global active target selector
+        if (window.activeTargetSelector === this) {
+            window.activeTargetSelector = null;
+        }
+        
         // Restore cursor
         document.body.style.cursor = this.originalCursor;
         
@@ -98,6 +111,7 @@ export class TargetSelector {
         // Remove event listeners
         canvas.stage.off('click', this.onCanvasClick);
         canvas.stage.off('rightclick', this.onCanvasRightClick);
+        canvas.stage.off('rightdown', this.onCanvasRightDown);
         document.removeEventListener('keydown', this.onKeyDown);
         document.removeEventListener('mousemove', this.onMouseMove);
         document.removeEventListener('click', this.onDocumentClick, { capture: true });
@@ -109,12 +123,15 @@ export class TargetSelector {
         }
         
         // Hide UI elements
-        this.hideTargetCountDisplay();
         this.hideMouseTargetDisplay();
         this.hideRangeIndicators();
         
         // Clear target highlights
         this.clearTargetHighlights();
+        
+        // Reset drag tracking
+        this.rightClickStartPos = null;
+        this.isDragging = false;
     }
 
     /**
@@ -136,11 +153,31 @@ export class TargetSelector {
     }
 
     /**
+     * Handle canvas right mouse down events (start tracking for drag detection)
+     */
+    onCanvasRightDown(event) {
+        // Store the starting position for drag detection
+        this.rightClickStartPos = {
+            x: event.data.global.x,
+            y: event.data.global.y
+        };
+        this.isDragging = false;
+    }
+
+    /**
      * Handle canvas right-click events
      */
     onCanvasRightClick(event) {
         event.preventDefault();
-        this.confirmSelection();
+        
+        // Only confirm selection if this wasn't a drag operation
+        if (!this.isDragging) {
+            this.confirmSelection();
+        }
+        
+        // Reset drag tracking
+        this.rightClickStartPos = null;
+        this.isDragging = false;
     }
 
     /**
@@ -149,15 +186,8 @@ export class TargetSelector {
     onKeyDown(event) {
         if (event.key === 'Escape') {
             this.cancel();
-        } else if (event.key === '[') {
-            // Decrease max targets (minimum 1)
-            this.adjustMaxTargets(-1);
-            event.preventDefault();
-        } else if (event.key === ']') {
-            // Increase max targets
-            this.adjustMaxTargets(1);
-            event.preventDefault();
         }
+        // Note: "[" and "]" keys are now handled by Foundry keybindings in config.js
     }
 
     /**
@@ -182,12 +212,7 @@ export class TargetSelector {
             }
         }
         
-        // Update displays
-        this.updateTargetCountDisplay();
-        
-        // Recreate the target count display with new max
-        this.hideTargetCountDisplay();
-        this.showTargetCountDisplay();
+        // Update displays (static display removed, only updating mouse display)
         
         // Recreate the mouse target display with new max and restore position
         this.hideMouseTargetDisplay();
@@ -216,6 +241,24 @@ export class TargetSelector {
      */
     onMouseMove(event) {
         if (!this.isActive) return;
+        
+        // Check for right-click dragging
+        if (this.rightClickStartPos) {
+            const currentX = event.clientX;
+            const currentY = event.clientY;
+            const startX = this.rightClickStartPos.x;
+            const startY = this.rightClickStartPos.y;
+            
+            // Calculate distance moved
+            const distance = Math.sqrt(
+                Math.pow(currentX - startX, 2) + Math.pow(currentY - startY, 2)
+            );
+            
+            // If moved more than 5 pixels, consider it a drag
+            if (distance > 5) {
+                this.isDragging = true;
+            }
+        }
         
         // Use requestAnimationFrame for smoother updates
         if (this.mouseUpdateFrame) {
@@ -290,15 +333,97 @@ export class TargetSelector {
         
         if (!this.requirements.range || !this.token) return true;
         
-        const distance = canvas.grid.measureDistance(
-            this.token.center,
-            token.center,
-            { gridSpaces: true }
-        );
-        
-
+        // Issue 2 fix: Calculate distance from edge to edge for larger tokens
+        const distance = this.calculateTokenDistance(this.token, token);
         
         return distance <= this.requirements.range;
+    }
+
+    /**
+     * Calculate distance between two tokens accounting for their size
+     * Grid-based solution: measure from closest edges in whole grid squares
+     * @param {Token} sourceToken - The source token (attacker)
+     * @param {Token} targetToken - The target token
+     * @returns {number} - Distance in scene units
+     */
+    calculateTokenDistance(sourceToken, targetToken) {
+        const gridDistance = canvas.grid.distance || 5;
+        const gridSize = canvas.grid.size;
+        
+        // Get token positions and sizes in grid units (convert from pixels to grid squares)
+        const sourceX = Math.floor(sourceToken.document.x / gridSize);
+        const sourceY = Math.floor(sourceToken.document.y / gridSize);
+        const sourceWidth = sourceToken.document.width; // Width in grid squares
+        const sourceHeight = sourceToken.document.height; // Height in grid squares
+        
+        const targetX = Math.floor(targetToken.document.x / gridSize);
+        const targetY = Math.floor(targetToken.document.y / gridSize);
+        const targetWidth = targetToken.document.width; // Width in grid squares
+        const targetHeight = targetToken.document.height; // Height in grid squares
+        
+        // Calculate the grid bounds of each token
+        const sourceBounds = {
+            left: sourceX,
+            right: sourceX + sourceWidth - 1,
+            top: sourceY,  
+            bottom: sourceY + sourceHeight - 1
+        };
+        
+        const targetBounds = {
+            left: targetX,
+            right: targetX + targetWidth - 1,
+            top: targetY,
+            bottom: targetY + targetHeight - 1
+        };
+        
+        // Calculate minimum distance between any squares of the two tokens
+        let minDistance = Infinity;
+        let closestSourceSquare = null;
+        let closestTargetSquare = null;
+        
+        // Check all squares of source token against all squares of target token
+        for (let sx = sourceBounds.left; sx <= sourceBounds.right; sx++) {
+            for (let sy = sourceBounds.top; sy <= sourceBounds.bottom; sy++) {
+                for (let tx = targetBounds.left; tx <= targetBounds.right; tx++) {
+                    for (let ty = targetBounds.top; ty <= targetBounds.bottom; ty++) {
+                        // Distance between these two grid squares (D&D 5e rules)
+                        const dx = Math.abs(sx - tx);
+                        const dy = Math.abs(sy - ty);
+                        const squareDistance = Math.max(dx, dy);
+                        
+                        if (squareDistance < minDistance) {
+                            minDistance = squareDistance;
+                            closestSourceSquare = `${sx},${sy}`;
+                            closestTargetSquare = `${tx},${ty}`;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // If tokens overlap, distance is 0
+        const gridSquareDistance = minDistance === Infinity ? 0 : minDistance;
+        const distance = gridSquareDistance * gridDistance;
+        
+        console.log(`BG3 Target Selector | Grid-based distance calculation:`, {
+            source: sourceToken.name,
+            target: targetToken.name,
+            sourcePos: `${sourceX},${sourceY}`,
+            targetPos: `${targetX},${targetY}`,
+            sourceSize: `${sourceWidth}x${sourceHeight}`,
+            targetSize: `${targetWidth}x${targetHeight}`,
+            sourceBounds: sourceBounds,
+            targetBounds: targetBounds,
+            closestSourceSquare: closestSourceSquare,
+            closestTargetSquare: closestTargetSquare,
+            gridSquareDistance: gridSquareDistance,
+            gridDistance: gridDistance,
+            distance: distance,
+            range: this.requirements.range,
+            inRange: distance <= this.requirements.range
+        });
+        
+        return distance;
     }
 
     /**
@@ -349,7 +474,6 @@ export class TargetSelector {
             this.addTargetHighlight(token);
         }
         
-        this.updateTargetCountDisplay();
         this.updateMouseTargetDisplayCount();
     }
 
@@ -528,19 +652,128 @@ export class TargetSelector {
         
         if (!this.requirements.range || !this.token) return;
         
+        // Get the range indicator shape setting
+        const rangeShape = game.settings.get('bg3-inspired-hotbar', 'rangeIndicatorShape');
+        
         // Range is in scene units, convert to pixels
         const gridDistance = canvas.scene.grid.distance || 5;
-        const radiusInPixels = (this.requirements.range / gridDistance) * canvas.grid.size;
+        const rangeInPixels = (this.requirements.range / gridDistance) * canvas.grid.size;
         
-        // Create range circle
-        const rangeCircle = new PIXI.Graphics();
-        rangeCircle.lineStyle(2, 0x00ff00, 0.5);
-        rangeCircle.drawCircle(0, 0, radiusInPixels);
-        rangeCircle.x = this.token.center.x;
-        rangeCircle.y = this.token.center.y;
+        // Calculate the effective radius accounting for token size
+        const tokenWidth = this.token.document.width || 1;
+        const tokenHeight = this.token.document.height || 1;
+        const tokenSizeInPixels = Math.max(tokenWidth, tokenHeight) * canvas.grid.size;
         
-        canvas.interface.addChild(rangeCircle);
-        this.rangeIndicators.push(rangeCircle);
+        // For large tokens, we need to add the token's radius to the range
+        // This ensures the range circle starts from the edge of the token
+        const tokenRadius = tokenSizeInPixels / 2;
+        const effectiveRadius = rangeInPixels + tokenRadius;
+        
+        // Create range indicator based on shape setting
+        const rangeIndicator = new PIXI.Graphics();
+        
+        // Get settings
+        const animationType = game.settings.get('bg3-inspired-hotbar', 'rangeIndicatorAnimation');
+        const lineWidth = game.settings.get('bg3-inspired-hotbar', 'rangeIndicatorLineWidth');
+        
+        // Apply line style with user-configured width
+        rangeIndicator.lineStyle(lineWidth, 0x00ff00, 0.6);
+        
+        // Set initial alpha based on animation setting
+        rangeIndicator.alpha = animationType === 'pulse' ? 0.5 : 0.6;
+        
+        if (rangeShape === 'square') {
+            // Calculate square dimensions based on grid
+            const rangeInGrids = this.requirements.range / gridDistance;
+            const tokenWidthInGrids = tokenWidth;
+            const tokenHeightInGrids = tokenHeight;
+            
+            // Square extends from token edges
+            const squareSize = (rangeInGrids * 2 + Math.max(tokenWidthInGrids, tokenHeightInGrids)) * canvas.grid.size;
+            const halfSize = squareSize / 2;
+            
+            // Draw square centered on token
+            rangeIndicator.drawRect(-halfSize, -halfSize, squareSize, squareSize);
+            
+            console.log(`BG3 Target Selector | Range square:`, {
+                tokenName: this.token.name,
+                tokenSize: `${tokenWidth}x${tokenHeight}`,
+                rangeInGrids: rangeInGrids,
+                squareSize: squareSize,
+                actualRange: this.requirements.range
+            });
+        } else {
+            // Default circle shape
+            rangeIndicator.drawCircle(0, 0, effectiveRadius);
+            
+            console.log(`BG3 Target Selector | Range circle:`, {
+                tokenName: this.token.name,
+                tokenSize: `${tokenWidth}x${tokenHeight}`,
+                tokenRadius: tokenRadius,
+                rangeInPixels: rangeInPixels,
+                effectiveRadius: effectiveRadius,
+                actualRange: this.requirements.range
+            });
+        }
+        
+        rangeIndicator.x = this.token.center.x;
+        rangeIndicator.y = this.token.center.y;
+        
+        // Set higher Z-index to appear above templates
+        rangeIndicator.zIndex = 1000;
+        
+        // Add animation based on setting
+        if (animationType === 'pulse') {
+            this.addPulseAnimation(rangeIndicator);
+        }
+        
+        // Add to highest available layer for visibility
+        if (canvas.foreground) {
+            canvas.foreground.addChild(rangeIndicator);
+        } else if (canvas.interface) {
+            canvas.interface.addChild(rangeIndicator);
+        } else {
+            // Fallback to tokens layer
+            canvas.tokens.addChild(rangeIndicator);
+        }
+        this.rangeIndicators.push(rangeIndicator);
+    }
+
+    /**
+     * Add pulsing animation to range indicator
+     */
+    addPulseAnimation(rangeIndicator) {
+        // Create animation variables
+        let animationTime = 0;
+        const animationSpeed = 0.03; // Speed of animation (slower for smoother effect)
+        const minAlpha = 0.4;
+        const maxAlpha = 0.7;
+        const minScale = 0.98;
+        const maxScale = 1.02;
+        
+        // Animation function
+        const animate = () => {
+            if (!rangeIndicator.parent) {
+                // Stop animation if indicator was removed
+                return;
+            }
+            
+            animationTime += animationSpeed;
+            
+            // Calculate pulsing values using sine wave
+            const pulse = Math.sin(animationTime) * 0.5 + 0.5; // 0 to 1
+            
+            // Apply pulsing to alpha and scale
+            rangeIndicator.alpha = minAlpha + (maxAlpha - minAlpha) * pulse;
+            const scale = minScale + (maxScale - minScale) * pulse;
+            rangeIndicator.scale.set(scale, scale);
+            
+            // Continue animation
+            requestAnimationFrame(animate);
+        };
+        
+        // Start animation
+        requestAnimationFrame(animate);
     }
 
     /**

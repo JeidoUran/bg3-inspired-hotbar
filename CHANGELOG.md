@@ -1,4 +1,36 @@
-## [3.2.3] - 2025-07-04
+## [3.2.6] - 2025-07-09
+### Fixed
+- **Target Selector (Beta)**
+  - **Target Selector Range Calculation** - Fixed range calculation to use proper edge-to-edge distance measurement instead of center-to-center.
+  - **Target Selector Right-Click** - Improved right-click behavior to only confirm target selection if mouse hasn't been dragged (allows camera panning without accidental target confirmation).
+
+### Features
+- **Target Selector (Beta)**
+    - **Target Selector Keybindings** - Added `[` and `]` keybinds for decreasing/increasing target count during targeting. Configurable in Foundry's keybind settings under "BG3 Inspired Hotbar" section.
+    - **Range Indicator Customization** - Added three new settings for range indicator appearance:
+      - **Range Indicator Shape**: Choose between circle or square indicators (default: square)
+      - **Range Indicator Animation**: Choose between pulsing or static indicators (default: pulse)
+      - **Range Indicator Line Width**: Choose line thickness from 1-4px (default: 2px)
+    - **Settings Organization** - Reorganized all Target Selector settings into logical order: Enable → Range Checking → Range Indicators → Shape → Animation → Line Width → Auto-Target Self.
+
+## [3.2.5] - 2025-07-08
+### Fixed
+- **Passive Features Classification** - Fixed issue where active abilities (actions, bonus actions, reactions) were incorrectly appearing in the passive features bar. Updated the classification logic to only include feats that are explicitly marked as passive or have no activation capabilities. (Related Issue: [#220])
+- **Auto-Sort Spell Level Ordering** - Fixed critical bugs in the auto-sort functionality where spells were not sorting correctly by level. The fallback logic was incorrectly defaulting all spells to level 99 instead of their actual spell levels. Now spells properly sort from cantrips (level 0) through 9th level spells with alphabetical sub-sorting within each level. (Related Issue: [#211])
+- **Passive Features Bar Hiding** - Added ability to completely empty the passive features bar by unchecking all features in the configuration dialog. Previously, when no features were selected, all available passive features would be displayed. Now an empty selection results in an empty (but still interactive) container. (Related Issue: [#205])
+- **Spell Tooltips Compatibility** - Fixed issue where spell tooltips were not working for users on D&D 5e system v3.x. The macro tooltip implementation was using a hook-based approach that failed with older system versions. Reverted to the v3.1.3 approach using direct prototype extension for better cross-version compatibility. (Related Issue: [#209])
+- **Portrait Toggle Logic** - Fixed the "Hide Portrait Image" setting working backwards. (Related Issue: [#204])
+  > **⚠️ IMPORTANT:** If your portraits are suddenly hidden after this update, check your **"Hide Portrait Image"** setting in the module configuration. Due to the previous backwards logic, this setting was enabled by default and many users may have it toggled on. **Disable this setting** to show portraits again. At the top, you can change this setting for all users simultaneously if you are the gamemaster.
+- **Auto-Populate Container Selection** - Fixed issue where newly added items (e.g., potions, scrolls) were always defaulting to container 1 instead of respecting the configured container settings. The `_findAppropriateContainer` method in `ItemUpdateManager.js` now properly handles consumable subtypes when determining which container should receive new items. For example, if potions are configured for container 3, new potions will now correctly auto-populate there instead of defaulting to container 1.
+
+### Features
+- **Extended Auto-Populate Options** - Replaced the blanket "Consumables" option with individual consumable subtype chips: Potions, Scrolls, Ammunition, Food & Drink, Wands, Rods, Poisons, and Trinkets. The feature includes automatic migration for existing users - any containers previously set to "Consumables" will be updated to show "Potions" and "Scrolls" by default. (Related Issue: [#21])
+
+## [3.2.4] - 2025-07-07
+### Fixed
+- Version 3.2.3 was not pointing to 3.2.3 manifest, so had to release a new version to keep installs clean.
+
+## [3.2.3] - 2025-07-07
 ### Fixed
 - **Show Secrets Module Compatibility** - Fixed compatibility issue with Show Secrets module by properly passing enrichment options through libWrapper and correcting module name registration. Thanks to @kaelad02 (Show Secrets module developer) for identifying the issue and providing the fix. (Related Issue: [#219])
 

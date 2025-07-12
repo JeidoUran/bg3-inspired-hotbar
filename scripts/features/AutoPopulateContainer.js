@@ -139,8 +139,16 @@ export class AutoPopulateDialog extends Dialog {
             { value: "weapon", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Weapons") },
             { value: "feat", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Features") },
             { value: "spell", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Spells") },
-            { value: "consumable", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Consumables") },
             { value: "equipment", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Equipment") },
+            // Replace single "consumable" with individual subtypes
+            { value: "consumable:potion", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Potions") },
+            { value: "consumable:scroll", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Scrolls") },
+            { value: "consumable:ammo", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Ammunition") },
+            { value: "consumable:food", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Food") },
+            { value: "consumable:wand", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Wands") },
+            { value: "consumable:rod", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Rods") },
+            { value: "consumable:poison", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Poisons") },
+            { value: "consumable:trinket", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Trinkets") },
             { value: "tool", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Tools") },
             { value: "loot", label: game.i18n.localize("BG3.Settings.ContainerAutoPopulate.Loot") }
         ];
@@ -165,8 +173,28 @@ export class AutoPopulateDialog extends Dialog {
           
           // Process all items from the actor
           for (const item of this.actor.items) {
-            // Skip if item type is not in the selected types
-            if ((selectedTypes.length > 0 && !selectedTypes.includes(item.type))
+            // Enhanced filtering logic to handle consumable subtypes
+            let includeItem = false;
+            
+            for (const selectedType of selectedTypes) {
+              if (selectedType.includes(':')) {
+                // Handle subtype (e.g., "consumable:potion")
+                const [mainType, subType] = selectedType.split(':');
+                if (item.type === mainType && item.system?.type?.value === subType) {
+                  includeItem = true;
+                  break;
+                }
+              } else {
+                // Handle main type (e.g., "weapon")
+                if (item.type === selectedType) {
+                  includeItem = true;
+                  break;
+                }
+              }
+            }
+            
+            // Skip if item doesn't match any selected types or is already in hotbar
+            if (!includeItem
               || Object.values(ui.BG3HOTBAR.components.weapon.components.combat[0].data.items).find(i => i.uuid === item.uuid)
               || ui.BG3HOTBAR.components.weapon?.components?.weapon?.reduce((acc, curr) => acc.concat(Object.values(curr.data.items)), []).find(i => i.uuid === item.uuid)
             ) continue;
@@ -191,15 +219,6 @@ export class AutoPopulateDialog extends Dialog {
             if (hasActivities || game.settings.get(BG3CONFIG.MODULE_NAME, 'noActivityAutoPopulate')) {
               itemsWithActivities.push({
                 uuid: item.uuid,
-                // name: item.name,
-                // icon: item.img,
-                // type: item.type,
-                // activation: item.system?.activation?.type || "action",
-                // sortData: {
-                //   spellLevel: item.type === "spell" ? item.system?.level ?? 99 : 99,
-                //   featureType: item.type === "feat" ? item.system?.type?.value ?? "" : "",
-                //   name: item.name
-                // }
               });
             }
           }

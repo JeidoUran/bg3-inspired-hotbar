@@ -146,6 +146,14 @@
             "Features": "Features",
             "Spells": "Spells",
             "Consumables": "Consumables",
+            "Potions": "Potions",
+            "Scrolls": "Scrolls",
+            "Ammunition": "Ammunition",
+            "Food": "Food & Drink",
+            "Wands": "Wands",
+            "Rods": "Rods",
+            "Poisons": "Poisons",
+            "Trinkets": "Trinkets",
             "Equipment": "Equipment",
             "Tools": "Tools",
             "Loot": "Loot",
@@ -210,6 +218,32 @@
         "ShowRangeIndicators": {
             "Name": "Show Range Indicators",
             "Hint": "Display visual range indicators when using the target selector. Shows circles around your token indicating the maximum range of spells and abilities."
+        },
+        "RangeIndicatorShape": {
+            "Name": "Range Indicator Shape",
+            "Hint": "Choose the shape of range indicators. Circle shows traditional round range, while Square shows grid-based D&D 5e range that better matches token movement.",
+            "Choices": {
+                "Circle": "Circle",
+                "Square": "Square"
+            }
+        },
+        "RangeIndicatorAnimation": {
+            "Name": "Range Indicator Animation",
+            "Hint": "Choose whether range indicators should pulse to draw attention or remain static. Pulse makes them more noticeable, while static provides a cleaner appearance.",
+            "Choices": {
+                "Pulse": "Pulse",
+                "Static": "Static"
+            }
+        },
+        "RangeIndicatorLineWidth": {
+            "Name": "Range Indicator Line Width",
+            "Hint": "Choose the thickness of range indicator lines. Thicker lines are more visible but may be more intrusive.",
+            "Choices": {
+                "Thin": "Thin (1px)",
+                "Normal": "Normal (2px)",
+                "Thick": "Thick (3px)",
+                "ExtraThick": "Extra Thick (4px)"
+            }
         },
         "AutoTargetSelf": {
             "Name": "Auto-Target Self",
@@ -297,6 +331,11 @@
         "ShowExtendedFilter": {
             "Name": "Show Extended Filters",
             "Hint": "If checked, show items with limited uses as Filter (no highlight/grey out)."
+        },
+        "Keybindings": {
+            "toggleUI": "Toggle BG3 Hotbar",
+            "decreaseTargets": "Decrease Target Count",
+            "increaseTargets": "Increase Target Count"
         },
         "Menu": {
             "Global": {

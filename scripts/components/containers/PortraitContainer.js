@@ -183,7 +183,7 @@ export class PortraitContainer extends BG3Component {
         this.element.setAttribute("data-shape", game.settings.get(BG3CONFIG.MODULE_NAME, 'shapePortraitPreferences'));
         this.element.setAttribute("data-border", game.settings.get(BG3CONFIG.MODULE_NAME, 'borderPortraitPreferences'));
         this.setImgBGColor();
-        this.element.classList.toggle('portrait-hidden', !game.settings.get(BG3CONFIG.MODULE_NAME, 'hidePortraitImage'));
+        this.element.classList.toggle('portrait-hidden', game.settings.get(BG3CONFIG.MODULE_NAME, 'hidePortraitImage'));
         this.setPortraitBendMode();
         this.togglePortraitOverlay();
         this.toggleExtraInfos();

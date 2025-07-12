@@ -29,8 +29,22 @@ export function needsTargeting(item) {
     // Check activities for targeting requirements (Foundry v12+)
     if (item.system?.activities) {
         for (const activity of item.system.activities.values()) {
-            if (activity.target?.type && activity.target.type !== "self" && activity.target.type !== "none") {
+            // Check for range that needs targeting
+            if (activity.range?.value && parseInt(activity.range.value) > 0 && activity.range.units !== "self") {
                 return true;
+            }
+            
+            // Check for target information
+            if (activity.target) {
+                const targetType = activity.target.type || activity.target.affects?.type;
+                // Skip self and none targeting
+                if (targetType === "self" || targetType === "none") {
+                    continue;
+                }
+                // If there's target information (type or count), activate targeting
+                if (targetType || activity.target.affects?.count !== undefined) {
+                    return true;
+                }
             }
         }
     }
@@ -115,7 +129,7 @@ export function getTargetRequirements(item) {
     // Check activities for more specific targeting (Foundry v12+)
     if (item.system?.activities) {
         for (const activity of item.system.activities.values()) {
-            if (activity.target?.type && activity.target.type !== "self") {
+            if (activity.target) {
                 targetConfig = activity.target;
                 break; // Use first valid activity target
             }
@@ -123,14 +137,22 @@ export function getTargetRequirements(item) {
     }
     
     if (targetConfig) {
-        // Target count
+        // Target type (check both locations)
+        requirements.type = targetConfig.type || targetConfig.affects?.type;
+        
+        // Target count - check both old and new formats
+        let targetCount = null;
         if (targetConfig.value) {
-            requirements.maxTargets = parseInt(targetConfig.value) || 1;
-            requirements.minTargets = Math.min(requirements.maxTargets, 1);
+            targetCount = parseInt(targetConfig.value) || null;
+        } else if (targetConfig.affects?.count) {
+            targetCount = parseInt(targetConfig.affects.count) || null;
         }
         
-        // Target type
-        requirements.type = targetConfig.type;
+        // Set target count if specified
+        if (targetCount && targetCount > 0) {
+            requirements.maxTargets = targetCount;
+            requirements.minTargets = Math.min(targetCount, 1);
+        }
         
         // Template information
         if (targetConfig.template) {
@@ -142,6 +164,12 @@ export function getTargetRequirements(item) {
         }
     }
     
+    // Issue 2 fix: Always ensure minimum 1 target unless it's a template spell
+    if (!requirements.template) {
+        requirements.minTargets = Math.max(requirements.minTargets, 1);
+        requirements.maxTargets = Math.max(requirements.maxTargets, 1);
+    }
+    
     // Range calculation
     requirements.range = calculateRange(item);
     
@@ -150,12 +178,6 @@ export function getTargetRequirements(item) {
     switch (item.type) {
         case "spell":
             enhancedRequirements = enhanceSpellTargeting(item, requirements);
-            break;
-        case "weapon":
-            enhancedRequirements = enhanceWeaponTargeting(item, requirements);
-            break;
-        case "feat":
-            enhancedRequirements = enhanceFeatureTargeting(item, requirements);
             break;
     }
     
@@ -301,57 +323,6 @@ function enhanceSpellTargeting(spell, requirements) {
 }
 
 /**
- * Enhance targeting requirements for weapons
- * @param {Item} weapon - The weapon item
- * @param {Object} requirements - Base requirements
- * @returns {Object} - Enhanced requirements
- */
-function enhanceWeaponTargeting(weapon, requirements) {
-    const enhanced = { ...requirements };
-    
-    // Melee weapons have short range
-    if (weapon.system?.actionType === "mwak") {
-        enhanced.range = weapon.system?.properties?.has("reach") ? 10 : 5;
-        enhanced.type = "creature";
-    }
-    
-    // Ranged weapons use their range
-    if (weapon.system?.actionType === "rwak") {
-        const range = weapon.system?.range;
-        if (range?.long) {
-            enhanced.range = range.long;
-        } else if (range?.value) {
-            enhanced.range = range.value;
-        }
-        enhanced.type = "creature";
-    }
-    
-    return enhanced;
-}
-
-/**
- * Enhance targeting requirements for features/feats
- * @param {Item} feature - The feature item
- * @param {Object} requirements - Base requirements
- * @returns {Object} - Enhanced requirements
- */
-function enhanceFeatureTargeting(feature, requirements) {
-    const enhanced = { ...requirements };
-    
-    // Most features that need targeting are similar to spells
-    if (feature.system?.actionType === "save") {
-        enhanced.type = "creature";
-    }
-    
-    if (feature.system?.actionType === "attack") {
-        enhanced.type = "creature";
-        enhanced.range = enhanced.range || 5; // Default melee range
-    }
-    
-    return enhanced;
-}
-
-/**
  * Validate if selected targets meet the item's requirements
  * @param {Item} item - The item being used
  * @param {Token[]} targets - Selected targets
@@ -375,11 +346,7 @@ export function validateTargets(item, targets) {
         const sourceToken = ui.BG3HOTBAR.manager.token;
         if (sourceToken) {
             for (const target of targets) {
-                const distance = canvas.grid.measureDistance(
-                    sourceToken.center,
-                    target.center,
-                    { gridSpaces: true }
-                );
+                const distance = calculateGridBasedDistance(sourceToken, target);
                 
                 if (distance > requirements.range) {
                     return {
@@ -432,4 +399,69 @@ function isValidTargetType(target, requiredType, sourceToken) {
         default:
             return true; // Unknown type, allow all
     }
+}
+
+/**
+ * Calculate distance between two tokens accounting for their size
+ * Grid-based solution: measure from closest edges in whole grid squares
+ * @param {Token} sourceToken - The source token (attacker)
+ * @param {Token} targetToken - The target token
+ * @returns {number} - Distance in scene units
+ */
+function calculateGridBasedDistance(sourceToken, targetToken) {
+    const gridDistance = canvas.grid.distance || 5;
+    const gridSize = canvas.grid.size;
+    
+    // Get token positions and sizes in grid units (convert from pixels to grid squares)
+    const sourceX = Math.floor(sourceToken.document.x / gridSize);
+    const sourceY = Math.floor(sourceToken.document.y / gridSize);
+    const sourceWidth = sourceToken.document.width; // Width in grid squares
+    const sourceHeight = sourceToken.document.height; // Height in grid squares
+    
+    const targetX = Math.floor(targetToken.document.x / gridSize);
+    const targetY = Math.floor(targetToken.document.y / gridSize);
+    const targetWidth = targetToken.document.width; // Width in grid squares
+    const targetHeight = targetToken.document.height; // Height in grid squares
+    
+    // Calculate the grid bounds of each token
+    const sourceBounds = {
+        left: sourceX,
+        right: sourceX + sourceWidth - 1,
+        top: sourceY,  
+        bottom: sourceY + sourceHeight - 1
+    };
+    
+    const targetBounds = {
+        left: targetX,
+        right: targetX + targetWidth - 1,
+        top: targetY,
+        bottom: targetY + targetHeight - 1
+    };
+    
+    // Calculate minimum distance between any squares of the two tokens
+    let minDistance = Infinity;
+    
+    // Check all squares of source token against all squares of target token
+    for (let sx = sourceBounds.left; sx <= sourceBounds.right; sx++) {
+        for (let sy = sourceBounds.top; sy <= sourceBounds.bottom; sy++) {
+            for (let tx = targetBounds.left; tx <= targetBounds.right; tx++) {
+                for (let ty = targetBounds.top; ty <= targetBounds.bottom; ty++) {
+                    // Distance between these two grid squares (D&D 5e rules)
+                    const dx = Math.abs(sx - tx);
+                    const dy = Math.abs(sy - ty);
+                    const squareDistance = Math.max(dx, dy);
+                    
+                    if (squareDistance < minDistance) {
+                        minDistance = squareDistance;
+                    }
+                }
+            }
+        }
+    }
+    
+    // If tokens overlap, distance is 0
+    const gridSquareDistance = minDistance === Infinity ? 0 : minDistance;
+    const distance = gridSquareDistance * gridDistance;
+    
+    return distance;
 } 
