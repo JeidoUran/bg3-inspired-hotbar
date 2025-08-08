@@ -1,3 +1,40 @@
+## [3.4.1] - 2025-08-08
+### Fixed
+- **Active Effects** - Fixed active effects not re-enabling or able to be deleted if disabled
+
+## [3.4.0] - 2025-08-07
+### Added
+- **Container Popovers** - Add bags, pouches, and other containers options to your hotbar to open them in a popover window showing their contents. Items in the container can be moved around the popover, but other features and items should not be placed here if they don't belong to the container itself
+
+### Reworked
+- **Target Selector** - Refactored, changed UI/UX, added keybindings for accept and roll (default Enter), added setting for skipping if target already selected (Issue: [#226 & #234])
+
+### Fixed
+- **Hotbar Auto-Update** - Items now automatically appear in hotbars when given to any character, even if their token and therefor hotbar isn't currently selected. Giving items to un/linked NPCs for example
+- **Consumable Items** - Potions, scrolls, and other consumables now properly auto-populate to hotbars with autopopulate feature
+- **Actor Duplication** - Duplicated actors now correctly reference their own items instead of the original actor's items when the hotbar is not already rendered (Issue: [#228])
+- **Drag Bar Movement** - Fixed to move at the right speed with set scale
+- **Common Actions Bug** - Common Actions would sometimes duplicate when the container was empty but the features were on the sheet and then the token was placed on the canvas again
+
+## [3.3.1] - 2025-07-31
+### Fixed
+ - **Passive Features Auto-Populate** - NPCs should autopopulate their passive features when toekn is created. This function was lost in last update(s).
+ - **Annoying Console Log** - Oops. Forgot to remove it.
+
+## [3.3.0] - 2025-07-30
+### Important
+- **Foundry VTT v13 & D&D 5e v5.x Support** - This release officially supports Foundry VTT v13 and D&D 5e v5.0.4+. Updates for Foundry VTT v12 will cease with this release. Users on v12 can continue using v3.2.6 as the final v12-compatible release.
+
+### Added
+- **NPC Container Defaults Setting** - Added new setting "NPCs Use Container Defaults" that allows NPCs (linked or unlinked) to ignore weapon sets and use container auto-populate defaults instead. This provides more flexibility for NPC hotbar organization.
+
+### Fixed
+- **Passive Features Detection** - Fixed issue where active abilities (actions, bonus actions, reactions) were incorrectly appearing in the passive features bar. Now only truly passive features are displayed.
+- **Passive Container Display** - Fixed issue where all available passive features were displayed when none were selected. Now the passive container shows no features when none are selected, while maintaining the invisible tab functionality for right-click configuration access.
+- **Target Selector** - Complete rewrite of target selector logic for D&D 5e v5.x compatibility. Target selector now properly integrates with Foundry's activity system, allowing normal activity selection followed by intelligent target selection only when needed. Updated to use v13's new targeting API (`canvas.tokens.setTargets`) and scene controls API (`ui.controls.render`).
+- **Auto-Population** - Fixed auto-population features to correctly detect items with activities using D&D5e v5.x Map-based activities structure instead of the old array-based structure.
+
+
 ## [3.2.6] - 2025-07-09
 ### Fixed
 - **Target Selector (Beta)**

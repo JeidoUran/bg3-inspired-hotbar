@@ -2,3 +2,5 @@
 .cursorignore
 TODO.md
 packs
+REFACTORING_AUDIT.md
+SYSTEM_SEPARATION_ANALYSIS.md

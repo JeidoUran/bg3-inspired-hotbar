@@ -28,7 +28,12 @@ export function needsTargeting(item) {
     
     // Check activities for targeting requirements (Foundry v12+)
     if (item.system?.activities) {
-        for (const activity of item.system.activities.values()) {
+        const activities = Array.from(item.system.activities.values());
+        
+        // If there's only one activity, check if it needs targeting
+        if (activities.length === 1) {
+            const activity = activities[0];
+            
             // Check for range that needs targeting
             if (activity.range?.value && parseInt(activity.range.value) > 0 && activity.range.units !== "self") {
                 return true;
@@ -39,7 +44,7 @@ export function needsTargeting(item) {
                 const targetType = activity.target.type || activity.target.affects?.type;
                 // Skip self and none targeting
                 if (targetType === "self" || targetType === "none") {
-                    continue;
+                    return false;
                 }
                 // If there's target information (type or count), activate targeting
                 if (targetType || activity.target.affects?.count !== undefined) {
@@ -47,6 +52,10 @@ export function needsTargeting(item) {
                 }
             }
         }
+        
+        // For multiple activities, don't activate target selector at item level
+        // Let the activity selection dialog appear first
+        return false;
     }
     
     // Check for attack rolls (weapons, attack spells)
@@ -227,12 +236,7 @@ function calculateRange(item) {
         rangeInSceneUnits = convertRangeUnits(rangeValue, range.units, gridUnits);
     }
     
-    // Debug logging
-    console.log(`BG3 Target Selector | Range calculation for ${item.name}:`, {
-        originalRange: `${rangeValue} ${range.units}`,
-        sceneUnits: gridUnits,
-        rangeInSceneUnits: rangeInSceneUnits
-    });
+
     
     return rangeInSceneUnits;
 }
@@ -399,6 +403,168 @@ function isValidTargetType(target, requiredType, sourceToken) {
         default:
             return true; // Unknown type, allow all
     }
+}
+
+/**
+ * Check if a specific activity requires targeting
+ * @param {Activity} activity - The activity to check
+ * @returns {boolean} - True if the activity needs targeting
+ */
+export function needsActivityTargeting(activity) {
+    if (!activity) return false;
+    
+    // Skip if target selector is disabled
+    if (!game.settings.get('bg3-inspired-hotbar', 'enableTargetSelector')) {
+        return false;
+    }
+    
+    // Skip if activity uses a template (AoE, emanation, etc.)
+    if (hasTemplate(activity)) {
+        return false;
+    }
+    
+    // Check for range that needs targeting
+    if (activity.range?.value && parseInt(activity.range.value) > 0 && activity.range.units !== "self") {
+        return true;
+    }
+    
+    // Check for target information
+    if (activity.target) {
+        const targetType = activity.target.type || activity.target.affects?.type;
+        // Skip self and none targeting
+        if (targetType === "self" || targetType === "none") {
+            return false;
+        }
+        // If there's target information (type or count), activate targeting
+        if (targetType || activity.target.affects?.count !== undefined) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+/**
+ * Check if an activity has a template (AoE, emanation, etc.)
+ * @param {Activity} activity - The activity to check
+ * @returns {boolean} - True if the activity uses a template
+ */
+function hasTemplate(activity) {
+    if (!activity?.target?.template) return false;
+    
+    const template = activity.target.template;
+    
+    // Check if template has a type (cone, sphere, cube, etc.)
+    if (template.type && template.type !== '') {
+        return true;
+    }
+    
+    // Check if template has size/dimensions
+    if (template.size && (template.size !== '' && template.size !== null && template.size !== 0)) {
+        return true;
+    }
+    
+    // Check for width/height (for rectangles/lines)
+    if ((template.width && template.width !== '' && template.width !== null && template.width !== 0) ||
+        (template.height && template.height !== '' && template.height !== null && template.height !== 0)) {
+        return true;
+    }
+    
+    return false;
+}
+
+/**
+ * Extract targeting requirements from a specific activity
+ * @param {Activity} activity - The activity to analyze
+ * @returns {Object} - Targeting requirements object
+ */
+export function getActivityTargetRequirements(activity, baseItem = null) {
+    if (!activity) return {};
+    
+    const requirements = {
+        minTargets: 1,
+        maxTargets: 1,
+        range: null,
+        type: null,
+        template: null
+    };
+    
+    // Get target configuration from activity
+    const targetConfig = activity.target;
+    
+    if (targetConfig) {
+        // Target type
+        requirements.type = targetConfig.type || targetConfig.affects?.type;
+        
+        // Target count
+        let targetCount = null;
+        if (targetConfig.affects?.count) {
+            targetCount = parseInt(targetConfig.affects.count) || null;
+        }
+        
+        // Set target count if specified
+        if (targetCount && targetCount > 0) {
+            requirements.maxTargets = targetCount;
+            requirements.minTargets = Math.min(targetCount, 1);
+        }
+        
+        // Template information
+        if (targetConfig.template) {
+            requirements.template = {
+                type: targetConfig.template.type,
+                size: targetConfig.template.size,
+                units: targetConfig.template.units
+            };
+        }
+    }
+    
+    // Range calculation - try activity range first, then fall back to item range
+    let rangeValue = null;
+    let rangeUnits = null;
+    
+    
+    
+    // Try activity range first - check both 'value' and 'reach' properties
+    if (activity.range?.value || activity.range?.reach) {
+        // Handle both string and number values, prefer 'value' over 'reach'
+        const activityRangeValue = activity.range.value || activity.range.reach;
+        const parsedValue = typeof activityRangeValue === 'string' ? 
+            parseInt(activityRangeValue) : activityRangeValue;
+        
+        if (parsedValue && parsedValue > 0) {
+            rangeValue = parsedValue;
+            rangeUnits = activity.range.units;
+            
+        }
+    }
+    
+    // Fall back to item range if activity range is null/empty - check both 'value' and 'reach'
+    const fallbackRange = baseItem?.system?.range || activity.item?.system?.range;
+    if (!rangeValue && fallbackRange && (fallbackRange.value || fallbackRange.reach)) {
+        // Handle both string and number values, prefer 'value' over 'reach'
+        const itemRangeValue = fallbackRange.value || fallbackRange.reach;
+        const parsedValue = typeof itemRangeValue === 'string' ? 
+            parseInt(itemRangeValue) : itemRangeValue;
+            
+        if (parsedValue && parsedValue > 0) {
+            rangeValue = parsedValue;
+            rangeUnits = fallbackRange.units;
+            
+        }
+    }
+    
+    // Set range if we found a valid value
+    if (rangeValue && rangeValue > 0 && rangeUnits !== "self") {
+        // Convert to scene units if needed
+        const gridUnits = canvas.scene.grid.units || "ft";
+        let rangeInSceneUnits = rangeValue;
+        if (rangeUnits !== gridUnits) {
+            rangeInSceneUnits = convertRangeUnits(rangeValue, rangeUnits, gridUnits);
+        }
+        requirements.range = rangeInSceneUnits;
+    }
+    
+    return requirements;
 }
 
 /**

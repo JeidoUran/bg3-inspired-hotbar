@@ -39,12 +39,16 @@ export class BG3Hotbar extends Application {
         Hooks.on("deleteToken", this._onDeleteToken.bind(this));
         Hooks.on("updateToken", this._onUpdateToken.bind(this));
         Hooks.on("updateActor", this._onUpdateActor.bind(this));
+        Hooks.on("createActor", this._onCreateActor.bind(this));
         // Hooks.on("deleteScene", this._onDeleteScene.bind(this));
         Hooks.on("updateCombat", this._onUpdateCombat.bind(this));
         Hooks.on("deleteCombat", this._onDeleteCombat.bind(this));
         Hooks.on("createActiveEffect", this._onUpdateActive.bind(this));
         Hooks.on("deleteActiveEffect", this._onUpdateActive.bind(this));
         Hooks.on("updateActiveEffect", this._onUpdateActive.bind(this));
+        
+        // Hook into activity usage for target selector
+        Hooks.on("renderApplicationV2", this._onRenderActivityDialog.bind(this));
 
         Hooks.on("pickerDone", this._onPickerDone.bind(this));
 
@@ -164,6 +168,32 @@ export class BG3Hotbar extends Application {
         }
     }
 
+    async _onCreateActor(actor, options, userId) {
+        if (!this.manager || game.user.id !== userId) return;
+        
+        // Check if this actor has hotbar data (indicating it might be duplicated)
+        const containersData = actor.getFlag(BG3CONFIG.MODULE_NAME, BG3CONFIG.CONTAINERS_NAME);
+        if (!containersData) return;
+        
+        // Add a small delay to ensure the actor and its items are fully created
+        setTimeout(async () => {
+            try {
+                console.log(`BG3 Hotbar | Checking duplicated actor "${actor.name}" for UUID fixes`);
+                
+                // Fix UUIDs in the duplicated actor's hotbar data
+                const fixedContainers = await this._fixDuplicatedActorUUIDs(actor, containersData);
+                
+                if (fixedContainers) {
+                    // Update the actor's flag with the fixed UUIDs
+                    await actor.setFlag(BG3CONFIG.MODULE_NAME, BG3CONFIG.CONTAINERS_NAME, fixedContainers);
+                    console.log(`BG3 Hotbar | Fixed UUIDs for duplicated actor "${actor.name}"`);
+                }
+            } catch (error) {
+                console.error(`BG3 Hotbar | Error fixing UUIDs for duplicated actor "${actor.name}":`, error);
+            }
+        }, 100);
+    }
+
     async _onUpdateActor(actor, changes, options, userId) {
         if(!this.manager) return;
         
@@ -233,6 +263,120 @@ export class BG3Hotbar extends Application {
     _onPickerDone(element, done) {
         const $input =  $(element).parent().find('input[is="colorpicker-input2"]');
         if($input) $input.trigger('change');
+    }
+
+    /**
+     * Hook into activity dialog rendering to handle target selection
+     * @param {Application} app - The rendered application
+     * @param {HTMLElement} html - The rendered HTML
+     */
+    async _onRenderActivityDialog(app, html) {
+
+
+        // Only handle if target selector is enabled
+        const targetSelectorEnabled = game.settings.get('bg3-inspired-hotbar', 'enableTargetSelector') ?? true;
+
+        if (!targetSelectorEnabled) return;
+
+        // Check if this is an activity choice dialog
+        const isDnd5e2 = app.options?.classes?.includes?.('dnd5e2');
+        const hasActivityElements = html.querySelectorAll('[data-activity-id]').length > 0;
+
+        if (!isDnd5e2 || !hasActivityElements) return;
+
+        
+
+        // Import targeting utilities
+                    const { needsActivityTargeting, getActivityTargetRequirements } = await import('./utils/targetingRules.js');
+        const { TargetSelector } = await import('./managers/TargetSelector.js');
+
+        // Hook into button clicks instead of submit method
+        setTimeout(() => {
+            const buttons = html.querySelectorAll('button[data-activity-id]');
+            
+            buttons.forEach(button => {
+                const activityId = button.dataset.activityId;
+                
+                // Add our own click listener with higher priority
+                button.addEventListener('click', async (event) => {
+                    
+                    
+                    // Stop the event from propagating to prevent normal execution
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.stopImmediatePropagation();
+                    
+                    // Get the item and activity
+                    const item = app.item || app.object;
+                    const activity = item?.system?.activities?.get(activityId);
+
+                    
+
+                    if (!activity) {
+                        
+                        return true; // Allow default behavior
+                    }
+
+                    const needsTargeting = needsActivityTargeting(activity);
+                    
+
+                    if (!needsTargeting) {
+                        
+                        // Re-trigger the original click without our listener
+                        button.removeEventListener('click', arguments.callee);
+                        button.click();
+                        return;
+                    }
+
+                    // Get current token
+                    const currentToken = ui.BG3HOTBAR.manager.token;
+                    if (!currentToken) {
+                        ui.notifications.warn("No token selected for targeting");
+                        return;
+                    }
+
+                    // Close the activity dialog first
+                    
+                    await app.close();
+
+                    // Get targeting requirements for this activity
+                    const requirements = getActivityTargetRequirements(activity, item);
+
+                    // Create and show target selector
+                    
+                    const targetSelector = new TargetSelector({
+                        token: currentToken,
+                        requirements: requirements
+                    });
+
+                    // Wait for target selection
+                    
+                    const selectedTargets = await targetSelector.select();
+
+                    
+
+                    // If no targets selected (cancelled), don't proceed
+                    if (!selectedTargets || selectedTargets.length === 0) {
+                        return;
+                    }
+
+                    // Set targets for the activity execution
+                    const targetIds = selectedTargets.map(t => t.id);
+                    canvas.tokens.setTargets(targetIds, { mode: "replace" });
+
+                    // Now execute the activity directly
+                    
+                    await activity.use();
+
+                    // Clear targets after a short delay
+                    setTimeout(() => {
+                        
+                        canvas.tokens.setTargets([], { mode: "replace" });
+                    }, 100);
+                    
+                }, true); // Use capture phase to intercept before other listeners
+            });
+        }, 100); // Small delay to ensure dialog is fully rendered
     }
 
     _applyMacrobarCollapseSetting() {
@@ -333,6 +477,69 @@ export class BG3Hotbar extends Application {
                 resolve();
             }, 300);
         });
+    }
+
+    /**
+     * Fix UUIDs in duplicated actor's hotbar data to point to the new actor's items
+     * @param {Actor} newActor - The newly created/duplicated actor
+     * @param {Object} containersData - The hotbar containers data
+     * @returns {Object|null} - Fixed containers data or null if no changes needed
+     */
+    async _fixDuplicatedActorUUIDs(newActor, containersData) {
+        let hasChanges = false;
+        const fixedContainers = foundry.utils.deepClone(containersData);
+        
+        // Helper function to fix UUIDs in a container
+        const fixContainerUUIDs = async (container) => {
+            if (!container?.items) return;
+            
+            for (const [slotKey, item] of Object.entries(container.items)) {
+                if (!item?.uuid) continue;
+                
+                // Check if this UUID points to an item from a different actor
+                const uuidParts = item.uuid.split('.');
+                const actorIndex = uuidParts.indexOf('Actor');
+                
+                if (actorIndex !== -1 && uuidParts[actorIndex + 1] !== newActor.id) {
+                    // This UUID points to a different actor - try to find the equivalent item in the new actor
+                    const originalItemId = uuidParts[uuidParts.length - 1];
+                    const newItem = newActor.items.get(originalItemId);
+                    
+                    if (newItem) {
+                        // Update the UUID to point to the new actor's item
+                        item.uuid = newItem.uuid;
+                        hasChanges = true;
+                        console.log(`BG3 Hotbar | Fixed UUID: ${originalItemId} -> ${newItem.uuid}`);
+                    } else {
+                        // Item doesn't exist in new actor, remove it from hotbar
+                        delete container.items[slotKey];
+                        hasChanges = true;
+                        console.log(`BG3 Hotbar | Removed missing item: ${originalItemId}`);
+                    }
+                }
+            }
+        };
+        
+        // Fix UUIDs in all container types
+        if (fixedContainers.hotbar) {
+            for (const container of fixedContainers.hotbar) {
+                await fixContainerUUIDs(container);
+            }
+        }
+        
+        if (fixedContainers.weapon) {
+            for (const container of fixedContainers.weapon) {
+                await fixContainerUUIDs(container);
+            }
+        }
+        
+        if (fixedContainers.combat) {
+            for (const container of fixedContainers.combat) {
+                await fixContainerUUIDs(container);
+            }
+        }
+        
+        return hasChanges ? fixedContainers : null;
     }
 
     async generate(token) {

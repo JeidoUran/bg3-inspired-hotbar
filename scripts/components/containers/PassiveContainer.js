@@ -18,8 +18,16 @@ export class PassiveContainer extends BG3Component {
     get passivesList() {
         if(!this.token && !this.actor) return null;
 
-        const availablePassives = this.actor.items.filter(item => item.type === "feat" && (!item.system.activation?.type || item.system.activation.type === "passive"));
-        return this.selectedPassives?.size ? availablePassives.filter(item => this.selectedPassives.has(item.uuid)) : availablePassives;
+        // Early return if no selected passives
+        if (!this.selectedPassives?.size) return [];
+
+        // Filter actor's items to only show selected passives that are actually passive
+        return this.actor.items.filter(item => 
+            item.type === "feat" && 
+            this.selectedPassives.has(item.uuid) &&
+            item.system.activities instanceof Map && 
+            item.system.activities.size === 0
+        );
     }
 
     get selectedPassives() {
@@ -39,7 +47,12 @@ export class PassiveContainer extends BG3Component {
                 
         // Get all available passive features from the actor
         const availableFeatures = this.actor.items
-            .filter(item => item.type === "feat" && (!item.system.activation?.type || item.system.activation.type === "passive"))
+            .filter(item => {
+                // Only include feats with no activities (passive features)
+                return item.type === "feat" && 
+                       item.system.activities instanceof Map && 
+                       item.system.activities.size === 0;
+            })
             .map(item => ({
                 uuid: item.uuid,
                 name: item.name,
@@ -98,15 +111,20 @@ export class PassiveContainer extends BG3Component {
             });
         }, 100);
     }
-
+    
     async render() {
         await super.render();
         const passivesList = this.passivesList;
-        // if(passivesList.length === 0) this.element.style.visibility = 'hidden';
-
-        const passives = passivesList.map((passive) => new PassiveButton({item: passive}, this));
-        for(const passive of passives) this.element.appendChild(passive.element);
-        await Promise.all(passives.map((passive) => passive.render()));
+        
+        // Clear existing content
+        this.element.innerHTML = '';
+        
+        // Only render passives if there are selected ones
+        if (passivesList && passivesList.length > 0) {
+            const passives = passivesList.map((passive) => new PassiveButton({item: passive}, this));
+            for(const passive of passives) this.element.appendChild(passive.element);
+            await Promise.all(passives.map((passive) => passive.render()));
+        }
 
         return this.element;
     }
