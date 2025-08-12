@@ -486,6 +486,8 @@ export class ItemUpdateManager {
 
     async _handleItemCreate(item, options, userId) {
         if (!ui.BG3HOTBAR.manager || game.user.id !== userId) return;
+        // Skip auto-add when caller explicitly requests it (e.g., CPR common actions bootstrap)
+        if (options?.noBG3AutoAdd) return;
 
         // Get the actor that received the item
         const itemActor = item.parent;

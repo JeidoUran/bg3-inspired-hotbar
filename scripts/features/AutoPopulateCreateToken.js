@@ -113,7 +113,7 @@ export class AutoPopulateCreateToken {
                 }
             }
 
-            if(token.actor.type !== 'character' && ((!token.actorLink && (game.settings.get(BG3CONFIG.MODULE_NAME, 'autoPopulateUnlinkedTokens') || force)) || (token.actorLink && (game.settings.get(BG3CONFIG.MODULE_NAME, 'autoPopulateLinkedTokens') || force)))) {
+            if((!token.actorLink && (game.settings.get(BG3CONFIG.MODULE_NAME, 'autoPopulateUnlinkedTokens') || force)) || (token.actorLink && (game.settings.get(BG3CONFIG.MODULE_NAME, 'autoPopulateLinkedTokens') || force))) {
                 // Get settings for each container
                 const container1Setting = game.settings.get(BG3CONFIG.MODULE_NAME, 'container1AutoPopulate');
                 const container2Setting = game.settings.get(BG3CONFIG.MODULE_NAME, 'container2AutoPopulate');
@@ -315,7 +315,8 @@ export class AutoPopulateCreateToken {
 
             if (toCreate.length) {
                 const docs = await Promise.all(toCreate.map(async (_id) => pack.getDocument(_id)));
-                const created = await actor.createEmbeddedDocuments('Item', docs);
+                // Suppress hotbar auto-add during CPR common actions creation
+                const created = await actor.createEmbeddedDocuments('Item', docs, { noBG3AutoAdd: true });
                 ids = ids.concat(created.map((i) => i.uuid));
             }
         } else {

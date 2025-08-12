@@ -1,3 +1,7 @@
+## [3.4.2] - 2025-08-08
+### Fixed
+- **Unlinked Tokens Autopopulate** - Fixed breaking bug getting caught with populating common actions container
+
 ## [3.4.1] - 2025-08-08
 ### Fixed
 - **Active Effects** - Fixed active effects not re-enabling or able to be deleted if disabled
