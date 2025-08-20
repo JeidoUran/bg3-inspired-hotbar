@@ -48,11 +48,42 @@ export class PortraitContainer extends BG3Component {
         return (async () => {
             const savedData = await game.settings.get(BG3CONFIG.MODULE_NAME, 'dataExtraInfo'),
                 extraInfos = [];
-            for(let i = 0; i < savedData.length; i++) {
+            for (let i = 0; i < savedData.length; i++) {
                 let extraData = {};
-                if(savedData[i].attr && savedData[i].attr !== '') {
-                    const attr = foundry.utils.getProperty(this.actor.system, savedData[i].attr) ?? foundry.utils.getProperty(this.actor.system, savedData[i].attr + ".value") ?? this._getInfoFromSettings(savedData[i].attr);
-                    if(attr) extraData = {icon: savedData[i].icon, value: attr, color: savedData[i].color};
+                const key = savedData[i].attr;
+                if (key && key !== '') {
+                    let value = null;
+                    try {
+                        // Literal value support: prefix with '=' to render as-is
+                        if (key.startsWith('=')) {
+                            value = key.slice(1);
+                        } else {
+                            // 1) Try absolute actor path (supports flags.* and other actor props)
+                            value = foundry.utils.getProperty(this.actor, key);
+                            // 2) Fallback to system path and common ".value" nesting
+                            if (value === undefined || value === null) {
+                                value = foundry.utils.getProperty(this.actor.system, key) ?? foundry.utils.getProperty(this.actor.system, `${key}.value`);
+                            }
+                            // 3) If flags.<namespace>.<key> format, try getFlag explicitly
+                            if ((value === undefined || value === null) && key.startsWith('flags.')) {
+                                const parts = key.split('.');
+                                if (parts.length >= 3) {
+                                    const namespace = parts[1];
+                                    const flagKey = parts.slice(2).join('.');
+                                    value = this.actor.getFlag(namespace, flagKey);
+                                }
+                            }
+                            // 4) Fallback to module setting string: module.setting
+                            if (value === undefined || value === null) {
+                                value = this._getInfoFromSettings(key);
+                            }
+                        }
+                    } catch (error) {
+                        // Ignore resolution errors and leave value as null
+                    }
+                    if (value !== undefined && value !== null && value !== '') {
+                        extraData = { icon: savedData[i].icon, value: value, color: savedData[i].color };
+                    }
                 }
                 extraInfos.push(extraData);
             }

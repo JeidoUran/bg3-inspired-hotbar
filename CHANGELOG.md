@@ -1,3 +1,16 @@
+## [3.4.3] - 2025-08-16
+### Added
+- **Portrait Extra Data**: Support custom flags in portrait extra data (e.g., `flags.custom-dnd5e.rdpg`) and literal values via `=15`. (Related Issue: [#229])
+
+### Fixed
+- **Auto Sort and Spell Sorting**: Spells sort by level (cantrip–9) then alphabetically; all other types sort alphabetically. (Related Issue: [#244])
+- **Lock Button Icon**: Icon now correctly switches between locked and unlocked states.
+- **Hotbar Auto-Update on Item Create**: Newly added items appear immediately on the hotbar for the current token without requiring a manual re-render.
+- **Item Context Menu Visibility**: Edit/Configure/Remove options only show when a cell has an item.
+- **NPC Common Actions**: Corrected typo preventing vehicle handling during autopopulate (`vehicule` -> `vehicle`).
+- **Extended Filter Sync**: After item deletion via sheet, the extended filter updates to stay in sync.
+- **Spell Prep Warning**: Removed deprecation warning by using `method`/`prepared` instead of `preparation`.
+
 ## [3.4.2] - 2025-08-08
 ### Fixed
 - **Unlinked Tokens Autopopulate** - Fixed breaking bug getting caught with populating common actions container

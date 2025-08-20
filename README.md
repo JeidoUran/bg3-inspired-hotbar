@@ -52,6 +52,17 @@ Check out my other module(s):
     - Left-click an effect to toggle it.
     - Right-click to remove an effect.
 
+## Troubleshooting: Unlinked tokens that were previously linked
+
+If an unlinked token is missing actions or shows mismatched entries (e.g., common actions in the Combat container pointing to the base actor instead of the token), follow these steps to fully reset the token’s hotbar data:
+
+1. Re-enable “Link Actor Data” for the actor’s base prototype token.
+2. Drag a linked token for this actor onto the canvas.
+3. Completely clear the BG3 hotbar for that token (all hotbar containers, Weapons, Combat/Common Actions) and ensure Passive and Active effects panels show nothing.
+4. Delete the placed token.
+5. Open the actor’s prototype token again and uncheck “Link Actor Data” to make tokens unlinked.
+6. Place a new unlinked token onto the canvas. The module will auto-populate it cleanly.
+
 ## Acknowledgments
 
 This module is an independent fan creation, drawing inspiration from the excellent UI/UX design of Baldur's Gate 3. Special thanks to:

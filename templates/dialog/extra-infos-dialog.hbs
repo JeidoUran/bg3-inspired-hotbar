@@ -1,5 +1,11 @@
 <form>
     <p>Blank attributes won't be displayed.</p>
+    <p class="notes">
+        Supported values:
+        - Actor/System paths (e.g., <code>attributes.ac.value</code>)
+        - Custom flags (e.g., <code>flags.custom-dnd5e.rdpg</code>)
+        - Literal values prefixed with <code>=</code> (e.g., <code>=15</code> for static values)
+    </p>
     <div class="dialog-container">
         {{#each extraInfos}}
         <div class="container-section">
@@ -7,7 +13,7 @@
                 <p class="notes">{{pos}}</p>
                 <div class="form-group">
                     <label for="attr{{@index}}">Attribute</label>
-                    <input type="text" class="attr" name="attr{{@index}}" value="{{attr}}">
+                    <input type="text" class="attr" name="attr{{@index}}" value="{{attr}}" title="Examples: system.attributes.ac.value, flags.custom-dnd5e.rdpg, =15">
                     <select class="list-attr">
                         <option></option>
                         {{#each ../listAttrChoices as |attrs|}}

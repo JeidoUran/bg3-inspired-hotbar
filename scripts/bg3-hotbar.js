@@ -136,7 +136,22 @@ export class BG3Hotbar extends Application {
 
     async _onUpdateToken(token, changes, options, userId) {
         if (!this.manager || game.user.id !== userId) return;
-        // If this is our current token and actor-related data changed
+        // If token was switched from linked to unlinked, reset stored data and repopulate
+        if (changes?.actorLink === false) {
+            try {
+                console.log("BG3 Hotbar | Detected link->unlink. Resetting and autopopulating hotbar for token:", token.name);
+                await this.manager.cleanupTokenData(token.id);
+                await AutoPopulateCreateToken.populateUnlinkedToken(token, true);
+                if (token.id === this.manager.currentTokenId) {
+                    await this.generate(token);
+                }
+                console.log("BG3 Hotbar | Completed reset and autopopulate for unlinked token:", token.name);
+                return;
+            } catch (e) {
+                console.error("BG3 Hotbar | Error resetting hotbar for unlinked token:", e);
+            }
+        }
+        // If this is our current token and other actor-related data changed
         if (token.id === this.manager.currentTokenId && (changes.actorId || changes.actorData || changes.actorLink)) {
             this.refresh();
         }
@@ -199,6 +214,24 @@ export class BG3Hotbar extends Application {
         
         if(changes?.flags?.[BG3CONFIG.MODULE_NAME] && game.user.id !== userId) return this.manager.socketUpdateData(actor, changes);
         
+        // Detect prototype token link->unlink toggles (v13): apply reset+autopopulate to placed tokens for this actor
+        if (changes?.prototypeToken?.actorLink === false) {
+            try {
+                console.log(`BG3 Hotbar | Prototype token link disabled for actor "${actor.name}". Resetting any unlinked placed tokens for this actor.`);
+                const affected = canvas.tokens.placeables.filter(t => t.actor?.id === actor.id && t.actorLink === false);
+                for (const token of affected) {
+                    await this.manager.cleanupTokenData(token.id);
+                    await AutoPopulateCreateToken.populateUnlinkedToken(token, true);
+                    if (token.id === this.manager.currentTokenId) {
+                        await this.generate(token);
+                    }
+                }
+                console.log(`BG3 Hotbar | Processed ${affected.length} placed token(s) for actor "${actor.name}" after prototype unlink.`);
+            } catch (e) {
+                console.error("BG3 Hotbar | Error processing prototype unlink reset:", e);
+            }
+        }
+
         // if (game.user.id !== userId) return;
         
         // Check if this update affects our current token
@@ -552,7 +585,7 @@ export class BG3Hotbar extends Application {
                 return;
             }
         } else this.manager.currentTokenId = token.id;
-        this.manager._loadTokenData();
+        await this.manager._loadTokenData();
         this.render(true);
     }
 
